@@ -1,0 +1,14 @@
+Name:               Project
+Version:            1.0
+Cabal-Version:      >= 1.2
+License:            GPL
+Author:             Menschen
+Synopsis:           One line synopsis
+Description:        Bigger decription
+Build-Type:         Simple
+
+Executable reports
+  Main-Is:          Main.hs
+  Build-Depends:    base >= 3 && < 5, haskell98
+  GHC-Options:      -O2 -Wall
+  Hs-Source-Dirs:   src/
