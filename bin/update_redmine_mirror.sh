@@ -1,2 +1,2 @@
 # !/bin/sh
-cd /home/redmine/repos/afp2009.git && git fetch origin && git reset refs/remotes/origin/master
+env -i && cd /home/redmine/repos/afp2009.git && git fetch origin && git reset refs/remotes/origin/master

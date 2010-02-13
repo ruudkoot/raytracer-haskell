@@ -1,3 +1,2 @@
 # !/bin/sh
-
-git --git-dir /home/afp2009/instance/.git pull
+env -i && cd /home/afp2009/instance && git fetch origin && git reset refs/remotes/origin/master
