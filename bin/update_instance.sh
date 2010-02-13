@@ -1,3 +1,2 @@
 # !/bin/sh
-cd ~afp2009/instance
-git pull
+cd /home/afp2009/instance/ && git pull
