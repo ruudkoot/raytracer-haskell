@@ -1,2 +1,2 @@
 # !/bin/sh
-cd /home/afp2009/instance && env -i git reset --hard
+cd /home/afp2009/instance && env -i git pull
