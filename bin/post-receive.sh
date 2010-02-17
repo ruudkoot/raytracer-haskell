@@ -19,8 +19,11 @@ cabal test &&
 # Generate Haddock documentation
 cabal --executable haddock &&
 
+# Copy website
+cp -r www/ /var/www/projects/afp2009/
+
 # Copy generated docs TODO
-cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009
+cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/
 
 # Run Hlint on all haskell source files
 find -name "*.hs" | xargs hlint
