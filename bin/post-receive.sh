@@ -20,6 +20,7 @@ cabal test &&
 cabal --executable haddock &&
 
 # Copy generated docs TODO
+cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009
 
 # Run Hlint on all haskell source files
 find -name "*.hs" | xargs hlint
