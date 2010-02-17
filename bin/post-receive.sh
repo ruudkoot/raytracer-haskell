@@ -1,5 +1,7 @@
 #!/bin/sh 
 
+# Update PATH so that cabal can find the right executables
+PATH="/home/afp2009/.cabal/bin:$PATH"
 
 # Update instance
 ./update_instance.sh && 
@@ -20,5 +22,5 @@ cabal --executable haddock &&
 # Copy generated docs TODO
 
 # Run Hlint on all haskell source files
-find -name "*.hs" | xargs ~/.cabal/bin/hlint
+find -name "*.hs" | xargs hlint
 
