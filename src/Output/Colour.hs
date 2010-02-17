@@ -1,9 +1,8 @@
-module Colour where 
+module Output.Colour where 
 
 
 -- | This module should probably move elsewhere 
 --
-
 
 
 newtype Colour a = Colour (a, a, a)

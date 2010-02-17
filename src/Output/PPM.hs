@@ -1,7 +1,7 @@
-module PPM where 
+module Output.PPM where 
 
-import Colour
-import Output 
+import Output.Colour
+import Output.Output 
 
 
 -- | Converts the colours to a String in PPM format.
