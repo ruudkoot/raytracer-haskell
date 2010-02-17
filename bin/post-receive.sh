@@ -20,5 +20,5 @@ cabal --executable haddock &&
 # Copy generated docs TODO
 
 # Run Hlint on all haskell source files
-find -name "*.hs" | xargs hlint
+find -name "*.hs" | xargs ~/.cabal/bin/hlint
 
