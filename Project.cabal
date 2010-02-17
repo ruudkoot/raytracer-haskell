@@ -1,14 +1,14 @@
-Name:               Project
+Name:               RayTracer
 Version:            1.0
 Cabal-Version:      >= 1.2
 License:            GPL
-Author:             Menschen
-Synopsis:           One line synopsis
-Description:        Bigger decription
+Author:             Alessandro Vermeulen, Bart Spaans, Bram Schuur, Ruud Koot, Thijs Alkemade
+Synopsis:           Ray Tracer 
+Description:        Ray Tracer
 Build-Type:         Simple
 
-Executable reports
-  Main-Is:          Main.hs
+Executable raytrace
+  Main-Is:          Project.hs
   Build-Depends:    base >= 3 && < 5, haskell98
   GHC-Options:      -O2 -Wall
   Hs-Source-Dirs:   src/
