@@ -20,7 +20,7 @@ cabal test &&
 cabal --executable haddock &&
 
 # Copy website
-cp -r www/ /var/www/projects/afp2009/
+cp -r www/* /var/www/projects/afp2009/
 
 # Copy generated docs TODO
 cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/
