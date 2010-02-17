@@ -1,8 +1,6 @@
-module Output.PPM where 
+module Output.PPM (toPPM) where 
 
-import Output.Colour
 import Output.Output 
-
 
 -- | Converts the colours to a String in PPM format.
 -- Returns Nothing if the length of the list does 
