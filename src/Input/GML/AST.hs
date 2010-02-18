@@ -1,6 +1,6 @@
 module Input.GML.AST where
 
-newtype TokenList = [TokenGroup]
+newtype TokenList = TokenList [TokenGroup]
 
 data TokenGroup = TokenS        Token 
                 | TokenFunction TokenList

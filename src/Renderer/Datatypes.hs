@@ -1,13 +1,24 @@
 module Renderer.Datatypes where
   
-type Point = (Real, Real, Real)
+import qualified Shared.Colour (Colour)
+import qualified Shared.Vector (Point3D, Vector3D)
+
+type Point3D = Shared.Vector.Point3D Double
+type Vector3D = Shared.Vector.Vector3D Double
+
+type Colour = Shared.Colour.Colour Int
+
+
+-- | The global datatype, also referenced to as `scene'. We pushed down some
+-- of the parameters as stated in the render function of gml for ease.
+data World surface = World 
+  {
+    options :: RenderOptions
+  , object  :: RenderObject surface
+  , lights  :: [RenderLight]
+  }
   
-data World = World RenderOptions
-                   RenderObject
-                   [RenderLights]
-                   -- AmbientLight
-    
--- Type inference causes restriction Surface a => on the a
+-- | Type inference causes restriction Surface a => on the a
 data RenderObject a = Sphere a
                   | Cube a
                   | Cylinder a
@@ -23,16 +34,34 @@ data RenderObject a = Sphere a
                   | Intersect (RenderObject a) (RenderObject a)
                   | Difference (RenderObject a) (RenderObject a) 
                   
+data RenderLight = RenderLight 
+  {
+    position  :: Point3D
+  , intensity :: Point3D
+  }
                   
-class Surface b where
-  shade :: -> a
+
+-- | Our |Shader| mechanism.
+-- Example: 
+-- instance Shader GML where
+--   shade surface ray = eval surface ray       
+class Shader s where
+  shade :: s -> Ray -> a
+
 
 data RenderOptions = RenderOptions
   {
-    amb   :: Point
-    depth :: Int
-    fov   :: Double
-    wid   :: Int
-    ht    :: Int
-    file  :: FilePath
+    ambience :: Colour -- amb
+  , depth    :: Int
+  , fov      :: Double -- fov
+  , width    :: Int -- wid
+  , height   :: Int -- ht
+  , file     :: FilePath
+  }
+  
+
+data Ray = Ray 
+  {
+    origin    :: Vector3D
+  , direction :: Vector3D
   }

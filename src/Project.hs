@@ -1,5 +1,9 @@
 module Main where 
 
+import Input.GML.AST
+--
+import Renderer.Datatypes
+--
 import Output.Output
 import Output.PPM
 
