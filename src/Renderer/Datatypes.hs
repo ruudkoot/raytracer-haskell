@@ -1,9 +1,9 @@
 module Renderer.Datatypes where
   
 import qualified Shared.Colour (Colour)
-import qualified Shared.Vector (Point3D, Vector3D)
+import qualified Shared.Vector (Vector3D)
 
-type Point3D = Shared.Vector.Point3D Double
+type Point3D = Shared.Vector.Vector3D Double
 type Vector3D = Shared.Vector.Vector3D Double
 
 type Colour = Shared.Colour.Colour Int
