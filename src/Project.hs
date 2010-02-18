@@ -1,6 +1,7 @@
 module Main where 
 
 import Input.GML.AST
+import Input.GML.Parser
 --
 import Renderer.Datatypes
 --
