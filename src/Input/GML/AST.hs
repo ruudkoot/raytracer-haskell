@@ -38,8 +38,8 @@ instance Arbitrary Token where
                       ,liftM TokenString genString]
 
 --Generate a list of chars satisfied by one of the functions
-allChars::[(Char->Bool)]->[Char]
-allChars fs = filter (\c -> (or.map (\f -> f c)) fs) (map chr [32..255])
+allChars::[Char->Bool]->String
+allChars fs = filter (\c -> (any (\f -> f c)) fs) (map chr [32..255])
 
 genIdent::Gen String
 genIdent = (listOf1.oneof.map return.allChars) [isLetter,isDigit,(=='-'),(=='_')]

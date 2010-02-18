@@ -51,5 +51,5 @@ parseBoolean =  Boolean True  <$ reserved gmlLexer "true"
 
 parseNumber::Parser NumberVal
 parseNumber =  DoubleVal             <$> float gmlLexer
-           <|> (IntVal).fromInteger  <$> integer gmlLexer
+           <|> IntVal . fromInteger  <$> integer gmlLexer
            <?> "number"
