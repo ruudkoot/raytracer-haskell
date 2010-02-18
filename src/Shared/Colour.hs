@@ -1,4 +1,4 @@
-module Output.Colour where 
+module Shared.Colour where 
 
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'

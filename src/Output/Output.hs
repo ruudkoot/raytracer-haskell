@@ -1,10 +1,10 @@
 module Output.Output ( Size(..), fromSize,
 		       Width, Height, ImageWriter,
-		       module Output.Colour
+		       module Shared.Colour
                      ) where
 
 
-import Output.Colour
+import Shared.Colour
 
 
 -- | Size is a positive integer (i.e. a natural number)
