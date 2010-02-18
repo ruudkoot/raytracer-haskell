@@ -154,9 +154,9 @@ dot v1 v2 = foldVector sum (v1 * v2)
 --
 crossProduct :: Num a => Vector3D a -> Vector3D a -> Vector3D a
 crossProduct (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) = 
-  Vector3D ((y1 * z2 - z1 * y2),
-            (z1 * x2 - x1 * z2),
-            (x1 * y2 - y1 * z2))
+  Vector3D (y1 * z2 - z1 * y2,
+            z1 * x2 - x1 * z2,
+            x1 * y2 - y1 * z2)
 
 
 -- | Calculates the length or magnitude of the given Vector.
@@ -172,7 +172,7 @@ magnitude' :: (Vector v, Integral a, Num (v a), Num (v Double)) => v a -> Double
 magnitude' = magnitude . fmap fromIntegral
 
 
--- | Normalize the length of the vector to @1.0@.
+-- | Normalize the length of a vector to @1.0@.
 --
 normalize :: (Vector v, Floating a, Num (v a)) => v a -> v a 
 normalize v1 = pure (1 / magnitude v1) * v1
