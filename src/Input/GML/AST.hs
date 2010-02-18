@@ -39,7 +39,7 @@ instance Arbitrary Token where
 
 --Generate a list of chars satisfied by one of the functions
 allChars::[Char->Bool]->String
-allChars fs = filter (\c -> (any (\f -> f c)) fs) (map chr [32..255])
+allChars fs = filter (\c -> any (\f -> f c) fs) (map chr [32..255])
 
 genIdent::Gen String
 genIdent = (listOf1.oneof.map return.allChars) [isLetter,isDigit,(=='-'),(=='_')]
