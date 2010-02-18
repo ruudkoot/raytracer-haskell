@@ -16,8 +16,7 @@ import Control.Applicative
 -- | Vectors in its most general form can be used 
 -- to fold and zip with. When the instance of Vector 
 -- is carrying Numerical values, they can also 
--- be used as built-in numerical values. 
--- For example: @2 * Vector3D (1,2,3)@
+-- be used as Nums. For example: @2 * Vector3D (1,2,3)@
 --
 class (Applicative v) => Vector v where 
   fromVector :: v a -> [a]
@@ -137,7 +136,6 @@ instance (Num a, Vector v, Show (v a), Eq (v a)) => Num (v a) where
 
 -- * Vector Operations
 -- The class constraints in the following definitions are also pretty awful 
--- (see the source for more details if you are reading this comment from haddock)
 
 
 -- | The dot product is an operation that takes two equal-length Vectors 
