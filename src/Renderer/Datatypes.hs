@@ -18,7 +18,7 @@ data World surface = World
   , lights  :: [RenderLight]
   }
   
--- | Type inference causes restriction `Shader a` => on the a
+-- | Type inference causes restriction 'Shader' a => on the a
 data RenderObject a = Sphere a
                   | Cube a
                   | Cylinder a
@@ -41,7 +41,7 @@ data RenderLight = RenderLight
   }
                   
 
--- | Our |Shader| mechanism.
+-- | Our 'Shader' mechanism.
 -- Example: 
 -- instance Shader GML where
 --   shade surface ray = eval surface ray       
