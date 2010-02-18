@@ -1,3 +1,7 @@
+-- | Colours are represented as a triple (r, g, b) which has been 
+-- made polymorphic. This enables us to use Colour Int for 
+-- displaying purposes and Colour Double for calculations.
+-- 
 module Shared.Colour where 
 
 
@@ -19,7 +23,7 @@ colourToList :: Colour a -> [a]
 colourToList (Colour (r, g, b)) = [r, g, b]
 
 
--- | Clamps the values in Colour, given a minimal and 
+-- | Clamps the values in Colour, given a minimum and 
 -- maximum value.
 --
 clampColour :: Ord a => a -> a -> Colour a -> Colour a
