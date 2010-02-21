@@ -1,0 +1,108 @@
+Planning
+--------
+
+  * Split in modules
+    Since the project is quite an undertaking
+    we have thought of some modules that 
+    we're definitely going to need and made 
+    a general design for them (which 
+    involved agreeing on the data types).
+    This means the parser, evaluator, renderer 
+    and output functions can be build separately.
+
+
+  * Agile (ie. no planning at all :P)
+    We currently have little else planned 
+    out and hope the code will magically 
+    crystalize as it often does.
+
+    We have scheduled weekly-ish meetings 
+    and will probably change our workflow
+    as the project moves on.
+
+
+Design Decisions
+----------------
+
+  * Modularity
+      We want to be able to try out other 
+      solutions and extend functionality 
+      without rewriting too much.
+      To make this easier, we've come up 
+      with a couple of design decisions:
+      
+      * Polymorphic Data Structures
+          Where it could be beneficial to do so, 
+          we're going for the most general data 
+          structure and types.
+          
+          This means we can reuse more code and
+          refactor more easily. This also might 
+          enable us to instantiate higher order 
+          structures (Functor, Applicative, 
+          Monad, etc.) which enhances readability 
+          and makes us write canonical Haskell.
+          
+          For an example compare:
+              type Vector3D = (Double, Double, Double)
+          to 
+              type Vector3D a = (a, a, a)
+
+      * Using classes  
+         Instead of capturing functionality at 
+         the function type level, we'll try 
+         to move it into a class; and give 
+         the function a class constraint.
+         This can make the types a little 
+         more involved, but makes extensibility
+         trivial.
+
+         Example:
+             
+             shader :: GML -> Params -> Color
+         Becomes:
+             shader :: (ShaderLang a) => a -> Params a -> Color
+         Where:
+             class ShaderLang a where 
+               shade :: a -> Params a -> Color     
+         
+         This means we can come back later and 
+         implement another language or EDSL, 
+         without needing to rewrite everything.
+         
+
+  * Parser combinators instead of Alex + Happy 
+      Parsing is most likely not going to be the 
+      bottleneck here and parser combinators 
+      map nicely to EBNF; so we've opted to keep 
+      it simple and readable.
+
+
+  * Testing
+      To be able to write our own Arbitrary 
+      instances we'll probably need to use
+      more newtypes. 
+
+
+Progress
+--------
+
+  Our build server is completely functional. We have...
+
+    * ...a centralized git repository; via ssh and key authorization
+    * ...a bug-tracker and wiki with integrated git support   (Redmine)
+    * ...a git hook script that on commit: 
+            * sends e-mail and IRC commit notifications
+            * builds the project and haddock documentation
+            * runs the test suite and hlint
+
+  On the software side we have..
+
+   * ...a parser and AST 
+   * ...data types for the renderer
+   * ...a Vector module
+   * ...a Colour module
+   * ...a PPM module 
+   * ...a global module design.
+
+  Dit was mijn spreekbeurt; zijn er nog vragen?
