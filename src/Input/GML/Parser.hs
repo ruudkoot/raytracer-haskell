@@ -1,4 +1,4 @@
-module Input.GML.Parser (parseGML) where
+module Input.GML.Parser (parseGML, parseNumber) where
 import Text.ParserCombinators.Parsec.Token
 import Data.Ratio
 import Control.Monad
