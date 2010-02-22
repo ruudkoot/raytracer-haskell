@@ -1,0 +1,3 @@
+Pagina over iets met raytracen in ocaml, kwam ik tegen toen ik op zoek was naar
+een voorbeeld gml file:
+http://moscova.inria.fr/~maranget/papers/jocamlrus/jocamlrus005.html

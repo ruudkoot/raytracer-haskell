@@ -6,16 +6,21 @@ import qualified Shared.Vector (Vector3D)
 type Point3D = Shared.Vector.Vector3D Double
 type Vector3D = Shared.Vector.Vector3D Double
 
-type Colour = Shared.Colour.Colour Int
+type Colour = Shared.Colour.Colour Double
+
+newtype Degrees     = Degrees Double
+newtype Attenuation = Attenuation Double
 
 
 -- | The global datatype, also referenced to as `scene'. We pushed down some
--- of the parameters as stated in the render function of gml for ease.
+-- of the parameters as stated in the render function of gml for ease. We are
+-- not entirely sure whether the `union' representation of the objects is 
+-- workable for us.
 data World surface = World 
   {
-    options :: RenderOptions
-  , object  :: RenderObject surface
-  , lights  :: [RenderLight]
+    wOptions :: RenderOptions
+  , wObject  :: RenderObject surface
+  , wLights  :: [RenderLight]
   }
   
 -- | Type inference causes restriction 'Shader' a => on the a
@@ -33,13 +38,44 @@ data RenderObject a = Sphere a
                   | Union (RenderObject a) (RenderObject a)
                   | Intersect (RenderObject a) (RenderObject a)
                   | Difference (RenderObject a) (RenderObject a) 
+          
                   
-data RenderLight = RenderLight 
+data RenderLight
+  -- | Light source at pos infinity.
+  = DirectLight 
   {
-    position  :: Point3D
-  , intensity :: Point3D
+    dlDirection  :: Point3D
+  , dlColor      :: Point3D
   }
-                  
+  -- | Point light source
+  | PointLight 
+  {
+    plPosition :: Point3D
+  , plColor    :: Point3D
+  }
+  -- | Spotlight with cutoff
+  | SpotLight 
+  {
+    slPosition    :: Point3D
+  , slTarget      :: Point3D
+  , slCutoff      :: Double -- Degrees
+  , slAttenuation :: Double -- ???
+  }        
+    
+  -- dir color  light  l
+  --  creates a directional light source at infinity with direction dir and intensity color. Both dir and color are specified as point values.
+  --  pos color  pointlight  l
+  --  creates a point-light source at the world coordinate position pos with intensity color. Both pos and color are specified as point values. Pointlights are a Tier-2 feature.
+  -- 
+  --  pos at color cutoff exp  spotlight  l
+  --  creates a spotlight source at the world coordinate position pos pointing
+  --  towards the position at. The light's color is given by color. The
+  --  spotlight's cutoff angle is given in degrees by cutoff and the attenuation
+  --  exponent is given by exp (these are real numbers). The intensity of the
+  --  light from a spotlight at a point Q is determined by the angle between the
+  --  light's direction vector (i.e., the vector from pos to at) and the vector
+  --  from pos to Q. If the angle is greater than the cutoff angle, then intensity
+  --  is zero; otherwise the intensity is given by the equation
 
 -- | Our 'Shader' mechanism.
 -- Example: 
@@ -51,17 +87,17 @@ class Shader s where
 
 data RenderOptions = RenderOptions
   {
-    ambience :: Colour -- amb
-  , depth    :: Int
-  , fov      :: Double -- fov
-  , width    :: Int -- wid
-  , height   :: Int -- ht
-  , file     :: FilePath
+    roAmbience :: Colour -- amb
+  , roDepth    :: Int
+  , roFov      :: Double -- fov
+  , roWidth    :: Int -- wid
+  , roHeight   :: Int -- ht
+  , roFile     :: FilePath
   }
   
 
 data Ray = Ray 
   {
-    origin    :: Vector3D
-  , direction :: Vector3D
+    rOrigin    :: Vector3D
+  , rDirection :: Vector3D
   }

@@ -64,7 +64,7 @@ Design Decisions
              shader :: (ShaderLang a) => a -> Params a -> Color
          Where:
              class ShaderLang a where 
-               shade :: a -> Params a -> Color     
+               shade :: a -> Ray -> Color     
          
          This means we can come back later and 
          implement another language or EDSL, 
