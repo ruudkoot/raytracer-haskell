@@ -6,6 +6,8 @@ import Input.GML.ApplicativeParsec
 import Input.GML.AST
 import Data.Char
 
+
+--Definitions for the lexer created by parsec, see parsec documentation 2.8/2.9 and refernce guide
 gmlDef::LanguageDef a
 gmlDef
  = LanguageDef
@@ -22,6 +24,7 @@ gmlDef
    , caseSensitive  = False
    }
 
+--Parsec lexer
 gmlLexer::TokenParser a
 gmlLexer = makeTokenParser gmlDef
 
@@ -55,6 +58,7 @@ parseBoolean =  Boolean True  <$ reserved gmlLexer "true"
             <|> Boolean False <$ reserved gmlLexer "false" 
             <?> "boolean"
 
+--Customized number lexer, parsec's standard number lexer is not signed, so added that
 parseNumber::Parser NumberVal
 parseNumber =  do sign <- option 1 (-1 <$ char '-')
                   num <- naturalOrFloat gmlLexer

@@ -3,6 +3,7 @@ import Test.QuickCheck
 import Data.Char
 import Control.Monad
 
+--AST defition following the specification in chapter 2.1 of the assignment
 type GML = TokenList
 
 newtype TokenList = TokenList [TokenGroup] deriving (Show,Eq)
@@ -29,7 +30,8 @@ instance Eq NumberVal where
     (==) (DoubleVal d1) (DoubleVal d2) = abs (d1-d2) < 0.00001
     (==) _ _ = False
 
---Algebra
+
+--Algebra for folding GML AST's
 type GmlAlgebra ls gr tok num = ([gr] -> ls --TokenList
 
                                 ,(tok  -> gr, --TokenS
@@ -63,7 +65,7 @@ foldGML (list,(tok,func,arr),(ident,bind,bool,nm,str),(intv,doubv)) = foldList
             foldNumber (IntVal i)       = intv i
             foldNumber (DoubleVal d)    = doubv d
 
---Algebra for printing GML
+--Algebra for printing GML, uses a very basic strategy, not pretty!
 simplePrintAlg::GmlAlgebra String String String String
 simplePrintAlg = (list,(tok,func,arr),(ident,bind,bool,num,str),(intv,doubv))
     where   list    = concat 
