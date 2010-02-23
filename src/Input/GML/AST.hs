@@ -3,6 +3,8 @@ import Test.QuickCheck
 import Data.Char
 import Control.Monad
 
+type GML = TokenList
+
 newtype TokenList = TokenList [TokenGroup] deriving (Show,Eq)
 
 data TokenGroup = TokenS        Token 
@@ -19,9 +21,70 @@ data Token = Identifier  String
 
 data NumberVal = IntVal    Int
                | DoubleVal Double
-                deriving (Show,Eq)
+                deriving (Show)
 
---Arbitrary instances
+--Needed for overiding double equality to account for rounding errors in tests
+instance Eq NumberVal where
+    (==) (IntVal i1) (IntVal i2)       = i1 == i2
+    (==) (DoubleVal d1) (DoubleVal d2) = abs (d1-d2) < 0.00001
+
+--Algebra
+type GmlAlgebra ls gr tok num = ([gr] -> ls --TokenList
+
+                                ,(tok  -> gr, --TokenS
+                                  ls   -> gr, --TokenFunction
+                                  ls   -> gr) --TokenArray
+
+                                ,(String    -> tok, --Identifier
+                                  String    -> tok, --Binder
+                                  Bool      -> tok, --Boolean
+                                  num       -> tok, --Number
+                                  String    -> tok) --TokenString
+
+                                ,(Int    -> num, --IntVal
+                                  Double -> num)) --DoubleVal
+
+--GML fold
+foldGML::GmlAlgebra ls gr tok num -> GML -> ls
+foldGML (list,(tok,func,arr),(ident,bind,bool,nm,str),(intv,doubv)) = foldList
+    where   foldList (TokenList l)      = list (map foldGroup l)
+            
+            foldGroup (TokenS t)        = tok (foldToken t)
+            foldGroup (TokenFunction l) = func (foldList l)
+            foldGroup (TokenArray l)    = arr (foldList l)
+        
+            foldToken (Identifier s)    = ident s
+            foldToken (Binder s)        = bind s
+            foldToken (Boolean b)       = bool b
+            foldToken (Number n)        = nm (foldNumber n)
+            foldToken (TokenString s)   = str s
+
+            foldNumber (IntVal i)       = intv i
+            foldNumber (DoubleVal d)    = doubv d
+
+--Algebra for printing GML
+simplePrintAlg::GmlAlgebra String String String String
+simplePrintAlg = (list,(tok,func,arr),(ident,bind,bool,num,str),(intv,doubv))
+    where   list    = concat 
+
+            tok t   = ' ':t++" "
+            func l  = '{':l++"}\n"
+            arr l   = '[':l++"]"
+
+            ident   = id
+            bind    = ('/':)
+            bool True  = "true"
+            bool False = "false"
+            num     = id
+            str s   = '\"':(s++"\"")
+
+            intv    = show 
+            doubv   = show 
+
+simplePrintGML::GML -> String
+simplePrintGML = foldGML simplePrintAlg
+
+--Arbitrary instances for GML        
 instance Arbitrary TokenList where
     arbitrary = liftM TokenList (listOf1 arbitrary)
 
@@ -39,10 +102,12 @@ instance Arbitrary Token where
 
 --Generate a list of chars satisfied by one of the functions
 allChars::[Char->Bool]->String
-allChars fs = filter (\c -> any (\f -> f c) fs) (map chr [32..255])
+allChars fs = filter (\c -> any (\f -> f c) fs) (map chr [32..126])
 
 genIdent::Gen String
-genIdent = (listOf1.oneof.map return.allChars) [isLetter,isDigit,(=='-'),(=='_')]
+genIdent = do fst <- (oneof.map return.allChars) [isLetter]
+              rst <- (listOf.oneof.map return.allChars) [isLetter,isDigit,(=='-'),(=='_')]
+              return (fst:rst)
 
 genString::Gen String
 genString = (listOf1.oneof.map return.allChars) [(/='"')]

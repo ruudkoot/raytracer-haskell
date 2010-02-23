@@ -5,6 +5,7 @@ import Control.Monad
 
 import Input.GML.ApplicativeParsec
 import Input.GML.AST
+import Data.Char
 
 gmlDef
  = LanguageDef
@@ -39,10 +40,14 @@ parseTokenGroup = TokenS        <$> parseToken
 parseToken :: Parser Token
 parseToken =  Number      <$> parseNumber
           <|> parseBoolean
-          <|> TokenString <$> stringLiteral gmlLexer
+          <|> TokenString <$> parseString
           <|> Binder      <$> (reservedOp gmlLexer "/" *> identifier gmlLexer)
           <|> Identifier  <$> identifier gmlLexer
           <?> "token"
+
+--Unescaped string parser
+parseString :: Parser String
+parseString = char '\"' *> many (satisfy (\x -> isPrint x && x /= '\"')) <* char '\"' <* whiteSpace gmlLexer
 
 parseBoolean :: Parser Token
 parseBoolean =  Boolean True  <$ reserved gmlLexer "true"
@@ -50,6 +55,10 @@ parseBoolean =  Boolean True  <$ reserved gmlLexer "true"
             <?> "boolean"
 
 parseNumber::Parser NumberVal
-parseNumber =  DoubleVal             <$> float gmlLexer
-           <|> IntVal . fromInteger  <$> integer gmlLexer
+parseNumber =  do sign <- option 1 (-1 <$ char '-')
+                  num <- naturalOrFloat gmlLexer
+                  return (case num of
+                            Left i  -> (IntVal . fromInteger) (i*sign)
+                            Right d -> DoubleVal (d * fromIntegral sign))
            <?> "number"
+

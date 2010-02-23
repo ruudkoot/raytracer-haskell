@@ -5,8 +5,13 @@ module Input.GML.ApplicativeParsec
     , module Text.ParserCombinators.Parsec
     ) where
 
+{-Extension ripped from the Real World Haskell book.
+  Only works with parsec 2.1, newer vesrion uses a different parsing system.
+-}
+
 import Control.Applicative
 import Control.Monad (MonadPlus(..), ap)
+
 -- Hide a few names that are provided by Applicative.
 import Text.ParserCombinators.Parsec hiding (many, optional, (<|>))
 
