@@ -24,11 +24,7 @@ data World surface = World
   }
   
 -- | Type inference causes restriction 'Shader' a => on the a
-data RenderObject a = Sphere a
-                  | Cube a
-                  | Cylinder a
-                  | Cone a
-                  | Plane a
+data RenderObject a = Simple Shape
                   | Translate (RenderObject a) Int Int Int
                   | Scale (RenderObject a) Int Int Int
                   | UScale (RenderObject a) Int
@@ -100,4 +96,20 @@ data Ray = Ray
   {
     rOrigin    :: Vector3D
   , rDirection :: Vector3D
+  }
+
+data Shape = Cube | Cylinder | Sphere | Cone | Plane
+
+data MetaObject a = MetaObject
+  {
+    moShape          :: Shape
+  , moSurface        :: a
+  , moTransformation :: ((Int, Int, Int), (Int, Int, Int), (Int, Int, Int)) -- TODO: pretty matrices
+  , moInverted       :: Bool
+  }
+  
+data ExtendedRenderObject a = ExtendedRenderObject
+  {
+    erMetaObject     :: MetaObject a
+  , erDifferences    :: [[MetaObject a]]
   }
