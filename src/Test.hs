@@ -6,4 +6,4 @@ allTests = [prop_parseOK
            ]
 
 runTests::IO()
-runTests = sequence_ (map quickCheck allTests)
+runTests = mapM_ quickCheck allTests

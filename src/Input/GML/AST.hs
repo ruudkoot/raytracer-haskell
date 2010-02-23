@@ -27,6 +27,7 @@ data NumberVal = IntVal    Int
 instance Eq NumberVal where
     (==) (IntVal i1) (IntVal i2)       = i1 == i2
     (==) (DoubleVal d1) (DoubleVal d2) = abs (d1-d2) < 0.00001
+    (==) _ _ = False
 
 --Algebra
 type GmlAlgebra ls gr tok num = ([gr] -> ls --TokenList
@@ -105,9 +106,9 @@ allChars::[Char->Bool]->String
 allChars fs = filter (\c -> any (\f -> f c) fs) (map chr [32..126])
 
 genIdent::Gen String
-genIdent = do fst <- (oneof.map return.allChars) [isLetter]
+genIdent = do fs <- (oneof.map return.allChars) [isLetter]
               rst <- (listOf.oneof.map return.allChars) [isLetter,isDigit,(=='-'),(=='_')]
-              return (fst:rst)
+              return (fs:rst)
 
 genString::Gen String
 genString = (listOf1.oneof.map return.allChars) [(/='"')]

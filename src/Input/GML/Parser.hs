@@ -1,12 +1,12 @@
 module Input.GML.Parser (parseGML, parseNumber) where
 import Text.ParserCombinators.Parsec.Token
-import Data.Ratio
 import Control.Monad
 
 import Input.GML.ApplicativeParsec
 import Input.GML.AST
 import Data.Char
 
+gmlDef::LanguageDef a
 gmlDef
  = LanguageDef
    { commentStart   = ""
@@ -22,6 +22,7 @@ gmlDef
    , caseSensitive  = False
    }
 
+gmlLexer::TokenParser a
 gmlLexer = makeTokenParser gmlDef
 
 parseGML :: String -> Either ParseError TokenList
