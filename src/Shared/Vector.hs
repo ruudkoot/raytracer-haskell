@@ -19,11 +19,13 @@ import Control.Applicative
 -- be used as Nums. For example: @2 * Vector3D (1,2,3)@
 --
 class (Applicative v) => Vector v where 
-  fromVector :: v a -> [a]
+  fromVector     :: v a -> [a]
   zipWithVectors :: (a -> b -> c) -> v a -> v b -> v c
-  foldVector :: ([a] -> b) -> v a -> b
+  foldVector     :: ([a] -> b) -> v a -> b
+
   zipWithVectors f v1 v2 = f <$> v1 <*> v2
-  foldVector f = f . fromVector 
+  foldVector f           = f . fromVector 
+
 
 instance Vector Vector2D where
   fromVector (Vector2D (x, y)) = [x, y]
@@ -38,15 +40,26 @@ instance Vector Vector4D where
 
 -- | A general two-dimensional vector.
 --
-newtype Vector2D a = Vector2D (a, a) deriving (Show, Eq)
+newtype Vector2D a = Vector2D (a, a) deriving Eq
 
 -- | A general three-dimensional vector.
 --
-newtype Vector3D a = Vector3D (a, a, a) deriving (Show, Eq)
+newtype Vector3D a = Vector3D (a, a, a) deriving Eq
 
 -- | A general four-dimensional vector.
 --
-newtype Vector4D a = Vector4D (a, a, a, a) deriving (Show, Eq)
+newtype Vector4D a = Vector4D (a, a, a, a) deriving Eq
+
+
+
+instance (Show v) => Show (Vector2D v) where 
+  show (Vector2D v) = show v
+
+instance (Show v) => Show (Vector3D v) where 
+  show (Vector3D v) = show v
+
+instance (Show v) => Show (Vector4D v) where 
+  show (Vector4D v) = show v
 
 
 instance Functor Vector2D where 
