@@ -129,6 +129,9 @@ unitVector4DZ = Vector4D (0, 0, 1, 0)
 
 
 -- Warning! Some serious type hackery ahead..
+--
+--  UPDATE! See Matrix for why this needs to change
+--
 -- This makes all Vectors instance of Num if the types allow it (i.e. 
 -- if the Vector v is carrying around a type of class Num).
 -- This enables some nice syntax for scalars, addition, etc.
