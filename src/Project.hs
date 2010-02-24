@@ -1,5 +1,7 @@
 module Main where 
 
+import Control.Applicative ((<$>))
+
 import Input.GML.AST
 import Input.GML.Parser
 --
@@ -13,7 +15,7 @@ import System.IO
 
 
 main :: IO()
-main = do parseResult <- hGetContents stdin >>= return . parseGML
+main = do parseResult <- parseGML <$> getContents
           case parseResult of 
             Left err -> putStrLn $ "Parse error on " ++ show err
             Right tks -> return () -- stub. should evaluate tks
