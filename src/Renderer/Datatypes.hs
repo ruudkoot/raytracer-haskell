@@ -2,6 +2,7 @@ module Renderer.Datatypes where
   
 import qualified Shared.Colour (Colour)
 import qualified Shared.Vector (Vector3D)
+import Shared.Matrix (Matrix3D)
 
 type Point3D = Shared.Vector.Vector3D Double
 type Vector3D = Shared.Vector.Vector3D Double
@@ -104,7 +105,7 @@ data MetaObject a = MetaObject
   {
     moShape          :: Shape
   , moSurface        :: a
-  , moTransformation :: ((Int, Int, Int), (Int, Int, Int), (Int, Int, Int)) -- TODO: pretty matrices
+  , moTransformation :: Matrix3D Double -- Should that be Matrix4D?
   , moInverted       :: Bool
   }
   
