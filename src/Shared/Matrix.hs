@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances, UndecidableInstances #-}
-
 -- | General purpose matrix module.
 --
 
@@ -49,20 +47,6 @@ instance Applicative Matrix4 where
   pure x = Matrix4 (pure x, pure x, pure x, pure x)
   Matrix4 (fx, fy, fz, fa) <*> Matrix4 (x, y, z, a) = Matrix4 (fx <*> x, fy <*> y, fz <*> z, fa <*> a)
 
-
--- | Because of the Num instance in Vector, this can't be defined now:
---
---      instance (Matrix m) => Num (m a) where 
---
--- Since instances are matched on the right hand side, 
--- which is Num (m a) here; ie. the same as Num (v a) 
--- in Vector. So now ghc errs on Duplicate Instances.
---
--- Here's a thread explaining it better: 
--- http://old.nabble.com/duplicate-instance-declarations.-Why--td20146171.html
---
--- So this means we need to make Vector2D, Vector3D and Vector4D instances of Num.
---
 
 instance (Num a) => Num (Matrix3 a) where 
   (+) = zipWithMatrices (+)

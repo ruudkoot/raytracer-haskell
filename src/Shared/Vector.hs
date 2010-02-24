@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances, UndecidableInstances #-}
-
 -- | Provides general (perhaps too general) data structures 
 -- and functions for 2D, 3D and 4D vectors. 
 --
@@ -127,19 +125,29 @@ unitVector4DZ :: Num a => Vector4D a
 unitVector4DZ = Vector4D (0, 0, 1, 0)
 
 
+-- | Using Vectors as ordinary Nums (for scaling, etc.)
+--
+instance (Num a) => Num (Vector2D a) where 
+  (+) = zipWithVectors (+)
+  (*) = zipWithVectors (*)
+  (-) = zipWithVectors (-)
+  negate = fmap negate 
+  abs    = fmap abs 
+  signum = fmap signum 
+  fromInteger = pure . fromInteger
 
--- Warning! Some serious type hackery ahead..
---
---  UPDATE! See Matrix for why this needs to change
---
--- This makes all Vectors instance of Num if the types allow it (i.e. 
--- if the Vector v is carrying around a type of class Num).
--- This enables some nice syntax for scalars, addition, etc.
--- I welcome a more elegant solution (without the need for UndecidableInstances), 
--- but this is the only way I got it to work without copy-pasting
--- for every new instance of Vector.
---
-instance (Num a, Vector v, Show (v a), Eq (v a)) => Num (v a) where 
+
+instance (Num a) => Num (Vector3D a) where 
+  (+) = zipWithVectors (+)
+  (*) = zipWithVectors (*)
+  (-) = zipWithVectors (-)
+  negate = fmap negate 
+  abs    = fmap abs 
+  signum = fmap signum 
+  fromInteger = pure . fromInteger
+
+
+instance (Num a) => Num (Vector4D a) where 
   (+) = zipWithVectors (+)
   (*) = zipWithVectors (*)
   (-) = zipWithVectors (-)
@@ -151,7 +159,6 @@ instance (Num a, Vector v, Show (v a), Eq (v a)) => Num (v a) where
 
 
 -- * Vector Operations
--- The class constraints in the following definitions are also pretty awful 
 
 
 -- | The dot product is an operation that takes two equal-length Vectors 
@@ -190,4 +197,5 @@ magnitude' = magnitude . fmap fromIntegral
 --
 normalize :: (Vector v, Floating a, Num (v a)) => v a -> v a 
 normalize v1 = pure (1 / magnitude v1) * v1
+
 
