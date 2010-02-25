@@ -100,6 +100,17 @@ fromVector4D (Vector4D a) = a
 
 -- * Unit Vectors
 --
+unitVector2D :: Num a => Vector2D a
+unitVector2D = Vector2D (1, 1)
+
+unitVector3D :: Num a => Vector3D a
+unitVector3D = Vector3D (1, 1, 1)
+
+unitVector4D :: Num a => Vector4D a
+unitVector4D = Vector4D (1, 1, 1, 1)
+
+
+
 unitVector2DX :: Num a => Vector2D a
 unitVector2DX = Vector2D (1, 0)
 
@@ -123,6 +134,7 @@ unitVector4DY = Vector4D (0, 1, 0, 0)
 
 unitVector4DZ :: Num a => Vector4D a
 unitVector4DZ = Vector4D (0, 0, 1, 0)
+
 
 
 -- | Using Vectors as ordinary Nums (for scaling, etc.)
@@ -155,6 +167,22 @@ instance (Num a) => Num (Vector4D a) where
   abs    = fmap abs 
   signum = fmap signum 
   fromInteger = pure . fromInteger
+
+
+instance (Fractional a) => Fractional (Vector2D a) where 
+  (/) = zipWithVectors (/)
+  recip = fmap recip
+  fromRational = pure . fromRational
+  
+instance (Fractional a) => Fractional (Vector3D a) where 
+  (/) = zipWithVectors (/)
+  recip = fmap recip
+  fromRational = pure . fromRational
+
+instance (Fractional a) => Fractional (Vector4D a) where 
+  (/) = zipWithVectors (/)
+  recip = fmap recip
+  fromRational = pure . fromRational
 
 
 
