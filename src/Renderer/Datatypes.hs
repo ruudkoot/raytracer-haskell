@@ -99,7 +99,25 @@ data Ray = Ray
   , rDirection :: Vector3D
   }
 
-data Shape = Cube | Cylinder | Sphere | Cone | Plane
+data Shape 
+  = Cube {
+    cDimensions :: (Double, Double, Double)
+  }
+  | Cylinder 
+  | Sphere 
+  {
+    sRadius :: Double
+  }
+  | Cone -- Maybe stick to the same representation here as in gml? With angles
+  {
+    cBaseRadius :: Double
+  , cHeight     :: Double
+  }
+  | Plane 
+  {
+    pNormal :: Vector3D
+  , pOffset :: Double -- not enterily sure where we used this for?
+  }
 
 data MetaObject a = MetaObject
   {
