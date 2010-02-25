@@ -25,16 +25,16 @@ data World surface = World
   }
   
 -- | Type inference causes restriction 'Shader' a => on the a
-data RenderObject a = Simple Shape
-                  | Translate (RenderObject a) Int Int Int
-                  | Scale (RenderObject a) Int Int Int
-                  | UScale (RenderObject a) Int
-                  | RotateX (RenderObject a) Int
-                  | RotateY (RenderObject a) Int
-                  | RotateZ (RenderObject a) Int
-                  | Union (RenderObject a) (RenderObject a)
-                  | Intersect (RenderObject a) (RenderObject a)
-                  | Difference (RenderObject a) (RenderObject a) 
+data GMLObject a = Simple Shape
+                 | Translate (GMLObject a) Int Int Int
+                 | Scale (GMLObject a) Int Int Int
+                 | UScale (GMLObject a) Int
+                 | RotateX (GMLObject a) Int
+                 | RotateY (GMLObject a) Int
+                 | RotateZ (GMLObject a) Int
+                 | Union (GMLObject a) (GMLObject a)
+                 | Intersect (GMLObject a) (GMLObject a)
+                 | Difference (GMLObject a) (GMLObject a) 
           
                   
 data RenderLight
@@ -101,16 +101,16 @@ data Ray = Ray
 
 data Shape = Cube | Cylinder | Sphere | Cone | Plane
 
-data MetaObject a = MetaObject
+data RenderObject a = RenderObject
   {
     moShape          :: Shape
   , moSurface        :: a
   , moTransformation :: Matrix3D Double -- Should that be Matrix4D?
-  , moInverted       :: Bool
+  , moIntersections  :: [ObjectTree a]
+  , moDifferences    :: [ObjectTree a]
   }
   
-data ExtendedRenderObject a = ExtendedRenderObject
-  {
-    erMetaObject     :: MetaObject a
-  , erDifferences    :: [[MetaObject a]]
-  }
+data ObjectTree a = RSimple Shape (Matrix3D Double) -- Should indeed be Matrix4D
+                  | RUnion (ObjectTree a) (ObjectTree a)
+                  | RIntersect (ObjectTree a) (ObjectTree a)
+                  | RDifference (ObjectTree a) (ObjectTree a)
