@@ -4,6 +4,8 @@ import Input.GML.AST
 import Input.GML.Parser
 --
 import Renderer.Datatypes
+import Renderer.Primitives
+import Renderer.Intersections
 --
 import Output.Output
 import Output.PPM

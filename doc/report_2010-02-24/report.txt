@@ -19,6 +19,14 @@ Planning
     We have scheduled weekly-ish meetings 
     and will probably change our workflow
     as the project moves on.
+    
+    
+Goals
+-----
+
+  * Tier 3 Raytracer
+  * Optimized
+  * Heavily parallellisable optimized
 
 
 Design Decisions
@@ -70,6 +78,13 @@ Design Decisions
          implement another language or EDSL, 
          without needing to rewrite everything.
          
+         
+  * Transformations are applied to the rays instead of the objects themselves
+      in order to make the calculation of the intersections easier.
+         
+  * Transparency
+  
+  * Reflection
 
   * Parser combinators instead of Alex + Happy 
       Parsing is most likely not going to be the 
