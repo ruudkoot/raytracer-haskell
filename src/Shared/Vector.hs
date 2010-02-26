@@ -196,6 +196,8 @@ instance (Fractional a) => Fractional (Vector4D a) where
 dot :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
 dot v1 v2 = foldVector sum (v1 * v2)
 
+(<.>) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
+(<.>) = dot
 
 -- | The cross product is a binary operation on two 3D vectors 
 -- that results in another vector which is perpendicular to 
@@ -207,6 +209,7 @@ crossProduct (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) =
             z1 * x2 - x1 * z2,
             x1 * y2 - y1 * z2)
 
+a `cross` b = a crossProduct b
 
 -- | Calculates the length or magnitude of the given Vector.
 --
@@ -225,5 +228,10 @@ magnitude' = magnitude . fmap fromIntegral
 --
 normalize :: (Vector v, Floating a, Num (v a)) => v a -> v a 
 normalize v1 = pure (1 / magnitude v1) * v1
+
+-- | Theorem of Duh
+
+sumVector :: (Vector v, Floating a, Num (v a)) => v a -> a
+sumVector = foldVector sum
 
 

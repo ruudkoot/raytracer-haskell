@@ -4,8 +4,8 @@ import qualified Shared.Colour (Colour)
 import qualified Shared.Vector (Vector3D)
 import Shared.Matrix (Matrix3D)
 
-type Point3D = Shared.Vector.Vector3D Double
-type Vector3D = Shared.Vector.Vector3D Double
+type Pt3D  = Shared.Vector.Vector3D Double
+type Vec3D = Shared.Vector.Vector3D Double
 
 type Colour = Shared.Colour.Colour Double
 
@@ -41,22 +41,22 @@ data RenderLight
   -- | Light source at pos infinity.
   = DirectLight 
   {
-    dlDirection  :: Point3D
-  , dlColor      :: Point3D
+    dlDirection  :: Pt3D
+  , dlColor      :: Pt3D
   }
   -- | Point light source
   | PointLight 
   {
-    plPosition :: Point3D
-  , plColor    :: Point3D
+    plPosition :: Pt3D
+  , plColor    :: Pt3D
   }
   -- | Spotlight with cutoff
   | SpotLight 
   {
-    slPosition    :: Point3D
-  , slTarget      :: Point3D
-  , slCutoff      :: Double -- Degrees
-  , slAttenuation :: Double -- ???
+    slPosition    :: Pt3D
+  , slTarget      :: Pt3D
+  , slCutoff      :: Degrees -- Degrees
+  , slAttenuation :: Attenuation -- ???
   }        
     
   -- dir color  light  l
@@ -95,8 +95,8 @@ data RenderOptions = RenderOptions
 
 data Ray = Ray 
   {
-    rOrigin    :: Vector3D
-  , rDirection :: Vector3D
+    rOrigin    :: Vec3D
+  , rDirection :: Vec3D
   }
 
 data Shape = Cube | Cylinder | Sphere | Cone | Plane
