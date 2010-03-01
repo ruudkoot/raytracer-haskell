@@ -99,7 +99,9 @@ fromVector4D (Vector4D a) = a
 
 
 -- * Unit Vectors
---
+{-
+-- These are not unit vectors! Unit vectors are length 1.
+
 unitVector2D :: Num a => Vector2D a
 unitVector2D = Vector2D (1, 1)
 
@@ -109,7 +111,7 @@ unitVector3D = Vector3D (1, 1, 1)
 unitVector4D :: Num a => Vector4D a
 unitVector4D = Vector4D (1, 1, 1, 1)
 
-
+-}
 
 unitVector2DX :: Num a => Vector2D a
 unitVector2DX = Vector2D (1, 0)
