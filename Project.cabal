@@ -9,6 +9,6 @@ Build-Type:         Simple
 
 Executable raytrace
   Main-Is:          Project.hs
-  Build-Depends:    base >= 3 && < 5, haskell98, parsec == 2.1.0.1, QuickCheck >= 2.1.0.3
+  Build-Depends:    base >= 3 && < 5, haskell98, parsec == 2.1.0.1, QuickCheck >= 2.1.0.3, containers >= 0.2
   GHC-Options:      -O2 -Wall
   Hs-Source-Dirs:   src/
