@@ -15,7 +15,8 @@ data TokenGroup = TokenS        Token
                 | TokenArray    TokenList
                 deriving (Show,Eq)
                 
-data Token = Identifier  String
+data Token = Operator    String
+           | Identifier  String
            | Binder      String
            | Boolean     Bool
            | Number      NumberVal

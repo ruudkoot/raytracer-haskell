@@ -20,7 +20,7 @@ gmlDef
    , opStart        = empty
    , opLetter       = empty
    , reservedOpNames= ["/"]
-   , reservedNames  = ["true","false"]
+   , reservedNames  = ["true","false","apply","if"]
    , caseSensitive  = False
    }
 
@@ -47,7 +47,13 @@ parseToken =  Number      <$> parseNumber
           <|> TokenString <$> parseString
           <|> Binder      <$> (reservedOp gmlLexer "/" *> identifier gmlLexer)
           <|> Identifier  <$> identifier gmlLexer
+          <|> parseOperator
           <?> "token"
+
+parseOperator :: Parser Token
+parseOperator =  (Operator "apply" <$ reserved gmlLexer "apply")
+             <|> (Operator "if" <$ reserved gmlLexer "if")
+             <?> "operator"
 
 --Unescaped string parser
 parseString :: Parser String
