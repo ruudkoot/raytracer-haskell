@@ -8,6 +8,8 @@ type GML = TokenList
 
 newtype TokenList = TokenList [TokenGroup] deriving (Show,Eq)
 
+{- RUUD: from the perspective of the evaluate it would be nicer to flatten
+         TokenGroup and Token, as well as losing the Token- prefixes          -}
 data TokenGroup = TokenS        Token 
                 | TokenFunction TokenList
                 | TokenArray    TokenList
