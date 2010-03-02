@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 -- | General purpose matrix module.
 --
 
@@ -6,7 +7,7 @@ module Shared.Matrix where
 
 import Control.Applicative
 import Data.List (intercalate, transpose)
-import Shared.Vector (Vector, Vector3D(..), Vector4D, fromVector)
+import Shared.Vector (Vector, Vector3D(..), Vector4D(..), (<.>), fromVector)
 
 
 -- * Matrices
@@ -113,11 +114,11 @@ rows = fromMatrix
 columns :: (Matrix m) => m a -> [[a]]
 columns = transpose . rows
 
---aclass MultSquare a b where 
---  mult :: a -> b -> b
+class MultSquare a b where 
+  mult :: a -> b -> b
 
---instance Num a => MultSquare (Matrix4D a) (Vector4D a) where 
---  mult (Matrix4D (mx, my, mz, mw)) v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
+instance Num a => MultSquare (Matrix4D a) (Vector4D a) where 
+  mult (Matrix4D (mx, my, mz, mw)) v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
 
 {-
 
