@@ -20,6 +20,28 @@ data BaseValue = Int      Int
                | String   String
                 deriving (Show)
 
+type Id        = String
+type Env       = Map.Map Id Value
+type Code      = GML.GML
+type Closure   = (Env, Code)
+
+type Point     = (Double, Double, Double)
+type Object    = ()
+type Light     = ()
+
+data Value     = BaseValue GML.BaseValue
+               | Closure   Closure
+               | Array     Array
+               | Point     Point
+               | Object    Object
+               | Light     Light
+               deriving (Show, Eq)
+               
+type Array     = [Value]
+type Stack     = [Value]
+
+type State     = (Env, Stack, Code) {- abstract newtype... -}
+
 --Needed for overiding double equality to account for rounding errors in tests
 instance Eq BaseValue where
     (==) (Real d1)    (Real d2)      = abs (d1-d2) < 0.00001
