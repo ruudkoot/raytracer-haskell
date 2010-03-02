@@ -18,87 +18,83 @@ data BaseValue = Int      Int
                | Real     Double
                | Boolean  Bool
                | String   String
-                deriving (Show, Eq)
+                deriving (Show)
 
 --Needed for overiding double equality to account for rounding errors in tests
-instance Eq NumberVal where
-    (==) (IntVal i1) (IntVal i2)       = i1 == i2
-    (==) (DoubleVal d1) (DoubleVal d2) = abs (d1-d2) < 0.00001
-    (==) _ _ = False
-
+instance Eq BaseValue where
+    (==) (Real d1)    (Real d2)      = abs (d1-d2) < 0.00001
+    (==) (String s1)  (String s2)    = s1 == s2
+    (==) (Boolean b1) (Boolean b2)   = b1 == b2
+    (==) (Int i1)     (Int i2)       = i1 == i2
 
 --Algebra for folding GML AST's
-type GmlAlgebra ls gr tok num = ([gr] -> ls --TokenList
+type GmlAlgebra tok bv = (([tok]     -> tok, --Function
+                           [tok]     -> tok, --Array
+                           String    -> tok, --Operator
+                           String    -> tok, --Identifier
+                           String    -> tok, --Binder
+                           bv        -> tok),--BaseValue 
 
-                                ,(tok  -> gr, --TokenS
-                                  ls   -> gr, --TokenFunction
-                                  ls   -> gr) --TokenArray
-
-                                ,(String    -> tok, --Identifier
-                                  String    -> tok, --Binder
-                                  Bool      -> tok, --Boolean
-                                  num       -> tok, --Number
-                                  String    -> tok) --TokenString
-
-                                ,(Int    -> num, --IntVal
-                                  Double -> num)) --DoubleVal
+                          (Int       -> bv, --Int
+                           Double    -> bv, --Real
+                           String    -> bv, --String
+                           Bool      -> bv --Boolean                           
+                           ))
 
 --GML fold
-foldGML::GmlAlgebra ls gr tok num -> GML -> ls
-foldGML (list,(tok,func,arr),(ident,bind,bool,nm,str),(intv,doubv)) = foldList
-    where   foldList (TokenList l)      = list (map foldGroup l)
-            
-            foldGroup (TokenS t)        = tok (foldToken t)
-            foldGroup (TokenFunction l) = func (foldList l)
-            foldGroup (TokenArray l)    = arr (foldList l)
-        
+foldGML::GmlAlgebra tok bv -> GML -> [tok]
+foldGML ((func,arr,op,ident,bind,base),(int,real,string,bool)) = map foldToken
+    where   foldToken (Function ls)     = func (map foldToken ls)
+            foldToken (Array ls)        = arr (map foldToken ls)        
+            foldToken (Operator s)      = op s
             foldToken (Identifier s)    = ident s
-            foldToken (Binder s)        = bind s
-            foldToken (Boolean b)       = bool b
-            foldToken (Number n)        = nm (foldNumber n)
-            foldToken (TokenString s)   = str s
+            foldToken (Binder s)        = bind s            
+            foldToken (BaseValue v)     = base (foldBase v)
 
-            foldNumber (IntVal i)       = intv i
-            foldNumber (DoubleVal d)    = doubv d
+            foldBase  (Int i)           = int i
+            foldBase  (Real d)          = real d
+            foldBase  (String s)        = string s
+            foldBase  (Boolean b)       = bool b    
 
 --Algebra for printing GML, uses a very basic strategy, not pretty!
-simplePrintAlg::GmlAlgebra String String String String
-simplePrintAlg = (list,(tok,func,arr),(ident,bind,bool,num,str),(intv,doubv))
-    where   list    = concat 
+simplePrintAlg::GmlAlgebra String String
+simplePrintAlg = ((func,arr,op,ident,bind,base),(int,real,string,bool))
+    where   func ls  = '{':(concatMap (' ':) ls)++"}\n"
+            arr ls   = '[':(concatMap (' ':) ls)++"]"
+            op       = id
+            ident    = id
+            bind     = ('/':)
+            base     = id
 
-            tok t   = ' ':t++" "
-            func l  = '{':l++"}\n"
-            arr l   = '[':l++"]"
-
-            ident   = id
-            bind    = ('/':)
+            int        = show 
+            real       = show
+            string s   = '\"':s++"\""
             bool True  = "true"
             bool False = "false"
-            num     = id
-            str s   = '\"':(s++"\"")
 
-            intv    = show 
-            doubv   = show 
 
 simplePrintGML::GML -> String
-simplePrintGML = foldGML simplePrintAlg
+simplePrintGML gml = concatMap (' ':) $ foldGML simplePrintAlg gml
 
 --Arbitrary instances for GML        
-instance Arbitrary TokenList where
-    arbitrary = liftM TokenList (listOf1 arbitrary)
-
-instance Arbitrary TokenGroup where
-    arbitrary = sized $ \n -> frequency [(8,liftM TokenS arbitrary)
-                                        ,(1,liftM TokenFunction (resize (n `div` 4) arbitrary))
-                                        ,(1,liftM TokenArray (resize (n `div` 4) arbitrary))]
 
 instance Arbitrary Token where
-    arbitrary = oneof [liftM Identifier genIdent
-                      ,liftM Binder genIdent
-                      ,liftM Boolean arbitrary
-                      ,liftM Number arbitrary
-                      ,liftM TokenString genString]
+    arbitrary = sized $ \n -> frequency [(1,liftM Function (resize (n `div` 4) arbitrary))
+                                        ,(1,liftM Array (resize (n `div` 4) arbitrary))
+                                        ,(2,genOperator)
+                                        ,(2,liftM Identifier genIdent)
+                                        ,(1,liftM Binder genIdent)
+                                        ,(3,liftM BaseValue arbitrary)]
 
+instance Arbitrary BaseValue where
+    arbitrary = oneof [liftM Int arbitrary
+                      ,liftM Real arbitrary
+                      ,liftM Boolean arbitrary
+                      ,liftM String genString]
+
+genOperator::Gen Token
+genOperator = return (Operator "apply")
+ 
 --Generate a list of chars satisfied by one of the functions
 allChars::[Char->Bool]->String
 allChars fs = filter (\c -> any (\f -> f c) fs) (map chr [32..126])
@@ -111,5 +107,4 @@ genIdent = do fs <- (oneof.map return.allChars) [isLetter]
 genString::Gen String
 genString = (listOf1.oneof.map return.allChars) [(/='"')]
                  
-instance Arbitrary NumberVal where
-    arbitrary = oneof [liftM IntVal arbitrary, liftM DoubleVal arbitrary]
+
