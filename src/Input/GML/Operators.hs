@@ -27,7 +27,7 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "asin"  ,   rr asin                   )
                      , ( "clampf",   rr clampf                 )
                      , ( "cos"   ,   rr cos                    )
-                     , ( "divi"  ,  iii div                    ) -- ???
+                     , ( "divi"  ,  iii div                    )
                      , ( "divf"  ,  rrr (/)                    )
                      , ( "eqi"   ,  iib (==)                   )
                      , ( "eqf"   ,  rrb (==)                   )
@@ -51,10 +51,11 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "point" , rrrp (,,)                   )
                      , ( "get"   ,  aiv (!!)                   ) -- arrays
                      , ( "lenght",   ai length                 ) ]
-            
-            
+
 clampf :: Double -> Double
-clampf r1 = if r1 < 0.0 then 0.0 else if r1 > 1.0 then 1.0 else r1
+clampf r1 | r1 < 0.0  = 0.0
+          | r1 > 1.0  = 1.0
+          | otherwise = r1
 
 getx :: Point -> Double
 getx (x, _, _) = x
