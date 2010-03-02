@@ -1,4 +1,4 @@
-module Input.GML.Parser (parseGML, parseNumber) where
+module Input.GML.Parser (parseGML) where
 import Text.ParserCombinators.Parsec.Token
 import Control.Monad
 
@@ -41,10 +41,10 @@ parseTokenList = many parseToken
 
 parseToken :: Parser Token
 parseToken =  Function   <$> braces gmlLexer parseTokenList
-          <|> TArray      <$> squares gmlLexer parseTokenList
+          <|> TArray     <$> squares gmlLexer parseTokenList
           <|> parseOperator   
           <|> Binder     <$> (reservedOp gmlLexer "/" *> identifier gmlLexer)
-          <|> TBaseValue  <$> parseBaseValue
+          <|> TBaseValue <$> parseBaseValue
           <|> Identifier <$> identifier gmlLexer          
           <?> "token"
 

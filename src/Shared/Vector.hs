@@ -235,7 +235,7 @@ magnitude v = sqrt (v <.> v)
 -- | Calculates the length or magnitude squared of the given Vector.
 --
 magnitudeSquared :: (Vector v, Floating a, Num (v a)) => v a -> a
-magnitudeSquared v = (v <.> v)
+magnitudeSquared v = v <.> v
 
 -- | A version of magnitude for Integrals. 
 -- Probably not needed.
@@ -249,8 +249,8 @@ magnitude' = magnitude . fmap fromIntegral
 normalize :: (Vector v, Floating a, Num (v a)) => v a -> v a 
 normalize v1 = pure (1 / magnitude v1) * v1
 
--- | Theorem of Duh
-
+-- | Sum values of a vector.
+--
 sumVector :: (Vector v, Floating a, Num (v a)) => v a -> a
 sumVector = foldVector sum
 

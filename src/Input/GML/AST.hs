@@ -83,8 +83,8 @@ foldGML ((func,arr,op,ident,bind,base),(int,real,string,bool)) = map foldToken
 --Algebra for printing GML, uses a very basic strategy, not pretty!
 simplePrintAlg::GmlAlgebra String String
 simplePrintAlg = ((func,arr,op,ident,bind,base),(int,real,string,bool))
-    where   func ls  = '{':(concatMap (' ':) ls)++"}\n"
-            arr ls   = '[':(concatMap (' ':) ls)++"]"
+    where   func ls  = '{':concatMap (' ':) ls++"}\n"
+            arr ls   = '[':concatMap (' ':) ls++"]"
             op       = id
             ident    = id
             bind     = ('/':)
