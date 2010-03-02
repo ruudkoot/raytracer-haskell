@@ -97,21 +97,38 @@ fromVector4D :: Vector4D a -> (a, a, a, a)
 fromVector4D (Vector4D a) = a
 
 
+getX2D :: Vector2D a -> a
+getX2D (Vector2D (x, _)) = x
+
+getY2D :: Vector2D a -> a
+getY2D (Vector2D (_, y)) = y
+
+
+getX3D :: Vector3D a -> a
+getX3D (Vector3D (x, _, _)) = x
+
+getY3D :: Vector3D a -> a
+getY3D (Vector3D (_, y, _)) = y
+
+getZ3D :: Vector3D a -> a
+getZ3D (Vector3D (_, _, z)) = z
+
+
+getX4D :: Vector4D a -> a
+getX4D (Vector4D (x, _, _, _)) = x
+
+getY4D :: Vector4D a -> a
+getY4D (Vector4D (_, y, _, _)) = y
+
+getZ4D :: Vector4D a -> a
+getZ4D (Vector4D (_, _, z, _)) = z
+
+getA4D :: Vector4D a -> a
+getA4D (Vector4D (_, _, _, a)) = a
+
 
 -- * Unit Vectors
-{-
--- These are not unit vectors! Unit vectors are length 1.
-
-unitVector2D :: Num a => Vector2D a
-unitVector2D = Vector2D (1, 1)
-
-unitVector3D :: Num a => Vector3D a
-unitVector3D = Vector3D (1, 1, 1)
-
-unitVector4D :: Num a => Vector4D a
-unitVector4D = Vector4D (1, 1, 1, 1)
-
--}
+--
 
 unitVector2DX :: Num a => Vector2D a
 unitVector2DX = Vector2D (1, 0)
