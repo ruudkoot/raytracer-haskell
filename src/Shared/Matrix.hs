@@ -62,7 +62,7 @@ instance Applicative Matrix4D where
 
 -- | Instance declarations for Nums.
 -- Note that (*) doesn't do proper matrix multiplication, 
--- but should be used for scalars.
+-- but should only be used for scalars.
 
 instance (Num a) => Num (Matrix3D a) where 
   (+) = zipWithMatrices (+)
@@ -82,6 +82,8 @@ instance (Num a) => Num (Matrix4D a) where
   signum = fmap signum 
   fromInteger = pure . fromInteger
 
+-- | Only for scalars.
+--
 instance (Fractional a) => Fractional (Matrix3D a) where 
   (/) = zipWithMatrices (/)
   recip = fmap recip
@@ -93,10 +95,23 @@ instance (Fractional a) => Fractional (Matrix4D a) where
   fromRational = pure . fromRational
 
 
+-- * Identity Matrices
+--
+identity3D :: Num a => Matrix3D a
+identity3D = Matrix3D(Vector3D(1, 0, 0), 
+                      Vector3D(0, 1, 0),
+                      Vector3D(0, 0, 1))
+
+identity4D :: Num a => Matrix4D a
+identity4D = Matrix4D(Vector4D(1, 0, 0, 0),
+                      Vector4D(0, 1, 0, 0),
+                      Vector4D(0, 0, 1, 0),
+                      Vector4D(0, 0, 0, 1))
 
 -- * Matrix Operations. 
 --
 -- Addition & substraction are handled by the Num instance.
+-- Matrix multiplication is done using the (!*!) operator.
 --
 
 
@@ -119,44 +134,49 @@ columns = transpose . rows
 --
 
 class MultSquare a b where 
-  mult :: a -> b -> b
+  (!*!) :: a -> b -> b
 
 
 -- Matrix * Vector
 --
 instance (Num a) => MultSquare (Matrix3D a) (Vector3D a) where 
-  mult (Matrix3D (mx, my, mz)) v = Vector3D (mx <.> v, my <.> v, mz <.> v)
+  Matrix3D (mx, my, mz) !*! v = Vector3D (mx <.> v, my <.> v, mz <.> v)
 
 instance (Num a) => MultSquare (Matrix4D a) (Vector4D a) where 
-  mult (Matrix4D (mx, my, mz, mw)) v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
+  Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
 
 
 -- Matrix * Matrix
 --
 instance (Num a) => MultSquare (Matrix3D a) (Matrix3D a) where 
-  mult m1 m2 = Matrix3D (Vector3D (dot r x, dot r y, dot r z), 
-                         Vector3D (dot s x, dot s y, dot s z),
-                         Vector3D (dot t x, dot t y, dot t z))
+  m1 !*! m2 = Matrix3D (Vector3D (dot r x, dot r y, dot r z), 
+                        Vector3D (dot s x, dot s y, dot s z),
+                        Vector3D (dot t x, dot t y, dot t z))
     where (r:s:t:[]) = rows m1
           (x:y:z:[]) = columns m2
           dot a b = sum (zipWith (*) a b)
 
 instance (Num a) => MultSquare (Matrix4D a) (Matrix4D a) where 
-  mult m1 m2 = Matrix4D (Vector4D (dot r x, dot r y, dot r z, dot r a), 
-                         Vector4D (dot s x, dot s y, dot s z, dot s a),
-                         Vector4D (dot t x, dot t y, dot t z, dot t a),
-                         Vector4D (dot u x, dot u y, dot u z, dot u a))
+  m1 !*! m2 = Matrix4D (Vector4D (dot r x, dot r y, dot r z, dot r a), 
+                        Vector4D (dot s x, dot s y, dot s z, dot s a),
+                        Vector4D (dot t x, dot t y, dot t z, dot t a),
+                        Vector4D (dot u x, dot u y, dot u z, dot u a))
     where (r:s:t:u:[]) = rows m1
           (x:y:z:a:[]) = columns m2
           dot a b = sum (zipWith (*) a b)
 
-
-
 {-
 
-mult :: (Matrix m, Num a) => m a => m a => m a
 inverse :: (Matrix m, Fractional a) => m a -> m a
-determinant :: (Matrix m, Fractional a) => m a -> a
-
 
 --}
+
+class SquareMatrix m where 
+  determinant :: Num a => m a -> a
+
+
+instance SquareMatrix Matrix3D where 
+  determinant = undefined 
+
+instance SquareMatrix Matrix4D where 
+  determinant = undefined
