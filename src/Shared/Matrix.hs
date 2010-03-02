@@ -6,7 +6,7 @@ module Shared.Matrix where
 
 import Control.Applicative
 import Data.List (intercalate, transpose)
-import Shared.Vector (Vector, Vector3D, Vector4D, fromVector)
+import Shared.Vector (Vector, Vector3D(..), Vector4D, fromVector)
 
 
 -- * Matrices
@@ -27,6 +27,12 @@ instance Matrix Matrix3D where
 
 instance Matrix Matrix4D where
   fromMatrix (Matrix4D (x, y, z, a)) = map fromVector [x, y, z, a]
+
+instance Matrix Vector3D where 
+  fromMatrix (Vector3D (x, y, z)) = [[x,y,z]]
+
+instance Matrix Vector4D where 
+  fromMatrix (Vector4D (x, y, z, w)) = [[x,y,z,w]]
 
 
 instance Show m => Show (Matrix3D m) where 
@@ -106,6 +112,12 @@ rows = fromMatrix
 
 columns :: (Matrix m) => m a -> [[a]]
 columns = transpose . rows
+
+--aclass MultSquare a b where 
+--  mult :: a -> b -> b
+
+--instance Num a => MultSquare (Matrix4D a) (Vector4D a) where 
+--  mult (Matrix4D (mx, my, mz, mw)) v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
 
 {-
 

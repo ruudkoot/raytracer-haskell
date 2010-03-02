@@ -230,7 +230,7 @@ cross (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) =
 -- | Calculates the length or magnitude of the given Vector.
 --
 magnitude :: (Vector v, Floating a, Num (v a)) => v a -> a
-magnitude v = sqrt (v `dot` v)
+magnitude v = sqrt (v <.> v)
 
 
 -- | A version of magnitude for Integrals. 
