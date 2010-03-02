@@ -6,21 +6,19 @@ import Control.Monad
 --AST defition following the specification in chapter 2.1 of the assignment
 type GML = [Token]
 
-{- RUUD: from the perspective of the evaluate it would be nicer to flatten
-         TokenGroup and Token, as well as losing the Token- prefixes          -}
 data Token = Function   [Token]
            | Array      [Token]
            | Operator   String
            | Identifier String
            | Binder     String
            | BaseValue  BaseValue
-           deriving (Show,Eq)
+           deriving (Show, Eq)
  
 data BaseValue = Int      Int
-               | Double   Double
+               | Real     Double
                | Boolean  Bool
                | String   String
-                deriving (Show)
+                deriving (Show, Eq)
 
 --Needed for overiding double equality to account for rounding errors in tests
 instance Eq NumberVal where

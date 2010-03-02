@@ -47,5 +47,5 @@ evaluate (g, a : b {-++???-}, OPERATOR : c                          ) = let a' =
 
 operator = error "OPERATOR"
 
-set k v m = Map.insert k v m
-get k   m = Map.findWithDefault (error "unknown identifier") k m
+set = Map.insert
+get = Map.findWithDefault (error "unknown identifier")
