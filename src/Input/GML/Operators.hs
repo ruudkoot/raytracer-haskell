@@ -3,19 +3,20 @@ module Input.GML.Operators (operators) where
 import Data.Map
 import Input.GML.AST
 
-type Operator = String -> Stack -> (Value, Stack)
+type Operator = Stack -> (Value, Stack)
 
-iii  f = \(BaseValue (Int  i1) : BaseValue (Int  i2)                       : ss) -> (BaseValue (Int     (f i1 i2   ), ss)
-rrr  f = \(BaseValue (Real r1) : BaseValue (Real r2)                       : ss) -> (BaseValue (Real    (f r1 r2   ), ss)
-rr   f = \(BaseValue (Real r1)                                             : ss) -> (BaseValue (Real    (f r1      ), ss)
-ri   f = \(BaseValue (Real r1)                                             : ss) -> (BaseValue (Int     (f r1      ), ss)
-ir   f = \(BaseValue (Int  i1)                                             : ss) -> (BaseValue (Real    (f i1      ), ss)
-pr   f = \(Point           p1                                              : ss) -> (BaseValue (Real    (f p1      ), ss)
-rrrp f = \(BaseValue (Real r1) : BaseValue (Real r2) : BaseValue (Real r3) : ss) -> (Point              (f r1 r2 r3), ss)
-iib  g = \(BaseValue (Int  i1) : BaseValue (Int  i2)                       : ss) -> (BaseValue (Boolean (f i1 i2   ), ss)
-rrb  g = \(BaseValue (Real r1) : BaseValue (Real r2)                       : ss) -> (BaseValue (Boolean (f r1 r2   ), ss)
-aiv  f = \(Array           a1  : BaseValue (Int  i2)                       : ss) -> (                    f a1 i2    , ss)
-ai   f = \(Array           a1                                              : ss) -> (BaseValue (Int     (f a1)      , ss)
+ii   f = \(BaseValue (Int  i1)                                             : ss) -> (BaseValue (Int     (f i1      )), ss)
+iii  f = \(BaseValue (Int  i1) : BaseValue (Int  i2)                       : ss) -> (BaseValue (Int     (f i1 i2   )), ss)
+rrr  f = \(BaseValue (Real r1) : BaseValue (Real r2)                       : ss) -> (BaseValue (Real    (f r1 r2   )), ss)
+rr   f = \(BaseValue (Real r1)                                             : ss) -> (BaseValue (Real    (f r1      )), ss)
+ri   f = \(BaseValue (Real r1)                                             : ss) -> (BaseValue (Int     (f r1      )), ss)
+ir   f = \(BaseValue (Int  i1)                                             : ss) -> (BaseValue (Real    (f i1      )), ss)
+pr   f = \(Point           p1                                              : ss) -> (BaseValue (Real    (f p1      )), ss)
+rrrp f = \(BaseValue (Real r1) : BaseValue (Real r2) : BaseValue (Real r3) : ss) -> (Point              (f r1 r2 r3) , ss)
+iib  f = \(BaseValue (Int  i1) : BaseValue (Int  i2)                       : ss) -> (BaseValue (Boolean (f i1 i2   )), ss)
+rrb  f = \(BaseValue (Real r1) : BaseValue (Real r2)                       : ss) -> (BaseValue (Boolean (f r1 r2   )), ss)
+aiv  f = \(Array           a1  : BaseValue (Int  i2)                       : ss) -> (                    f a1 i2     , ss)
+ai   f = \(Array           a1                                              : ss) -> (BaseValue (Int     (f a1)      ), ss)
                                 
 
 -- applicative??
@@ -26,19 +27,19 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "asin"  ,   rr asin                   )
                      , ( "clampf",   rr clampf                 )
                      , ( "cos"   ,   rr cos                    )
-                     , ( "divi"  ,  iii (/)                    ) -- ???
+                     , ( "divi"  ,  iii div                    ) -- ???
                      , ( "divf"  ,  rrr (/)                    )
-                     , ( "eqi"   ,  iii (==)                   )
-                     , ( "eqf"   ,  rrr (==)                   )
+                     , ( "eqi"   ,  iib (==)                   )
+                     , ( "eqf"   ,  rrb (==)                   )
                      , ( "floor" ,   ri floor                  )
                      , ( "frac"  ,   rr (snd . properFraction) ) -- ???
                      , ( "lessi" ,  iib (<)                    )
                      , ( "lessf" ,  rrb (<)                    )
-                     , ( "modi"  ,  iii (%)                    )
+                     , ( "modi"  ,  iii mod                    )
                      , ( "muli"  ,  iii (*)                    )
                      , ( "mulf"  ,  rrr (*)                    )
-                     , ( "negi"  ,   ii neg                    )
-                     , ( "negf"  ,   rr neg                    )
+                     , ( "negi"  ,   ii negate                 )
+                     , ( "negf"  ,   rr negate                 )
                      , ( "real"  ,   ir fromIntegral           )
                      , ( "sin"   ,   rr sin                    )
                      , ( "sqrt"  ,   rr sqrt                   )
