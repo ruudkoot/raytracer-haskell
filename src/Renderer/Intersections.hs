@@ -24,10 +24,12 @@ hit r Sphere   = let dir = rDirection r
                         _  -> True
                         
 hit r Cone     = undefined
-hit r Plane    = let vd = sumVector $ rDirection r
-                     v0 = sumVector $ rOrigin r
-                     t  = v0 / vd
-                 in  vd < 0 && (t >= 0 && t <= 1)
+                 -- The 'unit' plane is the XZ plane, so we only have to consider the Y direction.
+                 -- If oy == 0, we're in the plane, otherwise we hit it if we move 'downwards' on Y
+                 -- when we start 'above' the plane, or vice versa.
+hit r Plane    = let oy = unitVector3DY <.> rOrigin r -- ugly and inefficient way to extract y-value
+                     dy = unitVector3DY <.> rDirection r
+                 in if oy == 0 then True else if oy * dy < 0 then True else False
 
 
 intersection :: Ray -> Shape -> [Intersection]
@@ -53,4 +55,6 @@ intersection r Sphere   = let dir = rDirection r
                                       in [((-b-sqrd)/(2*a), (-b+sqrd)/(2*a))]
 
 intersection r Cone     = undefined
-intersection r Plane    = undefined
+intersection r Plane    = let oy = unitVector3DY <.> rOrigin r -- ugly and inefficient way to extract y-value
+                              dy = unitVector3DY <.> rDirection r
+                          in if oy == 0 then [] else if oy * dy < 0 then [(- oy / dy, - oy / dy)] else []
