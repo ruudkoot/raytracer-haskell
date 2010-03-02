@@ -5,6 +5,17 @@ import Input.GML.AST
 
 type Operator = Stack -> (Value, Stack)
 
+ii   :: (Int                        -> Int                         ) -> Operator
+iii  :: (Int    -> Int              -> Int                         ) -> Operator
+rrr  :: (Double -> Double           -> Double                      ) -> Operator
+rr   :: (Double                     -> Double                      ) -> Operator
+ri   :: (Double                     -> Int                         ) -> Operator
+ir   :: (Int                        -> Double                      ) -> Operator
+pr   :: ((Double,  Double,   Double)-> Double                      ) -> Operator
+rrrp :: (Double -> Double -> Double -> (Double -> Double -> Double)) -> Operator
+iib  :: (Int    -> Int              -> Bool                        ) -> Operator
+rrb  :: (Double -> Double           -> Bool                        ) -> Operator
+
 ii   f = \(BaseValue (Int  i1)                                             : ss) -> (BaseValue (Int     (f i1      )), ss)
 iii  f = \(BaseValue (Int  i1) : BaseValue (Int  i2)                       : ss) -> (BaseValue (Int     (f i1 i2   )), ss)
 rrr  f = \(BaseValue (Real r1) : BaseValue (Real r2)                       : ss) -> (BaseValue (Real    (f r1 r2   )), ss)
