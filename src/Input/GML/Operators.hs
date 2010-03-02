@@ -44,8 +44,8 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "eqf"   ,  rrb (==)                   )
                      , ( "floor" ,   ri floor                  )
                      , ( "frac"  ,   rr (snd . properFraction) ) -- ???
-                     , ( "lessi" ,  iib (<)                    )
-                     , ( "lessf" ,  rrb (<)                    )
+                     , ( "lessi" ,  iib (flip (<))             )
+                     , ( "lessf" ,  rrb (flip (<))             )
                      , ( "modi"  ,  iii mod                    )
                      , ( "muli"  ,  iii (*)                    )
                      , ( "mulf"  ,  rrr (*)                    )
