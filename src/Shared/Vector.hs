@@ -32,7 +32,7 @@ instance Vector Vector3D where
   fromVector (Vector3D (x, y, z)) = [x, y, z]
 
 instance Vector Vector4D where 
-  fromVector (Vector4D (x, y, z, a)) = [x, y, z, a]
+  fromVector (Vector4D (x, y, z, w)) = [x, y, z, w]
 
 
 
@@ -67,7 +67,7 @@ instance Functor Vector3D where
   fmap f (Vector3D (x, y, z)) = Vector3D (f x, f y, f z)
   
 instance Functor Vector4D where 
-  fmap f (Vector4D (x, y, z, a)) = Vector4D (f x, f y, f z, f a)
+  fmap f (Vector4D (x, y, z, w)) = Vector4D (f x, f y, f z, f w)
 
 
 
@@ -81,7 +81,7 @@ instance Applicative Vector3D where
 
 instance Applicative Vector4D where 
   pure x = Vector4D (x, x, x, x)
-  Vector4D (f1, f2, f3, f4) <*> Vector4D (x, y, z, a) = Vector4D (f1 x, f2 y, f3 z, f4 a)
+  Vector4D (f1, f2, f3, f4) <*> Vector4D (x, y, z, w) = Vector4D (f1 x, f2 y, f3 z, f4 w)
 
 
 
@@ -97,21 +97,38 @@ fromVector4D :: Vector4D a -> (a, a, a, a)
 fromVector4D (Vector4D a) = a
 
 
+getX2D :: Vector2D a -> a
+getX2D (Vector2D (x, _)) = x
+
+getY2D :: Vector2D a -> a
+getY2D (Vector2D (_, y)) = y
+
+
+getX3D :: Vector3D a -> a
+getX3D (Vector3D (x, _, _)) = x
+
+getY3D :: Vector3D a -> a
+getY3D (Vector3D (_, y, _)) = y
+
+getZ3D :: Vector3D a -> a
+getZ3D (Vector3D (_, _, z)) = z
+
+
+getX4D :: Vector4D a -> a
+getX4D (Vector4D (x, _, _, _)) = x
+
+getY4D :: Vector4D a -> a
+getY4D (Vector4D (_, y, _, _)) = y
+
+getZ4D :: Vector4D a -> a
+getZ4D (Vector4D (_, _, z, _)) = z
+
+getW4D :: Vector4D a -> a
+getW4D (Vector4D (_, _, _, w)) = w
+
 
 -- * Unit Vectors
-{-
--- These are not unit vectors! Unit vectors are length 1.
-
-unitVector2D :: Num a => Vector2D a
-unitVector2D = Vector2D (1, 1)
-
-unitVector3D :: Num a => Vector3D a
-unitVector3D = Vector3D (1, 1, 1)
-
-unitVector4D :: Num a => Vector4D a
-unitVector4D = Vector4D (1, 1, 1, 1)
-
--}
+--
 
 unitVector2DX :: Num a => Vector2D a
 unitVector2DX = Vector2D (1, 0)
@@ -137,6 +154,8 @@ unitVector4DY = Vector4D (0, 1, 0, 0)
 unitVector4DZ :: Num a => Vector4D a
 unitVector4DZ = Vector4D (0, 0, 1, 0)
 
+unitVector4DW :: Num a => Vector4D a
+unitVector4DW = Vector4D (0, 0, 0, 1)
 
 
 -- | Using Vectors as ordinary Nums (for scaling, etc.)
@@ -149,7 +168,6 @@ instance (Num a) => Num (Vector2D a) where
   abs    = fmap abs 
   signum = fmap signum 
   fromInteger = pure . fromInteger
-
 
 instance (Num a) => Num (Vector3D a) where 
   (+) = zipWithVectors (+)
@@ -195,23 +213,19 @@ instance (Fractional a) => Fractional (Vector4D a) where
 -- of numbers  and returns a single number obtained by multiplying 
 -- corresponding entries and adding up those products. 
 --
-dot :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
-dot v1 v2 = foldVector sum (v1 * v2)
-
 (<.>) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
-(<.>) = dot
+v1 <.> v2 = foldVector sum (v1 * v2)
 
 -- | The cross product is a binary operation on two 3D vectors 
 -- that results in another vector which is perpendicular to 
 -- the plane containing the two input vectors.
 --
-crossProduct :: Num a => Vector3D a -> Vector3D a -> Vector3D a
-crossProduct (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) = 
+cross :: Num a => Vector3D a -> Vector3D a -> Vector3D a
+cross (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) = 
   Vector3D (y1 * z2 - z1 * y2,
             z1 * x2 - x1 * z2,
             x1 * y2 - y1 * z2)
 
-a `cross` b = a crossProduct b
 
 -- | Calculates the length or magnitude of the given Vector.
 --

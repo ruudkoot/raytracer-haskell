@@ -4,7 +4,7 @@
 PATH="/home/afp2009/.cabal/bin:$PATH"
 
 # Update instance
-./update_instance.sh && 
+./update_instance.sh 2>/dev/null && 
 
 # Update redmine clone 
 ./update_redmine_mirror.sh && 
@@ -22,7 +22,7 @@ cabal --executable haddock &&
 # Copy website
 cp -r www/* /var/www/projects/afp2009/
 
-# Copy generated docs TODO
+# Copy generated docs
 cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/
 
 # Run Hlint on all haskell source files
