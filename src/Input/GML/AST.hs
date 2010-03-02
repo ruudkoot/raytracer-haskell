@@ -4,27 +4,22 @@ import Data.Char
 import Control.Monad
 
 --AST defition following the specification in chapter 2.1 of the assignment
-type GML = TokenList
-
-newtype TokenList = TokenList [TokenGroup] deriving (Show,Eq)
+type GML = [Token]
 
 {- RUUD: from the perspective of the evaluate it would be nicer to flatten
          TokenGroup and Token, as well as losing the Token- prefixes          -}
-data TokenGroup = TokenS        Token 
-                | TokenFunction TokenList
-                | TokenArray    TokenList
-                deriving (Show,Eq)
-                
-data Token = Operator    String
-           | Identifier  String
-           | Binder      String
-           | Boolean     Bool
-           | Number      NumberVal
-           | TokenString String
-            deriving (Show,Eq)
-
-data NumberVal = IntVal    Int
-               | DoubleVal Double
+data Token = Function   [Token]
+           | Array      [Token]
+           | Operator   String
+           | Identifier String
+           | Binder     String
+           | BaseValue  BaseValue
+           deriving (Show,Eq)
+ 
+data BaseValue = Int      Int
+               | Double   Double
+               | Boolean  Bool
+               | String   String
                 deriving (Show)
 
 --Needed for overiding double equality to account for rounding errors in tests
