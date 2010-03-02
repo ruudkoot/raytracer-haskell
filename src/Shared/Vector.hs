@@ -249,8 +249,8 @@ magnitude' = magnitude . fmap fromIntegral
 normalize :: (Vector v, Floating a, Num (v a)) => v a -> v a 
 normalize v1 = pure (1 / magnitude v1) * v1
 
--- | Theorem of Duh
-
+-- | Sum values of a vector.
+--
 sumVector :: (Vector v, Floating a, Num (v a)) => v a -> a
 sumVector = foldVector sum
 
