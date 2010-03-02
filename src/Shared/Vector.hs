@@ -235,7 +235,7 @@ magnitude v = sqrt (v <.> v)
 -- | Calculates the length or magnitude squared of the given Vector.
 --
 magnitudeSquared :: (Vector v, Floating a, Num (v a)) => v a -> a
-magnitudeSquared v = (v <.> v)
+magnitudeSquared v = v <.> v
 
 -- | A version of magnitude for Integrals. 
 -- Probably not needed.
