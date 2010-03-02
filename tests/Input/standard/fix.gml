@@ -1,21 +1,9 @@
-
-{ /f 
-    { /x {x x apply} f apply }
-    { /x {x x apply} f apply }
-    apply
-} /fix
-
 { /frec /n 
     0 n lessi
-    { n -1 addi frec apply
+    { n -1 addi frec frec apply
       n muli }
     { 1 }
     if
 } /facf
 
-{ /n 
-    facf fix apply
-    n apply
-} /fac
-
-5.0 fac apply
+5 facf facf  apply

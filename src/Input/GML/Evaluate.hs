@@ -27,7 +27,7 @@ evaluate' (g,                    b, Operator   o       : c) = let (a', b') = ope
 evaluate' st                                                = error ("Error in evaluation, state dump:\n"++show st)
                                                              
 operator :: String -> Operator
-operator o = Map.findWithDefault (error "unknown operator") o operators
+operator o = Map.findWithDefault (error ("unknown operator "++o)) o operators
 
 set = Map.insert
 get = Map.findWithDefault (error "unknown identifier")
