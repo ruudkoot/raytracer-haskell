@@ -29,7 +29,7 @@ hit r Cone     = undefined
                  -- when we start 'above' the plane, or vice versa.
 hit r Plane    = let oy = unitVector3DY <.> rOrigin r -- ugly and inefficient way to extract y-value
                      dy = unitVector3DY <.> rDirection r
-                 in if oy == 0 then True else if oy * dy < 0 then True else False
+                 in (oy == 0) || (oy * dy < 0)
 
 
 intersection :: Ray -> Shape -> [Intersection]
