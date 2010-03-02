@@ -232,6 +232,10 @@ cross (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) =
 magnitude :: (Vector v, Floating a, Num (v a)) => v a -> a
 magnitude v = sqrt (v <.> v)
 
+-- | Calculates the length or magnitude squared of the given Vector.
+--
+magnitudeSquared :: (Vector v, Floating a, Num (v a)) => v a -> a
+magnitudeSquared v = (v <.> v)
 
 -- | A version of magnitude for Integrals. 
 -- Probably not needed.
