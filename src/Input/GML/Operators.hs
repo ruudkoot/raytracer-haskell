@@ -12,7 +12,7 @@ rr   :: (Double                     -> Double                      ) -> Operator
 ri   :: (Double                     -> Int                         ) -> Operator
 ir   :: (Int                        -> Double                      ) -> Operator
 pr   :: ((Double,  Double,   Double)-> Double                      ) -> Operator
-rrrp :: (Double -> Double -> Double -> (Double -> Double -> Double)) -> Operator
+rrrp :: (Double -> Double -> Double -> (Double, Double, Double)    ) -> Operator
 iib  :: (Int    -> Int              -> Bool                        ) -> Operator
 rrb  :: (Double -> Double           -> Bool                        ) -> Operator
 
