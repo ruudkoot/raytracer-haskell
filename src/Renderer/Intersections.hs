@@ -57,4 +57,4 @@ intersection r Sphere   = let dir = rDirection r
 intersection r Cone     = undefined
 intersection r Plane    = let oy = unitVector3DY <.> rOrigin r -- ugly and inefficient way to extract y-value
                               dy = unitVector3DY <.> rDirection r
-                          in if oy == 0 then [] else if oy * dy < 0 then [(- oy / dy, - oy / dy)] else []
+                          in if (oy == 0) || (oy * dy >= 0) then [] else [(- oy / dy, - oy / dy)]
