@@ -114,11 +114,43 @@ rows = fromMatrix
 columns :: (Matrix m) => m a -> [[a]]
 columns = transpose . rows
 
+
+-- * Multiplication
+--
+
 class MultSquare a b where 
   mult :: a -> b -> b
 
-instance Num a => MultSquare (Matrix4D a) (Vector4D a) where 
+
+-- Matrix * Vector
+--
+instance (Num a) => MultSquare (Matrix3D a) (Vector3D a) where 
+  mult (Matrix3D (mx, my, mz)) v = Vector3D (mx <.> v, my <.> v, mz <.> v)
+
+instance (Num a) => MultSquare (Matrix4D a) (Vector4D a) where 
   mult (Matrix4D (mx, my, mz, mw)) v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
+
+
+-- Matrix * Matrix
+--
+instance (Num a) => MultSquare (Matrix3D a) (Matrix3D a) where 
+  mult m1 m2 = Matrix3D (Vector3D (dot r x, dot r y, dot r z), 
+                         Vector3D (dot s x, dot s y, dot s z),
+                         Vector3D (dot t x, dot t y, dot t z))
+    where (r:s:t:[]) = rows m1
+          (x:y:z:[]) = columns m2
+          dot a b = sum (zipWith (*) a b)
+
+instance (Num a) => MultSquare (Matrix4D a) (Matrix4D a) where 
+  mult m1 m2 = Matrix4D (Vector4D (dot r x, dot r y, dot r z, dot r a), 
+                         Vector4D (dot s x, dot s y, dot s z, dot s a),
+                         Vector4D (dot t x, dot t y, dot t z, dot t a),
+                         Vector4D (dot u x, dot u y, dot u z, dot u a))
+    where (r:s:t:u:[]) = rows m1
+          (x:y:z:a:[]) = columns m2
+          dot a b = sum (zipWith (*) a b)
+
+
 
 {-
 
