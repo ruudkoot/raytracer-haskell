@@ -6,6 +6,9 @@ import Input.GML.ApplicativeParsec
 import Input.GML.AST
 import Data.Char
 
+import Input.GML.Operators
+
+gmlOperators = ["apply","if"] ++ map fst operators
 
 --Definitions for the lexer created by parsec, see parsec documentation 2.8/2.9 and refernce guide
 gmlDef::LanguageDef a
@@ -20,7 +23,7 @@ gmlDef
    , opStart        = empty
    , opLetter       = empty
    , reservedOpNames= ["/"]
-   , reservedNames  = ["true","false","apply","if"]
+   , reservedNames  = ["true","false"]++gmlOperators
    , caseSensitive  = False
    }
 
@@ -28,48 +31,49 @@ gmlDef
 gmlLexer::TokenParser a
 gmlLexer = makeTokenParser gmlDef
 
-parseGML :: String -> Either ParseError TokenList
+parseGML :: String -> Either ParseError [Token]
 parseGML = parse (whiteSpace gmlLexer *> parseTokenList <* eof) ""
 
-parseTokenList :: Parser TokenList
-parseTokenList = TokenList <$> many parseTokenGroup 
+parseTokenList :: Parser [Token]
+parseTokenList = many parseToken
              <?> "token list" 
 
-parseTokenGroup :: Parser TokenGroup
-parseTokenGroup = TokenS        <$> parseToken
-              <|> TokenFunction <$> braces gmlLexer parseTokenList
-              <|> TokenArray    <$> squares gmlLexer parseTokenList
-              <?> "token group"
-
 parseToken :: Parser Token
-parseToken =  Number      <$> parseNumber
-          <|> parseBoolean
-          <|> TokenString <$> parseString
-          <|> Binder      <$> (reservedOp gmlLexer "/" *> identifier gmlLexer)
-          <|> Identifier  <$> identifier gmlLexer
-          <|> parseOperator
+parseToken =  Function   <$> braces gmlLexer parseTokenList
+          <|> Array      <$> squares gmlLexer parseTokenList
+          <|> parseOperator   
+          <|> Binder     <$> (reservedOp gmlLexer "/" *> identifier gmlLexer)
+          <|> BaseValue  <$> parseBaseValue
+          <|> Identifier <$> identifier gmlLexer          
           <?> "token"
 
 parseOperator :: Parser Token
-parseOperator =  (Operator "apply" <$ reserved gmlLexer "apply")
-             <|> (Operator "if" <$ reserved gmlLexer "if")
+parseOperator =  choice (map parseOp gmlOperators)
              <?> "operator"
+       where parseOp s = Operator s <$ reserved gmlLexer s
+
+parseBaseValue :: Parser BaseValue
+parseBaseValue =  parseNumber
+              <|> parseBoolean
+              <|> String <$> parseString       
+              <?> "base value"
+
 
 --Unescaped string parser
 parseString :: Parser String
 parseString = char '\"' *> many (satisfy (\x -> isPrint x && x /= '\"')) <* char '\"' <* whiteSpace gmlLexer
 
-parseBoolean :: Parser Token
+parseBoolean :: Parser BaseValue
 parseBoolean =  Boolean True  <$ reserved gmlLexer "true"
             <|> Boolean False <$ reserved gmlLexer "false" 
             <?> "boolean"
 
 --Customized number lexer, parsec's standard number lexer is not signed, so added that
-parseNumber::Parser NumberVal
+parseNumber::Parser BaseValue
 parseNumber =  do sign <- option 1 (-1 <$ char '-')
                   num <- naturalOrFloat gmlLexer
                   return (case num of
-                            Left i  -> (IntVal . fromInteger) (i*sign)
-                            Right d -> DoubleVal (d * fromIntegral sign))
+                            Left i  -> (Int . fromInteger) (i*sign)
+                            Right d -> Real (d * fromIntegral sign))
            <?> "number"
 

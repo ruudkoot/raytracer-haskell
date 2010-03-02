@@ -4,7 +4,7 @@ import Control.Applicative ((<$>))
 
 import Input.GML.AST
 import Input.GML.Parser
-import Input.GML.Evaluator
+
 --
 import Renderer.Datatypes
 import Renderer.Intersections
@@ -23,5 +23,5 @@ main :: IO()
 main = do --parseResult <- parseGML <$> getContents
           case parseGML test of 
             Left err -> putStrLn $ "Parse error on " ++ show err
-            Right (TokenList tks) -> print (evalGML (M.empty,[],tks))
+            Right (tks) -> print (evalGML (M.empty,[],tks))
           maybe (putStrLn "Not a valid image") putStrLn (toPPM (Size 0) (Size 0) [])
