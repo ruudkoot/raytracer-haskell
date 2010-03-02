@@ -95,6 +95,18 @@ instance (Fractional a) => Fractional (Matrix4D a) where
   fromRational = pure . fromRational
 
 
+-- * Identity Matrices
+--
+identity3D :: Num a => Matrix3D a
+identity3D = Matrix3D(Vector3D(1, 0, 0), 
+                      Vector3D(0, 1, 0),
+                      Vector3D(0, 0, 1))
+
+identity4D :: Num a => Matrix4D a
+identity4D = Matrix4D(Vector4D(1, 0, 0, 0),
+                      Vector4D(0, 1, 0, 0),
+                      Vector4D(0, 0, 1, 0),
+                      Vector4D(0, 0, 0, 1))
 
 -- * Matrix Operations. 
 --
@@ -156,7 +168,15 @@ instance (Num a) => MultSquare (Matrix4D a) (Matrix4D a) where
 {-
 
 inverse :: (Matrix m, Fractional a) => m a -> m a
-determinant :: (Matrix m, Fractional a) => m a -> a
 
 --}
 
+class SquareMatrix m where 
+  determinant :: Num a => m a -> a
+
+
+instance SquareMatrix Matrix3D where 
+  determinant = undefined 
+
+instance SquareMatrix Matrix4D where 
+  determinant = undefined
