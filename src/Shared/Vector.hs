@@ -150,7 +150,6 @@ instance (Num a) => Num (Vector2D a) where
   signum = fmap signum 
   fromInteger = pure . fromInteger
 
-
 instance (Num a) => Num (Vector3D a) where 
   (+) = zipWithVectors (+)
   (*) = zipWithVectors (*)
@@ -195,23 +194,19 @@ instance (Fractional a) => Fractional (Vector4D a) where
 -- of numbers  and returns a single number obtained by multiplying 
 -- corresponding entries and adding up those products. 
 --
-dot :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
-dot v1 v2 = foldVector sum (v1 * v2)
-
 (<.>) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
-(<.>) = dot
+v1 <.> v2 = foldVector sum (v1 * v2)
 
 -- | The cross product is a binary operation on two 3D vectors 
 -- that results in another vector which is perpendicular to 
 -- the plane containing the two input vectors.
 --
-crossProduct :: Num a => Vector3D a -> Vector3D a -> Vector3D a
-crossProduct (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) = 
+cross :: Num a => Vector3D a -> Vector3D a -> Vector3D a
+cross (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) = 
   Vector3D (y1 * z2 - z1 * y2,
             z1 * x2 - x1 * z2,
             x1 * y2 - y1 * z2)
 
-a `cross` b = a crossProduct b
 
 -- | Calculates the length or magnitude of the given Vector.
 --
