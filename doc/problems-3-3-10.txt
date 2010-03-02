@@ -1,0 +1,3 @@
+* stack evaluator / patterns
+* error handling
+* strings in gml, geen operaties.
