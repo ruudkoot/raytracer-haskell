@@ -1,18 +1,20 @@
 module Input.GML.AST where
-import Test.QuickCheck
-import Data.Char
-import Control.Monad
+
+import           Control.Monad
+import           Data.Char
+import qualified Data.Map        as Map
+import           Test.QuickCheck
 
 --AST defition following the specification in chapter 2.1 of the assignment
 type GML = [Token]
 
-data Token = Function   [Token]
-           | Array      [Token]
-           | Operator   String
-           | Identifier String
-           | Binder     String
-           | BaseValue  BaseValue
-           deriving (Show, Eq)
+data Token     = Function   [Token]
+               | TArray     [Token]
+               | Operator   String
+               | Identifier String
+               | Binder     String
+               | TBaseValue BaseValue
+               deriving (Show, Eq)
  
 data BaseValue = Int      Int
                | Real     Double
@@ -22,14 +24,14 @@ data BaseValue = Int      Int
 
 type Id        = String
 type Env       = Map.Map Id Value
-type Code      = GML.GML
+type Code      = GML
 type Closure   = (Env, Code)
 
 type Point     = (Double, Double, Double)
 type Object    = ()
 type Light     = ()
 
-data Value     = BaseValue GML.BaseValue
+data Value     = BaseValue BaseValue
                | Closure   Closure
                | Array     Array
                | Point     Point
@@ -67,11 +69,11 @@ type GmlAlgebra tok bv = (([tok]     -> tok, --Function
 foldGML::GmlAlgebra tok bv -> GML -> [tok]
 foldGML ((func,arr,op,ident,bind,base),(int,real,string,bool)) = map foldToken
     where   foldToken (Function ls)     = func (map foldToken ls)
-            foldToken (Array ls)        = arr (map foldToken ls)        
+            foldToken (TArray ls)       = arr (map foldToken ls)        
             foldToken (Operator s)      = op s
             foldToken (Identifier s)    = ident s
             foldToken (Binder s)        = bind s            
-            foldToken (BaseValue v)     = base (foldBase v)
+            foldToken (TBaseValue v)    = base (foldBase v)
 
             foldBase  (Int i)           = int i
             foldBase  (Real d)          = real d
@@ -102,11 +104,11 @@ simplePrintGML gml = concatMap (' ':) $ foldGML simplePrintAlg gml
 
 instance Arbitrary Token where
     arbitrary = sized $ \n -> frequency [(1,liftM Function (resize (n `div` 4) arbitrary))
-                                        ,(1,liftM Array (resize (n `div` 4) arbitrary))
+                                        ,(1,liftM TArray (resize (n `div` 4) arbitrary))
                                         ,(2,genOperator)
                                         ,(2,liftM Identifier genIdent)
                                         ,(1,liftM Binder genIdent)
-                                        ,(3,liftM BaseValue arbitrary)]
+                                        ,(3,liftM TBaseValue arbitrary)]
 
 instance Arbitrary BaseValue where
     arbitrary = oneof [liftM Int arbitrary

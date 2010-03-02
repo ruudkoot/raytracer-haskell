@@ -5,10 +5,11 @@ import Control.Monad
 import Input.GML.ApplicativeParsec
 import Input.GML.AST
 import Data.Char
+import qualified Data.Map as Map
 
 import Input.GML.Operators
 
-gmlOperators = ["apply","if"] ++ map fst operators
+gmlOperators = ["apply","if"] ++ Map.keys operators
 
 --Definitions for the lexer created by parsec, see parsec documentation 2.8/2.9 and refernce guide
 gmlDef::LanguageDef a
@@ -40,10 +41,10 @@ parseTokenList = many parseToken
 
 parseToken :: Parser Token
 parseToken =  Function   <$> braces gmlLexer parseTokenList
-          <|> Array      <$> squares gmlLexer parseTokenList
+          <|> TArray      <$> squares gmlLexer parseTokenList
           <|> parseOperator   
           <|> Binder     <$> (reservedOp gmlLexer "/" *> identifier gmlLexer)
-          <|> BaseValue  <$> parseBaseValue
+          <|> TBaseValue  <$> parseBaseValue
           <|> Identifier <$> identifier gmlLexer          
           <?> "token"
 

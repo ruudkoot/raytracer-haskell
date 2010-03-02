@@ -4,7 +4,7 @@ import Control.Applicative ((<$>))
 
 import Input.GML.AST
 import Input.GML.Parser
-import Input.GML.Evaluator
+import Input.GML.Evaluate
 --
 import Renderer.Datatypes
 import Renderer.Intersections
