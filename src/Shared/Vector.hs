@@ -32,7 +32,7 @@ instance Vector Vector3D where
   fromVector (Vector3D (x, y, z)) = [x, y, z]
 
 instance Vector Vector4D where 
-  fromVector (Vector4D (x, y, z, a)) = [x, y, z, a]
+  fromVector (Vector4D (x, y, z, w)) = [x, y, z, w]
 
 
 
@@ -67,7 +67,7 @@ instance Functor Vector3D where
   fmap f (Vector3D (x, y, z)) = Vector3D (f x, f y, f z)
   
 instance Functor Vector4D where 
-  fmap f (Vector4D (x, y, z, a)) = Vector4D (f x, f y, f z, f a)
+  fmap f (Vector4D (x, y, z, w)) = Vector4D (f x, f y, f z, f w)
 
 
 
@@ -81,7 +81,7 @@ instance Applicative Vector3D where
 
 instance Applicative Vector4D where 
   pure x = Vector4D (x, x, x, x)
-  Vector4D (f1, f2, f3, f4) <*> Vector4D (x, y, z, a) = Vector4D (f1 x, f2 y, f3 z, f4 a)
+  Vector4D (f1, f2, f3, f4) <*> Vector4D (x, y, z, w) = Vector4D (f1 x, f2 y, f3 z, f4 w)
 
 
 
@@ -123,8 +123,8 @@ getY4D (Vector4D (_, y, _, _)) = y
 getZ4D :: Vector4D a -> a
 getZ4D (Vector4D (_, _, z, _)) = z
 
-getA4D :: Vector4D a -> a
-getA4D (Vector4D (_, _, _, a)) = a
+getW4D :: Vector4D a -> a
+getW4D (Vector4D (_, _, _, w)) = w
 
 
 -- * Unit Vectors
@@ -154,6 +154,8 @@ unitVector4DY = Vector4D (0, 1, 0, 0)
 unitVector4DZ :: Num a => Vector4D a
 unitVector4DZ = Vector4D (0, 0, 1, 0)
 
+unitVector4DW :: Num a => Vector4D a
+unitVector4DW = Vector4D (0, 0, 0, 1)
 
 
 -- | Using Vectors as ordinary Nums (for scaling, etc.)
