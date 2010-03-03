@@ -74,14 +74,6 @@ data RenderLight
   --  from pos to Q. If the angle is greater than the cutoff angle, then intensity
   --  is zero; otherwise the intensity is given by the equation
 
--- | Our 'Shader' mechanism.
--- Example: 
--- instance Shader GML where
---   shade surface ray = eval surface ray       
-class Shader s where
-  shade :: s -> Ray -> a
-
-
 data RenderOptions = RenderOptions
   {
     roAmbience :: Colour -- amb

@@ -8,6 +8,7 @@ import Input.GML.Evaluate
 --
 import Renderer.Datatypes
 import Renderer.Intersections
+import Renderer.Shaders
 --
 import Output.Output
 import Output.PPM
