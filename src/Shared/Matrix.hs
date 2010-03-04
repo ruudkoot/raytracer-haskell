@@ -173,20 +173,28 @@ instance (Num a) => Multiplicable (Matrix4D a) (Matrix4D a) where
 -- ** Determinant and Inverse
 --
 class Matrix m => SquareMatrix m where 
+  -- | Calculates the determinant of a matrix 
   determinant :: Num a => m a -> a
-  cofactor :: Num a => m a -> m a
-  adjoint :: m a -> m a
-  inverse :: (Fractional a, Fractional (m a)) => m a -> m a
+  -- | The adjoint matrix is calculated by 
+  -- transposing the rows and columns.
+  adjoint     :: m a -> m a
+  -- | The cofactor is used to calculate the inverse.
+  cofactor    :: Num a => m a -> m a
+  -- | Calculates the inverse matrix
+  inverse     :: (Fractional a, Fractional (m a)) => m a -> m a
   inverse m = scaleF (1 / determinant m) (adjoint (cofactor m))
 
 
-det2D :: Num a => a -> a -> a -> a -> a
-det2D a b c d = a * d - b * c
 
--- | Inlined determinant function for 3D matrices.
--- Useful for laplace expansion. Not necessary to 
+
+-- | Inlined determinant function for 2D and 3D matrices.
+-- Useful for laplace expansion and cofactors. Not necessary to 
 -- use directly.
 --
+det2D :: Num a => a -> a -> a -> a -> a
+{-# INLINE det2D #-}
+det2D a b c d = a * d - b * c
+
 det3D :: Num a => a -> a -> a 
                -> a -> a -> a
                -> a -> a -> a -> a
@@ -205,26 +213,34 @@ instance SquareMatrix Matrix3D where
                          Vector3D (g, h, i))) = det3D a b c d e f g h i 
   adjoint (Matrix3D (Vector3D (a, b, c),
                      Vector3D (d, e, f),
-                     Vector3D (g, h, i))) = Matrix3D (Vector3D (a, d, g), Vector3D (b, e, h), Vector3D (c, f, i))
+                     Vector3D (g, h, i))) = Matrix3D (Vector3D (a, d, g), 
+                                                      Vector3D (b, e, h), 
+                                                      Vector3D (c, f, i))
   cofactor (Matrix3D (Vector3D (a, b, c),
                       Vector3D (d, e, f),
-                      Vector3D (g, h, i))) = Matrix3D (Vector3D (  det2D e f h i, - det2D d f g i,   det2D d e g h),
-                                                       Vector3D (- det2D b c h i,   det2D a c g i, - det2D a b g h),
-                                                       Vector3D (  det2D b c e f, - det2D a c d f,   det2D a b d e))
+                      Vector3D (g, h, i))) = 
+                                     Matrix3D (Vector3D (  det2D e f h i, 
+                                                         - det2D d f g i,
+                                                           det2D d e g h),
+                                               Vector3D (- det2D b c h i, 
+                                                           det2D a c g i, 
+                                                         - det2D a b g h),
+                                               Vector3D (  det2D b c e f, 
+                                                         - det2D a c d f, 
+                                                           det2D a b d e))
 
 
--- | Uses laplace expansion to calculate 
--- determinant from minors of the first row.
---
 instance SquareMatrix Matrix4D where 
+  -- | Uses laplace expansion to calculate 
+  -- determinant from minors of the first row.
+  --
   determinant (Matrix4D (Vector4D (a, b, c, d), 
                          Vector4D (e, f, g, h), 
                          Vector4D (i, j, k, l),
-                         Vector4D (m, n, o, p))) = 
-      a * det3D f g h j k l n o p
-    - b * det3D e g h i k l m o p
-    + c * det3D e f h i j l m n p
-    - d * det3D e f g i j k m n o
+                         Vector4D (m, n, o, p))) = a * det3D f g h j k l n o p
+                                                 - b * det3D e g h i k l m o p
+                                                 + c * det3D e f h i j l m n p
+                                                 - d * det3D e f g i j k m n o
   adjoint (Matrix4D (Vector4D (a, b, c, d), 
                      Vector4D (e, f, g, h), 
                      Vector4D (i, j, k, l),
@@ -232,6 +248,26 @@ instance SquareMatrix Matrix4D where
                                                          Vector4D (b, f, j, n), 
                                                          Vector4D (c, g, k, o), 
                                                          Vector4D (d, h, l, p))
-  cofactor m = m
+  cofactor (Matrix4D (Vector4D (a, b, c, d), 
+                      Vector4D (e, f, g, h), 
+                      Vector4D (i, j, k, l),
+                      Vector4D (m, n, o, p))) = 
+                                Matrix4D (Vector4D (  det3D f g h j k l n o p,
+                                                    - det3D e g h i k l m o p,
+                                                      det3D e f h i j l m n p, 
+                                                    - det3D e f g i j k m n o),
+                                          Vector4D (- det3D b c d j k l n o p, 
+                                                      det3D a c d i k l m o p,
+                                                    - det3D a b d i j l m n p,
+                                                      det3D a b c i j k m n o),
+                                          Vector4D (  det3D b c d f g h n o p, 
+                                                    - det3D a c d e g h m o p,
+                                                      det3D a b d e f h m n p,
+                                                    - det3D a b c e f g m n o),
+                                          Vector4D (- det3D b c d f g h j k l,
+                                                      det3D a c d e g h i k l,
+                                                    - det3D a b d e f h i j l,
+                                                      det3D a b c e f g i j k))
+           
 
 
