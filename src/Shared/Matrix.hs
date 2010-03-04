@@ -53,11 +53,13 @@ instance Functor Matrix4D where
 
 instance Applicative Matrix3D where 
   pure x = Matrix3D (pure x, pure x, pure x)
-  Matrix3D (fx, fy, fz) <*> Matrix3D (x, y, z) = Matrix3D (fx <*> x, fy <*> y, fz <*> z)
+  Matrix3D (fx, fy, fz) <*> Matrix3D (x, y, z) = 
+    Matrix3D (fx <*> x, fy <*> y, fz <*> z)
 
 instance Applicative Matrix4D where 
   pure x = Matrix4D (pure x, pure x, pure x, pure x)
-  Matrix4D (fx, fy, fz, fa) <*> Matrix4D (x, y, z, a) = Matrix4D (fx <*> x, fy <*> y, fz <*> z, fa <*> a)
+  Matrix4D (fx, fy, fz, fa) <*> Matrix4D (x, y, z, a) = 
+    Matrix4D (fx <*> x, fy <*> y, fz <*> z, fa <*> a)
 
 
 -- | Instance declarations for Nums.
@@ -172,6 +174,7 @@ instance (Num a) => Multiplicable (Matrix4D a) (Matrix4D a) where
 --
 class SquareMatrix m where 
   determinant :: Num a => m a -> a
+  inverse :: Num a => m a -> m a
 
 
 -- | Inlined determinant function for 3D matrices.
@@ -193,11 +196,11 @@ instance SquareMatrix Matrix3D where
   determinant (Matrix3D (Vector3D (a, b, c),
                          Vector3D (d, e, f),
                          Vector3D (g, h, i))) = det3D a b c d e f g h i 
-
+  inverse m = undefined
 
 
 -- | Uses laplace expansion to calculate 
--- determinant from minors.
+-- determinant from minors of the first row.
 --
 instance SquareMatrix Matrix4D where 
   determinant (Matrix4D (Vector4D (a, b, c, d), 
@@ -208,11 +211,6 @@ instance SquareMatrix Matrix4D where
     - b * det3D e g h i k l m o p
     + c * det3D e f h i j l m n p
     - d * det3D e f g i j k m n o
+  inverse m = undefined
 
 
-
-{-
-
-inverse :: (Matrix m, Fractional a) => m a -> m a
-
---}
