@@ -37,10 +37,10 @@ instance Matrix Vector4D where
 
 
 instance Show m => Show (Matrix3D m) where 
-  show (Matrix3D (x, y, z)) = concat ["[", intercalate ", \n " (map show [ x, y, z]), "]"]
+  show (Matrix3D (x, y, z)) = concat ["{[", intercalate ", \n  " (map show [ x, y, z]), "]}"]
 
 instance Show m => Show (Matrix4D m) where 
-  show (Matrix4D (x, y, z, a)) = concat ["[", intercalate ", \n " (map show [x, y, z, a]), "]"]
+  show (Matrix4D (x, y, z, a)) = concat ["{[", intercalate ", \n  " (map show [x, y, z, a]), "]}"]
   
 
 
@@ -110,7 +110,7 @@ identity4D = Matrix4D(Vector4D(1, 0, 0, 0),
                       Vector4D(0, 0, 1, 0),
                       Vector4D(0, 0, 0, 1))
 
--- * Matrix Operations. 
+-- * Matrix Operations
 --
 -- Addition & substraction are handled by the Num instance.
 -- Matrix multiplication is done using the (!*!) operator.
@@ -132,7 +132,7 @@ columns :: (Matrix m) => m a -> [[a]]
 columns = transpose . rows
 
 
--- * Multiplication
+-- ** Multiplication
 -- Matrix multiplication is done using the (!*!) operator, 
 -- and is only defined on square matrices and 3d/4d vectors.
 --
@@ -170,15 +170,22 @@ instance (Num a) => Multiplicable (Matrix4D a) (Matrix4D a) where
           dot a b = sum (zipWith (*) a b)
 
 
--- * Determinant
+-- ** Determinant and Inverse
 --
-class SquareMatrix m where 
+class Matrix m => SquareMatrix m where 
   determinant :: Num a => m a -> a
-  inverse :: Num a => m a -> m a
+  cofactor :: Num a => m a -> m a
+  adjoint :: m a -> m a
+  inverse :: (Fractional a, Fractional (m a)) => m a -> m a
+  inverse m = scaleF (1 / determinant m) (adjoint (cofactor m))
 
+
+det2D :: Num a => a -> a -> a -> a -> a
+det2D a b c d = a * d - b * c
 
 -- | Inlined determinant function for 3D matrices.
--- Useful for laplace expansion.
+-- Useful for laplace expansion. Not necessary to 
+-- use directly.
 --
 det3D :: Num a => a -> a -> a 
                -> a -> a -> a
@@ -196,7 +203,14 @@ instance SquareMatrix Matrix3D where
   determinant (Matrix3D (Vector3D (a, b, c),
                          Vector3D (d, e, f),
                          Vector3D (g, h, i))) = det3D a b c d e f g h i 
-  inverse m = undefined
+  adjoint (Matrix3D (Vector3D (a, b, c),
+                     Vector3D (d, e, f),
+                     Vector3D (g, h, i))) = Matrix3D (Vector3D (a, d, g), Vector3D (b, e, h), Vector3D (c, f, i))
+  cofactor (Matrix3D (Vector3D (a, b, c),
+                      Vector3D (d, e, f),
+                      Vector3D (g, h, i))) = Matrix3D (Vector3D (  det2D e f h i, - det2D d f g i,   det2D d e g h),
+                                                       Vector3D (- det2D b c h i,   det2D a c g i, - det2D a b g h),
+                                                       Vector3D (  det2D b c e f, - det2D a c d f,   det2D a b d e))
 
 
 -- | Uses laplace expansion to calculate 
@@ -211,6 +225,13 @@ instance SquareMatrix Matrix4D where
     - b * det3D e g h i k l m o p
     + c * det3D e f h i j l m n p
     - d * det3D e f g i j k m n o
-  inverse m = undefined
+  adjoint (Matrix4D (Vector4D (a, b, c, d), 
+                     Vector4D (e, f, g, h), 
+                     Vector4D (i, j, k, l),
+                     Vector4D (m, n, o, p))) = Matrix4D (Vector4D (a, e, i, m), 
+                                                         Vector4D (b, f, j, n), 
+                                                         Vector4D (c, g, k, o), 
+                                                         Vector4D (d, h, l, p))
+  cofactor m = m
 
 
