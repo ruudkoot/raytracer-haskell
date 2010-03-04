@@ -137,7 +137,7 @@ class MultSquare a b where
   (!*!) :: a -> b -> b
 
 
--- Matrix * Vector
+-- | Matrix * Vector
 --
 instance (Num a) => MultSquare (Matrix3D a) (Vector3D a) where 
   Matrix3D (mx, my, mz) !*! v = Vector3D (mx <.> v, my <.> v, mz <.> v)
@@ -146,7 +146,7 @@ instance (Num a) => MultSquare (Matrix4D a) (Vector4D a) where
   Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
 
 
--- Matrix * Matrix
+-- | Matrix * Matrix
 --
 instance (Num a) => MultSquare (Matrix3D a) (Matrix3D a) where 
   m1 !*! m2 = Matrix3D (Vector3D (dot r x, dot r y, dot r z), 
@@ -176,7 +176,20 @@ class SquareMatrix m where
 
 
 instance SquareMatrix Matrix3D where 
-  determinant = undefined 
+  determinant (Matrix3D (Vector3D (a, b, c),
+                         Vector3D (d, e, f),
+                         Vector3D (g, h, i))) = a * e * i 
+                                              + b * f * g 
+                                              + c * d * h
+                                              - a * f * h 
+                                              - b * d * i 
+                                              - c * e * g
 
 instance SquareMatrix Matrix4D where 
-  determinant = undefined
+  determinant (Matrix4D (Vector4D (a, b, c, d), 
+                         Vector4D (e, f, g, h), 
+                         Vector4D (i, j, k, l),
+                         Vector4D (m, n, o, p))) = undefined
+
+
+
