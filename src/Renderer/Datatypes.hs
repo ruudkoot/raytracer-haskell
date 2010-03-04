@@ -12,6 +12,9 @@ type Colour = Shared.Colour.Colour Double
 newtype Degrees     = Degrees Double
 newtype Attenuation = Attenuation Double
 
+newtype Shader = Shader (Ray -> Colour)
+-- Maybe these should be functions from <u,v> to colour and not ray to colour?
+
 
 -- | The global datatype, also referenced to as `scene'. We pushed down some
 -- of the parameters as stated in the render function of gml for ease. We are
@@ -96,7 +99,7 @@ data Shape = Cube | Cylinder | Sphere | Cone | Plane
 data RenderObject a = RenderObject
   {
     moShape          :: Shape
-  , moSurface        :: a
+  , moSurface        :: Shader
   , moTransformation :: Matrix3D Double -- Should that be Matrix4D?
   , moIntersections  :: [ObjectTree a]
   , moDifferences    :: [ObjectTree a]
