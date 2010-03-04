@@ -159,12 +159,12 @@ instance (Num a) => Multiplicable (Matrix3D a) (Matrix3D a) where
           dot a b = sum (zipWith (*) a b)
 
 instance (Num a) => Multiplicable (Matrix4D a) (Matrix4D a) where 
-  m1 !*! m2 = Matrix4D (Vector4D (dot r x, dot r y, dot r z, dot r a), 
-                        Vector4D (dot s x, dot s y, dot s z, dot s a),
-                        Vector4D (dot t x, dot t y, dot t z, dot t a),
-                        Vector4D (dot u x, dot u y, dot u z, dot u a))
+  m1 !*! m2 = Matrix4D (Vector4D (dot r x, dot r y, dot r z, dot r w), 
+                        Vector4D (dot s x, dot s y, dot s z, dot s w),
+                        Vector4D (dot t x, dot t y, dot t z, dot t w),
+                        Vector4D (dot u x, dot u y, dot u z, dot u w))
     where (r:s:t:u:[]) = rows m1
-          (x:y:z:a:[]) = columns m2
+          (x:y:z:w:[]) = columns m2
           dot a b = sum (zipWith (*) a b)
 
 
@@ -204,10 +204,10 @@ instance SquareMatrix Matrix4D where
                          Vector4D (e, f, g, h), 
                          Vector4D (i, j, k, l),
                          Vector4D (m, n, o, p))) = 
-      a * (det3D f g h j k l n o p)
-    - b * (det3D e g h i k l m o p)
-    + c * (det3D e f h i j l m n p)
-    - d * (det3D e f g i j k m n o)
+      a * det3D f g h j k l n o p
+    - b * det3D e g h i k l m o p
+    + c * det3D e f h i j l m n p
+    - d * det3D e f g i j k m n o
 
 
 
