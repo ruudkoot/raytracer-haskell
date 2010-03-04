@@ -131,24 +131,26 @@ columns = transpose . rows
 
 
 -- * Multiplication
+-- Matrix multiplication is done using the (!*!) operator, 
+-- and is only defined on square matrices and 3d/4d vectors.
 --
 
-class MultSquare a b where 
-  (!*!) :: a -> b -> b
+class Multiplicable a b where 
+  (!*!) :: a -> b -> b -- ^ Multiplication
 
 
 -- | Matrix * Vector
 --
-instance (Num a) => MultSquare (Matrix3D a) (Vector3D a) where 
+instance (Num a) => Multiplicable (Matrix3D a) (Vector3D a) where 
   Matrix3D (mx, my, mz) !*! v = Vector3D (mx <.> v, my <.> v, mz <.> v)
 
-instance (Num a) => MultSquare (Matrix4D a) (Vector4D a) where 
+instance (Num a) => Multiplicable (Matrix4D a) (Vector4D a) where 
   Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
 
 
 -- | Matrix * Matrix
 --
-instance (Num a) => MultSquare (Matrix3D a) (Matrix3D a) where 
+instance (Num a) => Multiplicable (Matrix3D a) (Matrix3D a) where 
   m1 !*! m2 = Matrix3D (Vector3D (dot r x, dot r y, dot r z), 
                         Vector3D (dot s x, dot s y, dot s z),
                         Vector3D (dot t x, dot t y, dot t z))
@@ -156,7 +158,7 @@ instance (Num a) => MultSquare (Matrix3D a) (Matrix3D a) where
           (x:y:z:[]) = columns m2
           dot a b = sum (zipWith (*) a b)
 
-instance (Num a) => MultSquare (Matrix4D a) (Matrix4D a) where 
+instance (Num a) => Multiplicable (Matrix4D a) (Matrix4D a) where 
   m1 !*! m2 = Matrix4D (Vector4D (dot r x, dot r y, dot r z, dot r a), 
                         Vector4D (dot s x, dot s y, dot s z, dot s a),
                         Vector4D (dot t x, dot t y, dot t z, dot t a),
@@ -165,31 +167,52 @@ instance (Num a) => MultSquare (Matrix4D a) (Matrix4D a) where
           (x:y:z:a:[]) = columns m2
           dot a b = sum (zipWith (*) a b)
 
-{-
 
-inverse :: (Matrix m, Fractional a) => m a -> m a
-
---}
-
+-- * Determinant
+--
 class SquareMatrix m where 
   determinant :: Num a => m a -> a
+
+
+-- | Inlined determinant function for 3D matrices.
+-- Useful for laplace expansion.
+--
+det3D :: Num a => a -> a -> a 
+               -> a -> a -> a
+               -> a -> a -> a -> a
+{-# INLINE det3D #-}
+det3D a b c d e f g h i = a * e * i
+                        + b * f * g 
+                        + c * d * h
+                        - a * f * h 
+                        - b * d * i 
+                        - c * e * g
 
 
 instance SquareMatrix Matrix3D where 
   determinant (Matrix3D (Vector3D (a, b, c),
                          Vector3D (d, e, f),
-                         Vector3D (g, h, i))) = a * e * i 
-                                              + b * f * g 
-                                              + c * d * h
-                                              - a * f * h 
-                                              - b * d * i 
-                                              - c * e * g
+                         Vector3D (g, h, i))) = det3D a b c d e f g h i 
 
+
+
+-- | Uses laplace expansion to calculate 
+-- determinant from minors.
+--
 instance SquareMatrix Matrix4D where 
   determinant (Matrix4D (Vector4D (a, b, c, d), 
                          Vector4D (e, f, g, h), 
                          Vector4D (i, j, k, l),
-                         Vector4D (m, n, o, p))) = undefined
+                         Vector4D (m, n, o, p))) = 
+      a * (det3D f g h j k l n o p)
+    - b * (det3D e g h i k l m o p)
+    + c * (det3D e f h i j l m n p)
+    - d * (det3D e f g i j k m n o)
 
 
 
+{-
+
+inverse :: (Matrix m, Fractional a) => m a -> m a
+
+--}
