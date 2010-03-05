@@ -1,15 +1,20 @@
 module Renderer.Intersections where
 
 import Shared.Vector
+import Shared.Matrix
 import Renderer.Datatypes
 import Data.Ord
 
 type Intersection = (Double, Double) -- Enters at x, leaves at y
 
+hit' :: Ray -> ObjectTree a -> Bool
+hit' (Ray o d) (RSimple s m) = hit (Ray ((inverse m) !*! o) ((inverse m) !*! d)) s
+hit' ray       (RUnion  l r) = hit' ray l || hit' ray r
+
 hit :: Ray -> Shape -> Bool
 hit r Cube     = undefined
-hit r Cylinder = let dir = Vector3D (1, 0, 1) * rDirection r
-                     k = Vector3D (1, 0, 1) * rOrigin r
+hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
+                     k = Vector4D (1, 0, 1, 0) * rOrigin r
                      a = dir <.> dir
                      b = 2.0 * (k <.> dir)
                      c = (k <.> k) - 1.0
@@ -18,15 +23,15 @@ hit r Cylinder = let dir = Vector3D (1, 0, 1) * rDirection r
                      x1 = (-b + sqrd)/(2*a)
                      x2 = (-b - sqrd)/(2*a)
                      sideHit = (x1 <= 1 && x1 >= 0) || (x2 <= 1 && x2 >= 0)
-                     oy = getY3D $ rOrigin r
-                     dy = getY3D $ rDirection r
+                     oy = getY4D $ rOrigin r
+                     dy = getY4D $ rDirection r
                      t = -oy / dy
-                     bottomHit = magnitudeSquared (k + dir * (Vector3D (t, t, t))) < 1
+                     bottomHit = magnitudeSquared (k + dir * (Vector4D (t, t, t, 1))) < 1
                      t' = (1 - oy) / dy
-                     topHit = magnitudeSquared (k + dir * (Vector3D (t', t', t'))) < 1
+                     topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
                  in (bottomHit || topHit || sideHit)
-hit r Sphere   = let dir = rDirection r
-                     k = rOrigin r
+hit r Sphere   = let dir = Vector4D (1, 1, 1, 0) * rDirection r
+                     k = Vector4D (1, 1, 1, 0) * rOrigin r
                      a = dir <.> dir
                      b = 2.0 * (k <.> dir)
                      c = (k <.> k) - 1.0
@@ -37,8 +42,8 @@ hit r Cone     = undefined
                  -- The 'unit' plane is the XZ plane, so we only have to consider the Y direction.
                  -- If oy == 0, we're in the plane, otherwise we hit it if we move 'downwards' on Y
                  -- when we start 'above' the plane, or vice versa.
-hit r Plane    = let oy = getY3D $ rOrigin r -- ugly and inefficient way to extract y-value
-                     dy = getY3D $ rDirection r
+hit r Plane    = let oy = getY4D $ rOrigin r
+                     dy = getY4D $ rDirection r
                  in (oy == 0) || (oy * dy < 0)
 
 
@@ -61,6 +66,6 @@ intersection r Sphere   = let dir = rDirection r
                                       in [((-b-sqrd)/(2*a), (-b+sqrd)/(2*a))]
 
 intersection r Cone     = undefined
-intersection r Plane    = let oy = getY3D $ rOrigin r -- ugly and inefficient way to extract y-value
-                              dy = getY3D $ rDirection r
+intersection r Plane    = let oy = getY4D $ rOrigin r
+                              dy = getY4D $ rDirection r
                           in if (oy == 0) || (oy * dy >= 0) then [] else [(- oy / dy, - oy / dy)]

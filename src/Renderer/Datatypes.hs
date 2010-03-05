@@ -1,11 +1,11 @@
 module Renderer.Datatypes where
   
 import qualified Shared.Colour (Colour)
-import qualified Shared.Vector (Vector3D)
-import Shared.Matrix (Matrix3D)
+import qualified Shared.Vector (Vector4D, Vector3D)
+import Shared.Matrix (Matrix4D)
 
 type Pt3D  = Shared.Vector.Vector3D Double
-type Vec3D = Shared.Vector.Vector3D Double
+type Vec4D = Shared.Vector.Vector4D Double
 
 type Colour = Shared.Colour.Colour Double
 
@@ -90,8 +90,8 @@ data RenderOptions = RenderOptions
 
 data Ray = Ray 
   {
-    rOrigin    :: Vec3D
-  , rDirection :: Vec3D
+    rOrigin    :: Vec4D
+  , rDirection :: Vec4D
   }
 
 data Shape = Cube | Cylinder | Sphere | Cone | Plane
@@ -100,12 +100,12 @@ data RenderObject a = RenderObject
   {
     moShape          :: Shape
   , moSurface        :: Shader
-  , moTransformation :: Matrix3D Double -- Should that be Matrix4D?
+  , moTransformation :: Matrix4D Double
   , moIntersections  :: [ObjectTree a]
   , moDifferences    :: [ObjectTree a]
   }
   
-data ObjectTree a = RSimple Shape (Matrix3D Double) -- Should indeed be Matrix4D
+data ObjectTree a = RSimple Shape (Matrix4D Double)
                   | RUnion (ObjectTree a) (ObjectTree a)
                   | RIntersect (ObjectTree a) (ObjectTree a)
                   | RDifference (ObjectTree a) (ObjectTree a)
