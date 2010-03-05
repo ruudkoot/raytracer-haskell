@@ -9,5 +9,5 @@ import Output.Output
 toPPM :: ImageWriter
 toPPM w h cs = if fromSize w * fromSize h /= toInteger (length cs)
                  then Nothing
-                 else Just $ concat ["P3 ", show w, " ", show w, " 255\n",
+                 else Just $ concat ["P3 ", show w, " ", show h, " 255\n",
                              unlines (map (unwords . map show . clampedList 0 255) cs)]
