@@ -13,5 +13,4 @@
     
 %4.0 square apply
 %-4.0 abs apply
-2.0 /x
-[x]
+2.0 3.0 /x divi
