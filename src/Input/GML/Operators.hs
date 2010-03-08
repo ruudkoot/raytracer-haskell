@@ -7,8 +7,28 @@ import Control.Monad.Error
 import Control.Applicative
 import Control.Monad
 import Data.Map
+import Data.Typeable
 import Input.GML.AST hiding (State)
+import Renderer.Datatypes
+import Renderer.GMLShader
+import Shared.Vector
 
+{-data StackT a b = StackT { runStack::(b,[a]) -> Either String (b,[a]) }
+
+pops::StackT a a
+pops = let cf []     = Left "Empty stack"
+           cf (x:xs) = Right (x,xs)
+       in StackT (\(_,st) -> cf st)
+
+pushs::StackT a a
+pushs = StackT (\(v,ls) -> (v,v:ls))
+
+instance Applicative (StackT Value) where
+    pure f    = StackT (\(_,ls) -> (f,ls))
+    (<*>) l r = StackT (\a -> case runStack l a of
+                                (Left er)        -> Left er
+                                (Right (av,als)) -> case runStack r 
+-}
 type Op = StateT Stack (Either String) 
 
 instance Applicative (Either String) where
@@ -19,17 +39,33 @@ instance (Monad f, Applicative f) => Applicative (StateT r f) where
     pure  = return
     (<*>) = ap
 
+{-
+popt::(Typeable a) => Op a
+popt = let cf v = case cast v of
+                    Nothing -> lift.throwError $ "Wrong Type: "++(show (typeOf v))
+                    Just v2 -> return v2
+       in pop >>= cf
+-}
+
+--pusht::(Typeable a) => a -> Op a
+
 pop::Op Value
 popi::Op Int
 popr::Op Double
 popp::Op Point
 popa::Op Array
+popo::Op Object
+popl::Op Light
+popc::Op Closure
+pops::Op String
 
 push::Value -> Op Value
 pushi::Int -> Op Value
 pushr::Double -> Op Value
 pushp::Point -> Op Value
 pushb::Bool -> Op Value
+pusho::Object -> Op Value
+pushl::Light -> Op Value
 
 pop = let cf []     = lift (throwError "Empty stack")
           cf (x:xs) = put xs >> return x
@@ -46,14 +82,30 @@ popp = let cf (Point p) = return p
 popa = let cf (Array a) = return a
            cf _         = lift (throwError "Expected Type: Array")
        in pop >>= cf
+popo = let cf (Object a) = return a
+           cf _          = lift (throwError "Expected Type: Object")
+       in pop >>= cf
+popl = let cf (Light a) = return a
+           cf _         = lift (throwError "Expected Type: Light")
+       in pop >>= cf
+popc = let cf (Closure a) = return a
+           cf _           = lift (throwError "Expected Type: Closure")
+       in pop >>= cf
+pops = let cf (BaseValue (String s)) = return s
+           cf _                      = lift (throwError "Expected Type: String")
+       in pop >>= cf
 
 push v = do cs <- get
             put (v:cs)
             return v
+
 pushi = push.BaseValue .Int
 pushr = push.BaseValue .Real
 pushp = push.Point
 pushb = push.BaseValue .Boolean
+pusho = push.Object
+pushl = push.Light
+pushR = push.Render
 
 type Operator = Op Value
 
@@ -63,24 +115,33 @@ rrr  :: (Double -> Double           -> Double                      ) -> Operator
 rr   :: (Double                     -> Double                      ) -> Operator
 ri   :: (Double                     -> Int                         ) -> Operator
 ir   :: (Int                        -> Double                      ) -> Operator
-pr   :: ((Double,  Double,   Double)-> Double                      ) -> Operator
-rrrp :: (Double -> Double -> Double -> (Double, Double, Double)    ) -> Operator
+pr   :: (Point                      -> Double                      ) -> Operator
+rrrp :: (Double -> Double -> Double -> Point                       ) -> Operator
 iib  :: (Int    -> Int              -> Bool                        ) -> Operator
 rrb  :: (Double -> Double           -> Bool                        ) -> Operator
+co   :: (Closure                    -> Object                      ) -> Operator
+orrro:: (Object -> Double -> Double -> Double -> Object            ) -> Operator
+oro  :: (Object -> Double           -> Object                      ) -> Operator
 
-
-ii op   = (op <$> popi)                   >>= pushi
-iii op  = (op <$> popi <*> popi)          >>= pushi
-rr op   = (op <$> popr)                   >>= pushr
-rrr op  = (op <$> popr <*> popr)          >>= pushr
-ri op   = (op <$> popr)                   >>= pushi
-ir op   = (op <$> popi)                   >>= pushr
-pr op   = (op <$> popp)                   >>= pushr
-rrrp op = (op <$> popr <*> popr <*> popr) >>= pushp
-iib op  = (op <$> popi <*> popi)          >>= pushb
-rrb op  = (op <$> popr <*> popr)          >>= pushb
-aiv op  = (op <$> popa <*> popi)          >>= push
-ai op   = (op <$> popa)                   >>= pushi
+ii op   = (op <$> popi)                             >>= pushi
+iii op  = (op <$> popi <*> popi)                    >>= pushi
+rr op   = (op <$> popr)                             >>= pushr
+rrr op  = (op <$> popr <*> popr)                    >>= pushr
+ri op   = (op <$> popr)                             >>= pushi
+ir op   = (op <$> popi)                             >>= pushr
+pr op   = (op <$> popp)                             >>= pushr
+rrrp op = (op <$> popr <*> popr <*> popr)           >>= pushp
+iib op  = (op <$> popi <*> popi)                    >>= pushb
+rrb op  = (op <$> popr <*> popr)                    >>= pushb
+aiv op  = (op <$> popa <*> popi)                    >>= push
+ai op   = (op <$> popa)                             >>= pushi
+co op   = (op <$> popc)                             >>= pusho
+orrro op= (op <$> popo <*> popr <*> popr <*> popr)  >>= pusho
+oro op  = (op <$> popo <*> popr)                    >>= pusho
+ppl op  = (op <$> popp <*> popp)                    >>= pushl
+ppprrl op = (op <$> popp <*> popp <*> popp <*> popr <*> popr) >>= pushl
+ooo op  = (op <$> popo <*> popo)                    >>= pusho
+paoiriisR op = (op <$> popp <*> popa <*> popo <*> popi <*> popr <*> popi <*> popi <*> pops) >>= pushR
 
 {-
 ii   f = \(BaseValue (Int  i1)                                             : ss) -> (BaseValue (Int     (f i1      )), ss)
@@ -123,12 +184,31 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "sqrt"  ,   rr sqrt                   )
                      , ( "subi"  ,  iii (-)                    )
                      , ( "subf"  ,  rrr (-)                    )
-                     , ( "getx"  ,   pr getx                   ) -- points
-                     , ( "gety"  ,   pr gety                   )
-                     , ( "getz"  ,   pr getz                   )
-                     , ( "point" , rrrp (,,)                   )
+                     , ( "getx"  ,   pr getX3D                 ) -- points
+                     , ( "gety"  ,   pr getY3D                 )
+                     , ( "getz"  ,   pr getZ3D                 )
+                     , ( "point" , rrrp (\x y z -> Vector3D (x, y, z)))
                      , ( "get"   ,  aiv (!!)                   ) -- arrays
-                     , ( "lenght",   ai length                 ) ]
+                     , ( "length",   ai length                 )
+                     , ( "sphere",   co (Simple Sphere .gmlShader)) -- Primitive Objects
+                     , ( "cube"  ,   co (Simple Cube .gmlShader)   )
+                     , ( "cylinder", co (Simple Cylinder .gmlShader))
+                     , ( "cone"  ,   co (Simple Cone .gmlShader) )
+                     , ( "plane" ,    co (Simple Plane .gmlShader))
+                     , ( "translate",orrro Translate           ) --Transformations
+                     , ( "scale" ,   orrro  Scale              ) 
+                     , ( "uscale",   oro  UScale               )
+                     , ( "rotatex",  oro RotateX               )
+                     , ( "rotatey",  oro RotateY               )
+                     , ( "rotatez",  oro RotateZ               )
+                     , ( "light"  ,  ppl DirectLight           ) --Lights
+                     , ( "pointlight", ppl PointLight          )                            
+                     , ( "spotlight", ppprrl SpotLight         )
+                     , ( "union"  ,  ooo Union                 ) --Boolean operators
+                     , ( "intersect", ooo Intersect            )
+                     , ( "difference" ,ooo Difference          )
+                    -- , ( "render", paoiriisR GMLRender         )
+                     ]
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)
@@ -138,13 +218,4 @@ clampf :: Double -> Double
 clampf r1 | r1 < 0.0  = 0.0
           | r1 > 1.0  = 1.0
           | otherwise = r1
-
-getx :: Point -> Double
-getx (x, _, _) = x
-
-gety :: Point -> Double
-gety (_, y, _) = y
-
-getz :: Point -> Double
-getz (_, _, z) = z
 

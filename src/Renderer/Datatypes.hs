@@ -9,10 +9,24 @@ type Vec4D = Shared.Vector.Vector4D Double
 
 type Colour = Shared.Colour.Colour Double
 
-newtype Degrees     = Degrees Double
-newtype Attenuation = Attenuation Double
+--newtype Degrees     = Degrees Double deriving (Show,Eq)
+--newtype Attenuation = Attenuation Double deriving (Show,Eq)
 
-newtype Shader = Shader (Ray -> Colour)
+type ShaderCoord = (Double,Double,Int)
+data ShaderResult = ShaderResult
+    {
+     color::Colour
+    ,kd::Double
+    ,ks::Double
+    ,phong::Double
+    }
+
+newtype Shader = Shader (ShaderCoord -> ShaderResult)
+instance Show Shader where
+    show s = "Shader function"
+instance Eq Shader where
+    (==) a b = True
+
 -- Maybe these should be functions from <u,v> to colour and not ray to colour?
 
 
@@ -28,16 +42,17 @@ data World surface = World
   }
   
 -- | Type inference causes restriction 'Shader' a => on the a
-data GMLObject a = Simple Shape
-                 | Translate (GMLObject a) Int Int Int
-                 | Scale (GMLObject a) Int Int Int
-                 | UScale (GMLObject a) Int
-                 | RotateX (GMLObject a) Int
-                 | RotateY (GMLObject a) Int
-                 | RotateZ (GMLObject a) Int
-                 | Union (GMLObject a) (GMLObject a)
-                 | Intersect (GMLObject a) (GMLObject a)
-                 | Difference (GMLObject a) (GMLObject a) 
+data GMLObject   = Simple Shape Shader
+                 | Translate GMLObject  Double Double Double
+                 | Scale GMLObject Double Double Double
+                 | UScale GMLObject Double 
+                 | RotateX GMLObject Double
+                 | RotateY GMLObject Double
+                 | RotateZ GMLObject Double
+                 | Union GMLObject GMLObject
+                 | Intersect GMLObject GMLObject
+                 | Difference GMLObject GMLObject
+                 deriving (Show,Eq)
           
                   
 data RenderLight
@@ -58,10 +73,11 @@ data RenderLight
   {
     slPosition    :: Pt3D
   , slTarget      :: Pt3D
-  , slCutoff      :: Degrees -- Degrees
-  , slAttenuation :: Attenuation -- ???
+  , slColor       :: Pt3D
+  , slCutoff      :: Double
+  , slAttenuation :: Double
   }        
-    
+  deriving (Show,Eq)  
   -- dir color  light  l
   --  creates a directional light source at infinity with direction dir and intensity color. Both dir and color are specified as point values.
   --  pos color  pointlight  l
@@ -76,6 +92,19 @@ data RenderLight
   --  light's direction vector (i.e., the vector from pos to at) and the vector
   --  from pos to Q. If the angle is greater than the cutoff angle, then intensity
   --  is zero; otherwise the intensity is given by the equation
+
+data GMLRender = GMLRender
+  {
+    gmlAmbience :: Pt3D
+  , gmlLights   :: [RenderLight]
+  , gmlObj      :: GMLObject
+  , gmlDepth    :: Int
+  , gmlFov      :: Double -- fov
+  , gmlWidth    :: Int -- wid
+  , gmlHeight   :: Int -- ht
+  , gmlFile     :: FilePath
+  }
+  deriving (Show,Eq)
 
 data RenderOptions = RenderOptions
   {
@@ -94,7 +123,7 @@ data Ray = Ray
   , rDirection :: Vec4D
   }
 
-data Shape = Cube | Cylinder | Sphere | Cone | Plane
+data Shape = Cube | Cylinder | Sphere | Cone | Plane deriving (Show,Eq)
 
 data RenderObject a = RenderObject
   {

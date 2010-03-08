@@ -1,10 +1,13 @@
+{-# OPTIONS_GHC -XDeriveDataTypeable #-}
 module Input.GML.AST where
 
 import           Control.Monad
 import           Data.Char
 import qualified Data.Map        as Map
 import           Test.QuickCheck
-
+import           Renderer.Datatypes
+import           Data.Typeable
+import           Shared.Vector (Vector3D)
 --AST defition following the specification in chapter 2.1 of the assignment
 type GML = [Token]
 
@@ -20,16 +23,16 @@ data BaseValue = Int      Int
                | Real     Double
                | Boolean  Bool
                | String   String
-                deriving (Show)
+                deriving (Show, Typeable)
 
 type Id        = String
 type Env       = Map.Map Id Value
 type Code      = GML
 type Closure   = (Env, Code)
 
-type Point     = (Double, Double, Double)
-type Object    = ()
-type Light     = ()
+type Point     = Vector3D Double
+type Object    = GMLObject
+type Light     = RenderLight
 
 data Value     = BaseValue BaseValue
                | Closure   Closure
@@ -37,7 +40,8 @@ data Value     = BaseValue BaseValue
                | Point     Point
                | Object    Object
                | Light     Light
-               deriving (Show, Eq)
+               | Render    GMLRender
+               deriving (Show, Eq, Typeable)
                
 type Array     = [Value]
 type Stack     = [Value]
