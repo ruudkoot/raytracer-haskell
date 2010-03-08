@@ -15,10 +15,10 @@ title "Updating Instance" &&
 
 
 title "Updating RedMine Clone" &&
-./update_redmine_mirror.sh 2>/dev/null && 
+./update_redmine_mirror.sh >/dev/null && 
 
 # Build programme
-title "Builing Program" &&
+title "Building Program" &&
 cd .. && 
 cabal install && 
 
