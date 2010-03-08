@@ -1,30 +1,43 @@
 #!/bin/sh 
 
+title() {
+  echo "============================================"
+  echo "  $1"
+  echo "============================================"
+}
+
+
 # Update PATH so that cabal can find the right executables
 PATH="/home/afp2009/.cabal/bin:$PATH"
 
-# Update instance
+title "Updating Instance" &&
 ./update_instance.sh 2>/dev/null && 
 
-# Update redmine clone 
-./update_redmine_mirror.sh && 
+
+title "Updating RedMine Clone" &&
+./update_redmine_mirror.sh 2>/dev/null && 
 
 # Build programme
+title "Builing Program" &&
 cd .. && 
 cabal install && 
 
 # Run tests (configure with UserHooks)
-cabal test && 
+title "Running Tests [TODO]" &&
 
 # Generate Haddock documentation
+title "Generating Haddock Documentation" &&
 cabal --executable haddock &&
 
 # Copy website
-cp -r www/* /var/www/projects/afp2009/
+title "Copying www/ Folder to Website" &&
+cp -r www/* /var/www/projects/afp2009/ &&
 
 # Copy generated docs
-cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/
+title "Copying generating Haddock docs" &&
+cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/ &&
 
 # Run Hlint on all haskell source files
-find -name "*.hs" | xargs hlint
+title "Linting" && 
+find -name "*.hs" | xargs hlint 
 
