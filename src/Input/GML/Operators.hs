@@ -10,7 +10,7 @@ import Data.Map
 import Data.Typeable
 import Input.GML.AST hiding (State)
 import Renderer.Datatypes
-import Renderer.GMLShader
+import Renderer.Shaders
 import Shared.Vector
 
 {-data StackT a b = StackT { runStack::(b,[a]) -> Either String (b,[a]) }
