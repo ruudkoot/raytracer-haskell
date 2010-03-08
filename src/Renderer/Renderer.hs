@@ -20,3 +20,5 @@ renderScene t w h fov = [if hit' (ray i j) t
         x = tan(0.5 * fov)
         y = x * (fromInteger (fromSize h) / fromInteger (fromSize w))
         delta = 2 * x / fromInteger (fromSize w)
+        
+renderTest = maybe (putStrLn "errorz") (writeFile "output.ppm") (Output.PPM.toPPM (Size 800) (Size 800) $ renderScene (Renderer.Datatypes.RSimple Sphere (Shared.Matrix.Matrix4D ((Shared.Vector.Vector4D (0.3, 0, 0, 0)), (Shared.Vector.Vector4D (0, 0.3, 0, 0.2)), (Shared.Vector.Vector4D (0, 0, 0.3, 0)), (Shared.Vector.Vector4D (0, 0, 0, 1))))) (Size 800) (Size 800) 1)

@@ -15,10 +15,10 @@ type Colour = Shared.Colour.Colour Double
 type ShaderCoord = (Double,Double,Int)
 data ShaderResult = ShaderResult
     {
-     color::Colour
-    ,kd::Double
-    ,ks::Double
-    ,phong::Double
+     srColor::Colour
+    ,srKd::Double
+    ,srKs::Double
+    ,srPhong::Double
     }
 
 newtype Shader = Shader (ShaderCoord -> ShaderResult)
