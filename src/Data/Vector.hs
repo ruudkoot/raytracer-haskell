@@ -258,6 +258,6 @@ sumVector = foldVector sum
 
 -- | Downgrade 4D vector to 3D.
 --
-dropW :: (Vector4D a) -> (Vector3D a)
+dropW :: Vector4D a -> Vector3D a
 dropW (Vector4D (x, y, z, _)) = Vector3D (x, y, z)
 

@@ -115,13 +115,13 @@ identity4D = Matrix4D(Vector4D(1, 0, 0, 0),
 --
 -- ** Diagonals
 --
-diagonal3D :: Num a => (Vector3D a) -> (Matrix3D a)
+diagonal3D :: Num a => Vector3D a -> Matrix3D a
 diagonal3D (Vector3D (x,y,z)) = Matrix3D (Vector3D(x, 0, 0), 
                                           Vector3D(0, y, 0), 
                                           Vector3D(0, 0, z))
 
 
-diagonal4D :: Num a => (Vector4D a) -> (Matrix4D a)
+diagonal4D :: Num a => Vector4D a -> Matrix4D a
 diagonal4D (Vector4D (x,y,z,w)) = Matrix4D (Vector4D(x, 0, 0, 0), 
                                             Vector4D(0, y, 0, 0), 
                                             Vector4D(0, 0, z, 0), 
