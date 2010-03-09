@@ -1,5 +1,5 @@
 -- file: ch16/ApplicativeParsec.hs
-module Input.GML.ApplicativeParsec
+module Input.GML.Parser.ApplicativeParsec
     (
       module Control.Applicative
     , module Text.ParserCombinators.Parsec

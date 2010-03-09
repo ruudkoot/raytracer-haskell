@@ -1,23 +1,21 @@
-{-# OPTIONS_GHC -XFlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Input.GML.Operators (operators,runOp,Operator) where
+
+import Control.Applicative
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Error
-import Control.Applicative
-import Control.Monad
 
 import Data.Maybe
-import Data.Map hiding (map)
+import Data.Map                              hiding (map)
 
-import Data.Typeable
+import           Shared.Vector
+import           Shared.RenderBase
 
-import Shared.Vector
-import Shared.RenderBase
-
-import Input.GML.AST hiding (State)
-import qualified Input.GML.Render as Render
-import Input.GML.Shaders
+import           Input.GML.AST               hiding (State)
+import qualified Input.GML.Scene   as Render
+import           Input.GML.Shaders
 
 type Op = StateT Stack (Either String) 
 
@@ -86,7 +84,7 @@ pushp = push.Point
 pushb = push.BaseValue .Boolean
 pusho = push.Object
 pushl = push.Light
-pushR = push.Render
+pushR = push.Scene
 
 type Operator = Op Value
 
@@ -105,7 +103,7 @@ ai   :: (Array                      -> Int                         ) -> Operator
 co   :: (Closure                    -> Render.Object               ) -> Operator
 orrro:: (Render.Object -> Double -> Double -> Double -> Render.Object     ) -> Operator
 oro  :: (Render.Object -> Double           -> Render.Object               ) -> Operator
-paoiriisR :: (Point -> Array -> Render.Object -> Int -> Double -> Int -> Int -> String -> Render.Render) -> Operator
+paoiriisR :: (Point -> Array -> Render.Object -> Int -> Double -> Int -> Int -> String -> Render.Scene) -> Operator
 
 ii op   = (op <$> popi)                             >>= pushi
 iii op  = (op <$> popi <*> popi)                    >>= pushi
@@ -180,8 +178,8 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      ]
 
 --Convert light array types
-renderF::Point -> Array -> Render.Object -> Int -> Double -> Int -> Int -> String -> Render.Render
-renderF p a = Render.Render p (map (\(Light l) -> l) a)
+renderF::Point -> Array -> Render.Object -> Int -> Double -> Int -> Int -> String -> Render.Scene
+renderF p a = Render.Scene p (map (\(Light l) -> l) a)
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)

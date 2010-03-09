@@ -1,7 +1,19 @@
-module Input.GML.Render where
+module Input.GML.Scene where
   
 import Shared.Vector
 import Shared.RenderBase
+
+data Scene = Scene
+  { sceneAmbience :: Pt3D
+  , sceneLights   :: [RenderLight]
+  , sceneObj      :: Object
+  , sceneDepth    :: Int
+  , sceneFov      :: Double        -- fov
+  , sceneWidth    :: Int           -- wid
+  , sceneHeight   :: Int           -- ht
+  , sceneFile     :: FilePath
+  }
+  deriving (Show,Eq)
 
 data Object = Simple     Shape  Shader
             | Translate  Object Double Double Double
@@ -15,18 +27,6 @@ data Object = Simple     Shape  Shader
             | Difference Object Object
             deriving (Show,Eq)
           
-data Render = Render
-  { gmlAmbience :: Pt3D
-  , gmlLights   :: [RenderLight]
-  , gmlObj      :: Object
-  , gmlDepth    :: Int
-  , gmlFov      :: Double        -- fov
-  , gmlWidth    :: Int           -- wid
-  , gmlHeight   :: Int           -- ht
-  , gmlFile     :: FilePath
-  }
-  deriving (Show,Eq)
-
 type ObjectAlgebra r =
     ( Shape -> Shader -> r
     , r -> Double -> Double -> Double -> r

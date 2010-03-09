@@ -1,11 +1,12 @@
 module Input.GML.ToThijsObject where
 
 import           Shared.Matrix
-import qualified Input.GML.Render  as Render
+
+import qualified Input.GML.Scene   as Scene
 import qualified Shared.RenderBase as Thijs
 
-toThijsObject :: Render.Object -> Thijs.ObjectTree Thijs.Shader
-toThijsObject = Render.foldObject algebra
+toThijsObject :: Scene.Object -> Thijs.ObjectTree Thijs.Shader
+toThijsObject = Scene.foldObject algebra
     where algebra = ( \shape shader -> Thijs.RSimple shape identity4D identity4D shader
                     , undefined
                     , undefined

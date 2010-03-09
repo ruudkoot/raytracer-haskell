@@ -1,14 +1,15 @@
-{-# OPTIONS_GHC -XDeriveDataTypeable #-}
 module Input.GML.AST where
 
 import           Control.Monad
+
 import           Data.Char
 import qualified Data.Map        as Map
+
 import           Test.QuickCheck
-import           Data.Typeable
+
+import           Input.GML.Scene
 import           Shared.Vector (Vector3D)
 import           Shared.RenderBase
-import           Input.GML.Render
 --AST defition following the specification in chapter 2.1 of the assignment
 
 -- * Parser
@@ -26,7 +27,7 @@ data BaseValue = Int      Int
                | Real     Double
                | Boolean  Bool
                | String   String
-                deriving (Show, Typeable)
+                deriving (Show)
 
 -- * Stack
 type Id        = String
@@ -44,8 +45,8 @@ data Value     = BaseValue BaseValue
                | Point     Point
                | Object    Object
                | Light     Light
-               | Render    Render
-               deriving (Show, Eq, Typeable)
+               | Scene     Scene
+               deriving (Show, Eq)
                
 type Array     = [Value]
 type Stack     = [Value]

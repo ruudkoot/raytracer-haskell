@@ -1,12 +1,13 @@
 module Input.GML.Parser (parseGML) where
+
 import Text.ParserCombinators.Parsec.Token
 import Control.Monad
 
-import Input.GML.ApplicativeParsec
-import Input.GML.AST
 import Data.Char
 import qualified Data.Map as Map
 
+import Input.GML.Parser.ApplicativeParsec
+import Input.GML.AST
 import Input.GML.Operators
 
 gmlOperators = ["apply","if"] ++ Map.keys operators
