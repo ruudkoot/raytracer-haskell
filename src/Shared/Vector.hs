@@ -7,6 +7,10 @@ module Shared.Vector where
   
 import Control.Applicative 
 
+-- * Synonyms
+type Pt3D  = Shared.Vector.Vector3D Double
+type Vec4D = Shared.Vector.Vector4D Double
+
 
 -- * Vectors 
 

@@ -8,10 +8,13 @@ import Control.Applicative
 import Control.Monad
 import Data.Map
 import Data.Typeable
-import Input.GML.AST hiding (State)
-import Renderer.Datatypes
-import Renderer.Shaders
+
 import Shared.Vector
+import Shared.RenderBase
+
+import Input.GML.AST hiding (State)
+import Input.GML.Render
+import Input.GML.Shaders
 
 {-data StackT a b = StackT { runStack::(b,[a]) -> Either String (b,[a]) }
 
@@ -206,7 +209,7 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "spotlight", ppprrl SpotLight         )
                      , ( "union"  ,  ooo Union                 ) --Boolean operators
                      , ( "intersect", ooo Intersect            )
-                     , ( "difference" ,ooo Difference          )
+                     , ( "difference", ooo Difference          )
                     -- , ( "render", paoiriisR GMLRender         )
                      ]
 

@@ -4,6 +4,8 @@
 -- 
 module Shared.Colour where 
 
+-- * Synonyms
+type ColourD = Colour Double
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 

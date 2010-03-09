@@ -2,6 +2,8 @@ module Renderer.Intersections where
 
 import Shared.Vector
 import Shared.Matrix
+import Shared.RenderBase
+
 import Renderer.Datatypes
 import Data.Ord
 

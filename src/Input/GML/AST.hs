@@ -5,10 +5,13 @@ import           Control.Monad
 import           Data.Char
 import qualified Data.Map        as Map
 import           Test.QuickCheck
-import           Renderer.Datatypes
 import           Data.Typeable
 import           Shared.Vector (Vector3D)
+import           Shared.RenderBase
+import           Input.GML.Render
 --AST defition following the specification in chapter 2.1 of the assignment
+
+-- * Parser
 type GML = [Token]
 
 data Token     = Function   [Token]
@@ -25,6 +28,7 @@ data BaseValue = Int      Int
                | String   String
                 deriving (Show, Typeable)
 
+-- * Stack
 type Id        = String
 type Env       = Map.Map Id Value
 type Code      = GML
