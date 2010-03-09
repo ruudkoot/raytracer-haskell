@@ -36,6 +36,7 @@ cp -r www/* /var/www/projects/afp2009/ &&
 # Copy generated docs
 title "Copying generating Haddock docs" &&
 cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/ &&
+echo "  Browse haddock documentation at: http://projects.spockz.nl/projects/afp2009/doc/" && 
 
 # Run Hlint on all haskell source files
 title "Linting" && 
