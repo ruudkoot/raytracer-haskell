@@ -13,13 +13,13 @@
 0.0 1.0 0.0 point mkSphere apply /greenSphere
 0.0 0.0 1.0 point mkSphere apply /blueSphere
 
-%redSphere   -2.5 0.0 9.0 translate
+redSphere   -2.5 0.0 9.0 translate
 %greenSphere  0.0 0.0 9.0 translate
 %blueSphere   2.5 0.0 9.0 translate
 %union union /scene
 
         % directional light
-%1.0 -1.0 1.0 point          % direction
+1.0 -1.0 1.0 point          % direction
 1.0 0.0 0.0 point          % direction
 1.0 1.0 1.0 point light /l % directional light
 

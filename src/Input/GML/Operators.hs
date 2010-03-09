@@ -187,7 +187,7 @@ renderF::Point -> Array -> Render.Object -> Int -> Double -> Int -> Int -> Strin
 renderF p a = Render.Render p (map (\(Light l) -> l) a)
 
 runOp::(String,Operator) -> Stack -> Stack
-runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)
+runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e++(show st))
                    in either er id (execStateT op st)
 
 clampf :: Double -> Double
