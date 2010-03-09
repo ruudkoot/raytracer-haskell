@@ -14,18 +14,18 @@ import Renderer.Shaders
 import Renderer.Renderer
 import Renderer.Scene
 --
-import Output.Output
 import Output.PPM
 
+import System
 import System.IO
 
-import Data.Map as M
+import qualified Data.Map as M
 
-doParseGML::IO GML
-doParseGML = do parseResult <- parseGML <$> getContents
-                case parseResult of
-                  Left err -> error $ "Parse error on " ++ show err
-                  Right tks -> return tks
+doParseGML :: Handle -> IO GML
+doParseGML h = do parseResult <- parseGML <$> hGetContents h
+                  case parseResult of
+                    Left  err -> error $ "Parse error on " ++ show err
+                    Right tks -> return tks
 
 doEvaluateGML::GML->Scene
 doEvaluateGML gml = case evaluate (M.empty,[],gml) of
@@ -33,8 +33,21 @@ doEvaluateGML gml = case evaluate (M.empty,[],gml) of
                         _                  -> error "No render object found"
            
 main :: IO()
-main = do gml <- doParseGML
-          renderScene.toWorld.doEvaluateGML $ gml          
+main = do args <- getArgs 
+          handler <- if null args 
+                      then return stdin
+                      else readHandler $ head args 
+          gml <- doParseGML handler
+          renderScene . toWorld $ doEvaluateGML gml      
+
+readHandler :: FilePath -> IO Handle
+readHandler = flip openFile ReadMode 
+
+
+usage :: IO ()
+usage = putStrLn $ unlines 
+          [ "raytracer 1.0 - Yet Another Haskell Ray Tracer",
+            "Copyright 2010, The Ray Team" ]
 
 {-main = do parseResult <- parseGML <$> getContents
           case parseResult of
