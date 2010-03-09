@@ -33,8 +33,8 @@ doEvaluateGML gml = case evaluate (M.empty,[],gml) of
                         _                  -> error "No render object found"
            
 main :: IO()
-main = do gml <- doParseGML          
-          maybe (putStrLn "Not a valid image") putStrLn (toPPM (Size 0) (Size 0) [])
+main = do gml <- doParseGML
+          renderScene.toWorld.doEvaluateGML $ gml          
 
 {-main = do parseResult <- parseGML <$> getContents
           case parseResult of
