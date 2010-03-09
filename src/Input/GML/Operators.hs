@@ -6,8 +6,12 @@ import Control.Monad.State
 import Control.Monad.Error
 import Control.Applicative
 import Control.Monad
+<<<<<<< HEAD
 import Data.Map
 import Data.Maybe
+=======
+import Data.Map hiding (map)
+>>>>>>> 8f56b7289a19b8ce495fd922908e2f21900320b7
 import Data.Typeable
 
 import Shared.Vector
@@ -17,22 +21,6 @@ import Input.GML.AST hiding (State)
 import Input.GML.Render
 import Input.GML.Shaders
 
-{-data StackT a b = StackT { runStack::(b,[a]) -> Either String (b,[a]) }
-
-pops::StackT a a
-pops = let cf []     = Left "Empty stack"
-           cf (x:xs) = Right (x,xs)
-       in StackT (\(_,st) -> cf st)
-
-pushs::StackT a a
-pushs = StackT (\(v,ls) -> (v,v:ls))
-
-instance Applicative (StackT Value) where
-    pure f    = StackT (\(_,ls) -> (f,ls))
-    (<*>) l r = StackT (\a -> case runStack l a of
-                                (Left er)        -> Left er
-                                (Right (av,als)) -> case runStack r 
--}
 type Op = StateT Stack (Either String) 
 
 instance Applicative (Either String) where
@@ -42,16 +30,6 @@ instance Applicative (Either String) where
 instance (Monad f, Applicative f) => Applicative (StateT r f) where
     pure  = return
     (<*>) = ap
-
-{-
-popt::(Typeable a) => Op a
-popt = let cf v = case cast v of
-                    Nothing -> lift.throwError $ "Wrong Type: "++(show (typeOf v))
-                    Just v2 -> return v2
-       in pop >>= cf
--}
-
---pusht::(Typeable a) => a -> Op a
 
 pop::Op Value
 popi::Op Int
@@ -134,9 +112,12 @@ pr   :: (Point                      -> Double                      ) -> Operator
 rrrp :: (Double -> Double -> Double -> Point                       ) -> Operator
 iib  :: (Int    -> Int              -> Bool                        ) -> Operator
 rrb  :: (Double -> Double           -> Bool                        ) -> Operator
+aiv  :: (Array  -> Int              -> Value                       ) -> Operator
+ai   :: (Array                      -> Int                         ) -> Operator
 co   :: (Closure                    -> Object                      ) -> Operator
 orrro:: (Object -> Double -> Double -> Double -> Object            ) -> Operator
 oro  :: (Object -> Double           -> Object                      ) -> Operator
+paoiriisR :: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> GMLRender) -> Operator
 
 ii op   = (op <$> popi)                             >>= pushi
 iii op  = (op <$> popi <*> popi)                    >>= pushi
@@ -157,21 +138,6 @@ ppl op  = (op <$> popp <*> popp)                    >>= pushl
 ppprrl op = (op <$> popp <*> popp <*> popp <*> popr <*> popr) >>= pushl
 ooo op  = (op <$> popo <*> popo)                    >>= pusho
 paoiriisR op = (op <$> popp <*> popa <*> popo <*> popi <*> popr <*> popi <*> popi <*> pops) >>= pushR
-
-{-
-ii   f = \(BaseValue (Int  i1)                                             : ss) -> (BaseValue (Int     (f i1      )), ss)
-iii  f = \(BaseValue (Int  i1) : BaseValue (Int  i2)                       : ss) -> (BaseValue (Int     (f i1 i2   )), ss)
-rrr  f = \(BaseValue (Real r1) : BaseValue (Real r2)                       : ss) -> (BaseValue (Real    (f r1 r2   )), ss)
-rr   f = \(BaseValue (Real r1)                                             : ss) -> (BaseValue (Real    (f r1      )), ss)
-ri   f = \(BaseValue (Real r1)                                             : ss) -> (BaseValue (Int     (f r1      )), ss)
-ir   f = \(BaseValue (Int  i1)                                             : ss) -> (BaseValue (Real    (f i1      )), ss)
-pr   f = \(Point           p1                                              : ss) -> (BaseValue (Real    (f p1      )), ss)
-rrrp f = \(BaseValue (Real r1) : BaseValue (Real r2) : BaseValue (Real r3) : ss) -> (Point              (f r1 r2 r3) , ss)
-iib  f = \(BaseValue (Int  i1) : BaseValue (Int  i2)                       : ss) -> (BaseValue (Boolean (f i1 i2   )), ss)
-rrb  f = \(BaseValue (Real r1) : BaseValue (Real r2)                       : ss) -> (BaseValue (Boolean (f r1 r2   )), ss)
-aiv  f = \(Array           a1  : BaseValue (Int  i2)                       : ss) -> (                    f a1 i2     , ss)
-ai   f = \(Array           a1                                              : ss) -> (BaseValue (Int     (f a1)      ), ss)                             
--}
 
 -- applicative??
 operators :: Map String Operator
@@ -222,8 +188,12 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "union"  ,  ooo Union                 ) --Boolean operators
                      , ( "intersect", ooo Intersect            )
                      , ( "difference", ooo Difference          )
-                    -- , ( "render", paoiriisR GMLRender         )
+                     , ( "render", paoiriisR renderF         )
                      ]
+
+--Convert light array types
+renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> GMLRender
+renderF p a = GMLRender p (map (\(Light l) -> l) a)
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)
