@@ -13,6 +13,7 @@ import Renderer.Datatypes
 import Renderer.Intersections
 import Renderer.Shaders
 import Renderer.Renderer
+import Renderer.Scene
 --
 import Output.Output
 import Output.PPM
@@ -33,7 +34,6 @@ doEvaluateGML gml = case evaluate (M.empty,[],gml) of
                         _            -> error "No render object found"
            
 main :: IO()
-
 main = do gml <- doParseGML          
           maybe (putStrLn "Not a valid image") putStrLn (toPPM (Size 0) (Size 0) [])
 
