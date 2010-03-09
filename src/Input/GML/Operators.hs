@@ -6,7 +6,10 @@ import Control.Monad.State
 import Control.Monad.Error
 import Control.Applicative
 import Control.Monad
+
+import Data.Maybe
 import Data.Map hiding (map)
+
 import Data.Typeable
 
 import Shared.Vector
@@ -44,33 +47,34 @@ pushb::Bool -> Op Value
 pusho::Render.Object -> Op Value
 pushl::Light -> Op Value
 
+
+-- * Pop
 pop = let cf []     = lift (throwError "Empty stack")
           cf (x:xs) = put xs >> return x
       in get >>= cf
-popi = let cf (BaseValue (Int i)) = return i
-           cf _                   = lift (throwError "Expected Type: Int")
-       in pop >>= cf
-popr = let cf (BaseValue (Real r)) = return r
-           cf _                    = lift (throwError "Expected type: Real")
-       in pop >>= cf
-popp = let cf (Point p) = return p
-           cf _         = lift (throwError "Expected Type: Point")
-       in pop >>= cf
-popa = let cf (Array a) = return a
-           cf _         = lift (throwError "Expected Type: Array")
-       in pop >>= cf
-popo = let cf (Object a) = return a
-           cf _          = lift (throwError "Expected Type: Object")
-       in pop >>= cf
-popl = let cf (Light a) = return a
-           cf _         = lift (throwError "Expected Type: Light")
-       in pop >>= cf
-popc = let cf (Closure a) = return a
-           cf _           = lift (throwError "Expected Type: Closure")
-       in pop >>= cf
-pops = let cf (BaseValue (String s)) = return s
-           cf _                      = lift (throwError "Expected Type: String")
-       in pop >>= cf
+      
+popt :: (Value -> Maybe a) -> String -> Op a
+popt match etype 
+  = pop >>= maybe ((lift.throwError) ("Expected type: " ++ etype)) return . match
+      
+popi = popt (\x -> case x of (BaseValue (Int  i)) -> Just i; _ -> Nothing)
+       "Int"
+popr = popt (\x -> case x of (BaseValue (Real r)) -> Just r; _ -> Nothing)
+       "Real"
+popp = popt (\x -> case x of (Point p)   -> Just p; _ -> Nothing)
+       "Point"
+popa = popt (\x -> case x of (Array a)   -> Just a; _ -> Nothing)
+       "Array"
+popo = popt (\x -> case x of (Object a)  -> Just a; _ -> Nothing)
+       "Object"
+popl = popt (\x -> case x of (Light a)   -> Just a; _ -> Nothing)
+       "Light"
+popc = popt (\x -> case x of (Closure a) -> Just a; _ -> Nothing)
+       "Closure"
+pops = popt (\x -> case x of (BaseValue (String s)) -> Just s; _ -> Nothing)
+            "String"
+
+-- * Push
 
 push v = do cs <- get
             put (v:cs)
