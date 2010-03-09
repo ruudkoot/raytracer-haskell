@@ -44,7 +44,7 @@ data Value     = BaseValue BaseValue
                | Point     Point
                | Object    Object
                | Light     Light
-               | Render    GMLRender
+               | Render    Render
                deriving (Show, Eq, Typeable)
                
 type Array     = [Value]
