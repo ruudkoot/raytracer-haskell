@@ -16,7 +16,7 @@ import Shared.Vector
 import Shared.RenderBase
 
 import Input.GML.AST hiding (State)
-import Input.GML.Render
+import qualified Input.GML.Render as Render
 import Input.GML.Shaders
 
 type Op = StateT Stack (Either String) 
@@ -34,7 +34,7 @@ popi::Op Int
 popr::Op Double
 popp::Op Point
 popa::Op Array
-popo::Op Object
+popo::Op Render.Object
 popl::Op Light
 popc::Op Closure
 pops::Op String
@@ -44,7 +44,7 @@ pushi::Int -> Op Value
 pushr::Double -> Op Value
 pushp::Point -> Op Value
 pushb::Bool -> Op Value
-pusho::Object -> Op Value
+pusho::Render.Object -> Op Value
 pushl::Light -> Op Value
 
 
@@ -102,13 +102,13 @@ iib  :: (Int    -> Int              -> Bool                        ) -> Operator
 rrb  :: (Double -> Double           -> Bool                        ) -> Operator
 aiv  :: (Array  -> Int              -> Value                       ) -> Operator
 ai   :: (Array                      -> Int                         ) -> Operator
-co   :: (Closure                    -> Object                      ) -> Operator
-orrro:: (Object -> Double -> Double -> Double -> Object            ) -> Operator
-oro  :: (Object -> Double           -> Object                      ) -> Operator
+co   :: (Closure                    -> Render.Object               ) -> Operator
+orrro:: (Render.Object -> Double -> Double -> Double -> Render.Object     ) -> Operator
+oro  :: (Render.Object -> Double           -> Render.Object               ) -> Operator
 ppl  :: (Point -> Point             -> Light                       ) -> Operator
 ppprrl::(Point -> Point -> Point -> Double -> Double -> Light      ) -> Operator
-ooo  :: (Object -> Object           ->  Object                     ) -> Operator
-paoiriisR:: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render) -> Operator
+ooo  :: (Render.Object -> Render.Object ->  Render.Object          ) -> Operator
+paoiriisR :: (Point -> Array -> Render.Object -> Int -> Double -> Int -> Int -> String -> Render.Render) -> Operator
 
 ii op   = (op <$> popi)                             >>= pushi
 iii op  = (op <$> popi <*> popi)                    >>= pushi
@@ -162,29 +162,29 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      , ( "point" , rrrp (\x y z -> Vector3D (x, y, z)))
                      , ( "get"   ,  aiv (!!)                   ) -- arrays
                      , ( "length",   ai length                 )
-                     , ( "sphere",   co (Simple Sphere .gmlShader)) -- Primitive Objects
-                     , ( "cube"  ,   co (Simple Cube .gmlShader)   )
-                     , ( "cylinder", co (Simple Cylinder .gmlShader))
-                     , ( "cone"  ,   co (Simple Cone .gmlShader) )
-                     , ( "plane" ,    co (Simple Plane .gmlShader))
-                     , ( "translate",orrro Translate           ) --Transformations
-                     , ( "scale" ,   orrro  Scale              ) 
-                     , ( "uscale",   oro  UScale               )
-                     , ( "rotatex",  oro RotateX               )
-                     , ( "rotatey",  oro RotateY               )
-                     , ( "rotatez",  oro RotateZ               )
+                     , ( "sphere",   co (Render.Simple Sphere .gmlShader)) -- Primitive Objects
+                     , ( "cube"  ,   co (Render.Simple Cube .gmlShader)   )
+                     , ( "cylinder", co (Render.Simple Cylinder .gmlShader))
+                     , ( "cone"  ,   co (Render.Simple Cone .gmlShader) )
+                     , ( "plane" ,    co (Render.Simple Plane .gmlShader))
+                     , ( "translate",orrro Render.Translate           ) --Transformations
+                     , ( "scale" ,   orrro  Render.Scale              ) 
+                     , ( "uscale",   oro  Render.UScale               )
+                     , ( "rotatex",  oro Render.RotateX               )
+                     , ( "rotatey",  oro Render.RotateY               )
+                     , ( "rotatez",  oro Render.RotateZ               )
                      , ( "light"  ,  ppl DirectLight           ) --Lights
                      , ( "pointlight", ppl PointLight          )                            
                      , ( "spotlight", ppprrl SpotLight         )
-                     , ( "union"  ,  ooo Union                 ) --Boolean operators
-                     , ( "intersect", ooo Intersect            )
-                     , ( "difference", ooo Difference          )
+                     , ( "union"  ,  ooo Render.Union                 ) --Boolean operators
+                     , ( "intersect", ooo Render.Intersect            )
+                     , ( "difference", ooo Render.Difference          )
                      , ( "render", paoiriisR renderF         )
                      ]
 
 --Convert light array types
-renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render
-renderF p a = Render p (map (\(Light l) -> l) a)
+renderF::Point -> Array -> Render.Object -> Int -> Double -> Int -> Int -> String -> Render.Render
+renderF p a = Render.Render p (map (\(Light l) -> l) a)
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)
