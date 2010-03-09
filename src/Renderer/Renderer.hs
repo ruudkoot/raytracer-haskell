@@ -52,3 +52,7 @@ renderTest something = maybe bad save (makePPM scene)
                                      , (Data.Vector.Vector4D (0, 0, 0, 1))
                                      )
          m3inv = inverse m3
+
+
+trace :: World -> Ray -> ColorD
+trace w = undefined
