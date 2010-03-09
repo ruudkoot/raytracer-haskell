@@ -61,6 +61,7 @@ instance Eq BaseValue where
     (==) (String s1)  (String s2)    = s1 == s2
     (==) (Boolean b1) (Boolean b2)   = b1 == b2
     (==) (Int i1)     (Int i2)       = i1 == i2
+    (==) _            _              = False
 
 --Algebra for folding GML AST's
 type CodeAlgebra tok bv = (([tok]     -> tok, --Function
@@ -109,7 +110,7 @@ simplePrintAlg = ((func,arr,op,ident,bind,base),(int,real,string,bool))
 
 
 simplePrintGML::Code -> String
-simplePrintGML gml = concatMap (' ':) $ foldCode simplePrintAlg gml
+simplePrintGML = concatMap (' ':) . foldCode simplePrintAlg
 
 --Arbitrary instances for GML        
 
