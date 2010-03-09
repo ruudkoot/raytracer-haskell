@@ -29,10 +29,22 @@ renderTest = maybe bad save (makePPM scene)
          save = writeFile "output.ppm"
          makePPM = Output.PPM.toPPM (Size 800) (Size 800)
          scene = renderScene sphere (Size 800) (Size 800) 1
-         sphere = Shared.RenderBase.RSimple Cone m minv ()
-         m = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.1, 0, 0, 0))
-                                    , (Shared.Vector.Vector4D (0, 0.1, 0, 0.2))
-                                    , (Shared.Vector.Vector4D (0, 0, 0.1, 0))
+         sphere = Shared.RenderBase.RIntersect (Shared.RenderBase.RUnion (Shared.RenderBase.RSimple Cone m minv ()) (Shared.RenderBase.RSimple Sphere m2 m2inv ())) (Shared.RenderBase.RSimple Cylinder m3 m3inv ())
+         m = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.2, 0, 0, 0))
+                                    , (Shared.Vector.Vector4D (0, 0.2, 0, 0.1))
+                                    , (Shared.Vector.Vector4D (0, 0, 0.2, 0))
                                     , (Shared.Vector.Vector4D (0, 0, 0, 1))
                                     )
          minv = inverse m
+         m2 = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.2, 0, 0, 0))
+                                     , (Shared.Vector.Vector4D (0, 0.2, 0, -0.1))
+                                     , (Shared.Vector.Vector4D (0, 0, 0.2, 0))
+                                     , (Shared.Vector.Vector4D (0, 0, 0, 1))
+                                     )
+         m2inv = inverse m2
+         m3 = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.1, 0, 0, 0))
+                                     , (Shared.Vector.Vector4D (0, 10, 0, -0.2))
+                                     , (Shared.Vector.Vector4D (0, 0, 0.1, 0))
+                                     , (Shared.Vector.Vector4D (0, 0, 0, 1))
+                                     )
+         m3inv = inverse m3
