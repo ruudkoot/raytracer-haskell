@@ -1,9 +1,10 @@
 module Input.GML.ToRenderObject where
 
-import           Shared.Matrix
-import           Shared.Vector
-import qualified Input.GML.Scene   as Scene
-import qualified Shared.RenderBase as Render
+import           Data.Matrix
+import           Data.Vector
+
+import qualified Input.GML.Scene    as Scene
+import qualified Base.Miscellaneous as Render
 
 toRenderObject :: Scene.Object -> Render.ObjectTree Render.Shader
 toRenderObject = flip (Scene.foldObject algebra) identity4D

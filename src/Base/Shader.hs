@@ -1,6 +1,6 @@
 module Base.Shader where
 
-import Shared.Colour
+import Data.Colour
 
 -- ** Shaders
 type ShaderCoord = (Double,Double,Int)

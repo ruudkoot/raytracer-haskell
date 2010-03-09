@@ -2,7 +2,7 @@
 -- made polymorphic. This enables us to use Colour Int for 
 -- displaying purposes and Colour Double for calculations.
 -- 
-module Shared.Colour where 
+module Data.Colour where 
 
 -- * Synonyms
 type ColourD = Colour Double

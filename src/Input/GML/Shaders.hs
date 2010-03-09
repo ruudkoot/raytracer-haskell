@@ -1,6 +1,6 @@
 module Input.GML.Shaders where
 
-import Shared.Colour
+import Data.Colour
 import Base.Shader
 
 import Input.GML.AST

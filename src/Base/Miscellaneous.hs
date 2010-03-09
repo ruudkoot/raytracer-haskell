@@ -1,11 +1,11 @@
-module Shared.RenderBase where
+module Base.Miscellaneous where
+
+import Data.Colour
+import Data.Vector
+import Data.Matrix (Matrix4D)
 
 import Base.Light
 import Base.Shape
-
-import Shared.Colour
-import Shared.Vector
-import Shared.Matrix (Matrix4D)
 
 -- * Types
 
