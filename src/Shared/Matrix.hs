@@ -110,12 +110,43 @@ identity4D = Matrix4D(Vector4D(1, 0, 0, 0),
                       Vector4D(0, 0, 1, 0),
                       Vector4D(0, 0, 0, 1))
 
+
+-- * Building Matrices
+--
+-- ** Diagonals
+--
 diagonal3D :: Num a => (Vector3D a) -> (Matrix3D a)
-diagonal3D (Vector3D (x,y,z)) = Matrix3D (Vector3D(x, 0, 0), Vector3D(0, y, 0), Vector3D(0, 0, z))
+diagonal3D (Vector3D (x,y,z)) = Matrix3D (Vector3D(x, 0, 0), 
+                                          Vector3D(0, y, 0), 
+                                          Vector3D(0, 0, z))
 
 
 diagonal4D :: Num a => (Vector4D a) -> (Matrix4D a)
-diagonal4D (Vector4D (x,y,z,w)) = Matrix4D (Vector4D(x, 0, 0, 0), Vector4D(0, y, 0, 0), Vector4D(0, 0, z, 0), Vector4D(0, 0, 0, w))
+diagonal4D (Vector4D (x,y,z,w)) = Matrix4D (Vector4D(x, 0, 0, 0), 
+                                            Vector4D(0, y, 0, 0), 
+                                            Vector4D(0, 0, z, 0), 
+                                            Vector4D(0, 0, 0, w))
+
+-- ** Rotations
+--
+rotateX :: Floating a => a -> Matrix4D a
+rotateX d = Matrix4D(Vector4D( 1,      0,       0,  0),
+                     Vector4D( 0,  cos d,  -sin d,  0),
+                     Vector4D( 0,  sin d,   cos d,  0),
+                     Vector4D( 0,      0,       0,  1))
+
+rotateY :: Floating a => a -> Matrix4D a
+rotateY d = Matrix4D(Vector4D( cos d,  0,  -sin d, 0),
+                     Vector4D(     0,  1,       0, 0),
+                     Vector4D( sin d,  0,   cos d, 0),
+                     Vector4D(     0,  0,       0, 1))
+
+rotateZ :: Floating a => a -> Matrix4D a
+rotateZ d = Matrix4D(Vector4D( cos d, -sin d,  0,  0),
+                     Vector4D( sin d,  cos d,  0,  0),
+                     Vector4D(     0,      0,  1,  0),
+                     Vector4D(     0,      0,  0,  1))
+
 
 -- * Matrix Operations
 --
