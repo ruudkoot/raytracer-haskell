@@ -29,8 +29,8 @@ renderScene t w h fov = [if hit' (ray i j) t
 renderTest = maybe bad save (makePPM scene)
    where bad = putStrLn "errorz"
          save = writeFile "output.ppm"
-         makePPM = Output.PPM.toPPM (Size 800) (Size 800)
-         scene = renderScene sphere (Size 800) (Size 800) 1
+         makePPM = Output.PPM.toPPM (Size 800) (Size 400)
+         scene = renderScene sphere (Size 800) (Size 400) 1
          sphere = Shared.RenderBase.RIntersect (Shared.RenderBase.RUnion (Shared.RenderBase.RSimple Cone m minv ()) (Shared.RenderBase.RSimple Sphere m2 m2inv ())) (Shared.RenderBase.RSimple Cylinder m3 m3inv ())
          m = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.2, 0, 0, 0))
                                     , (Shared.Vector.Vector4D (0, 0.2, 0, 0.1))

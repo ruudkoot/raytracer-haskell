@@ -22,10 +22,10 @@ test::String
 test ="{ /a /b /c b c } /solveRoot 3.0 4.0 5.0 solveRoot apply"
 
 main :: IO()
-main = do parseResult <- parseGML <$> getContents
-          case parseResult of
-            Left err -> putStrLn $ "Parse error on " ++ show err
-            Right (tks) -> print (evaluate (M.empty,[],tks))
-          maybe (putStrLn "Not a valid image") putStrLn (toPPM (Size 0) (Size 0) [])
+-- main = do parseResult <- parseGML <$> getContents
+--           case parseResult of
+--             Left err -> putStrLn $ "Parse error on " ++ show err
+--             Right (tks) -> print (evaluate (M.empty,[],tks))
+--           maybe (putStrLn "Not a valid image") putStrLn (toPPM (Size 0) (Size 0) [])
 
--- main = Renderer.Renderer.renderTest
+main = Renderer.Renderer.renderTest
