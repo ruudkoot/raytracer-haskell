@@ -69,6 +69,16 @@ hit r Plane    = let oy = getY4D $ rOrigin r
                  in (oy == 0) || (oy * dy < 0)
 
 
+hitSquareZ::Ray->Bool
+hitSquareZ r = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
+                   (dx,dy,dz,_) = fromVector4D $ rDirection r
+               in if (oz == 0) || (oz * dz >= 0) 
+                  then False
+                  else let t = -oz/dz
+                           u = ox + t*dx
+                           v = oy + t*dy
+                       in u < 1.0 && v < 1.0
+                
 intersection :: Ray -> Shape -> [Intersection]
 intersection r Cube     = undefined
 intersection r Cylinder = undefined
