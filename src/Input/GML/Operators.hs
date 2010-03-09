@@ -110,25 +110,37 @@ ppprrl :: (Point  -> Point  -> Point  -> Double -> Double -> Light ) -> Operator
 ooo    :: (Object -> Object                               -> Object) -> Operator
 paoiriisR :: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Scene) -> Operator
 
-ii op   = (op <$> popi)                             >>= pushi
-iii op  = (op <$> popi <*> popi)                    >>= pushi
-rr op   = (op <$> popr)                             >>= pushr
-rrr op  = (op <$> popr <*> popr)                    >>= pushr
-ri op   = (op <$> popr)                             >>= pushi
-ir op   = (op <$> popi)                             >>= pushr
-pr op   = (op <$> popp)                             >>= pushr
-rrrp op = (op <$> popr <*> popr <*> popr)           >>= pushp
-iib op  = (op <$> popi <*> popi)                    >>= pushb
-rrb op  = (op <$> popr <*> popr)                    >>= pushb
-aiv op  = (op <$> popa <*> popi)                    >>= push
-ai op   = (op <$> popa)                             >>= pushi
-co op   = (op <$> popc)                             >>= pusho
-orrro op= (op <$> popo <*> popr <*> popr <*> popr)  >>= pusho
-oro op  = (op <$> popo <*> popr)                    >>= pusho
-ppl op  = (op <$> popp <*> popp)                    >>= pushl
-ppprrl op = (op <$> popp <*> popp <*> popp <*> popr <*> popr) >>= pushl
-ooo op  = (op <$> popo <*> popo)                    >>= pusho
-paoiriisR op = (op <$> popp <*> popa <*> popo <*> popi <*> popr <*> popi <*> popi <*> pops) >>= pushR
+flip3::(a->b->c->d)->c->b->a->d
+flip3 f c b a = f a b c
+
+flip4::(a->b->c->d->e)->d->c->b->a->e
+flip4 f d c b a = f a b c d
+
+flip5::(a->b->c->d->e->f)->e->d->c->b->a->f
+flip5 f e d c b a = f a b c d e
+
+flip8::(a->b->c->d->e->f->g->h->i)->h->g->f->e->d->c->b->a->i
+flip8 ff h g f e d c b a = ff a b c d e f g h
+
+ii        op = (op      <$> popi)                                       >>= pushi
+iii       op = (flip op <$> popi <*> popi)                              >>= pushi
+rr        op = (op      <$> popr)                                       >>= pushr
+rrr       op = (flip op <$> popr <*> popr)                              >>= pushr
+ri        op = (op      <$> popr)                                       >>= pushi
+ir        op = (op      <$> popi)                                       >>= pushr
+pr        op = (op      <$> popp)                                       >>= pushr
+rrrp      op = (flip3 op<$> popr <*> popr <*> popr)                     >>= pushp
+iib       op = (flip op <$> popi <*> popi)                              >>= pushb
+rrb       op = (flip op <$> popr <*> popr)                              >>= pushb
+aiv       op = (flip op <$> popi <*> popa)                              >>= push
+ai        op = (op      <$> popa)                                       >>= pushi
+co        op = (op      <$> popc)                                       >>= pusho
+orrro     op = (flip4 op<$> popr <*> popr <*> popr <*> popo)            >>= pusho
+oro       op = (flip op <$> popr <*> popo)                              >>= pusho
+ppl       op = (flip op <$> popp <*> popp)                              >>= pushl
+ppprrl    op = (flip5 op<$> popr <*> popr <*> popp <*> popp <*> popp)   >>= pushl
+ooo       op = (flip op <$> popo <*> popo)                              >>= pusho
+paoiriisR op = (flip8 op<$> pops <*> popi <*> popi <*> popr <*> popi <*> popo <*> popa <*> popp) >>= pushR
 
 operators :: Map String Operator
 operators = fromList [ ( "addi"      ,       iii (+)                    ) -- numbers
@@ -186,7 +198,7 @@ renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Sc
 renderF p a = Scene p (map (\(Light l) -> l) a)
 
 runOp::(String,Operator) -> Stack -> Stack
-runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)
+runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e++(show st))
                    in either er id (execStateT op st)
 
 clampf :: Double -> Double
