@@ -14,7 +14,7 @@ import Output.PPM
 
 
 
-renderScene :: Object a -> Width -> Height -> Double -> Colours Int
+renderScene :: Object -> Width -> Height -> Double -> Colours Int
 renderScene t w h fov = [if hit' (ray i j) t
                          then Colour (255,255,255)
                          else Colour (0,0,0)

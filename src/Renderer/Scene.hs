@@ -6,14 +6,15 @@ import Data.Matrix (Matrix4D)
 
 import Base.Light
 import Base.Shape
+import Base.Shader
 
 -- * Types
 
 -- ** World
-data World surface = World 
+data World = World 
   {
     wOptions :: RenderOptions
-  , wObject  :: Object surface
+  , wObject  :: Object
   , wLights  :: [RenderLight]
   }
   
@@ -43,8 +44,8 @@ data Ray = Ray
 
 
   
-data Object a = Simple Shape (Matrix4D Double) (Matrix4D Double) a -- Shape, transformation and inverse of transformation matrix
-              | Union      (Object a) (Object a)
-              | Intersect  (Object a) (Object a)
-              | Difference (Object a) (Object a)
+data Object   = Simple Shape (Matrix4D Double) (Matrix4D Double) Shader -- Shape, transformation and inverse of transformation matrix
+              | Union      Object Object
+              | Intersect  Object Object
+              | Difference Object Object
               deriving Show

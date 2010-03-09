@@ -43,4 +43,4 @@ main = do gml <- doParseGML
             Right (tks) -> print (evaluate (M.empty,[],tks))
           maybe (putStrLn "Not a valid image") putStrLn (toPPM (Size 0) (Size 0) [])-}
 
-main = Renderer.Renderer.renderTest $ toRenderObject (RotateZ (UScale (Union (Simple Sphere (solid 1 0 0)) (Simple Cone (solid 1 0 0))) 0.2) pi)
+--main = Renderer.Renderer.renderTest $ toRenderObject (RotateZ (UScale (Union (Simple Sphere (solid 1 0 0)) (Simple Cone (solid 1 0 0))) 0.2) pi)

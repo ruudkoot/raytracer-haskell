@@ -12,7 +12,7 @@ import Renderer.Scene
 
 type Intersection = (Double, Double) -- Enters at x, leaves at y
 
-hit' :: Ray -> Object a -> Bool
+hit' :: Ray -> Object -> Bool
 hit' (Ray o d) (Simple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
 hit' ray       (Union  l r)        = hit' ray l || hit' ray r
 hit' ray       (Difference  l r)   = hit' ray l && not (hit' ray r)

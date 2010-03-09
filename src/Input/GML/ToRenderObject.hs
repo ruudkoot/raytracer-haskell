@@ -2,12 +2,13 @@ module Input.GML.ToRenderObject where
 
 import           Data.Matrix
 import           Data.Vector
+import           Data.Colour
 
 import           Base.Shader
 import qualified Input.GML.Scene as GML
 import qualified Renderer.Scene  as Renderer
 
-toRenderObject :: GML.Object -> Renderer.Object Shader
+toRenderObject :: GML.Object -> Renderer.Object
 toRenderObject = flip (GML.foldObject algebra) identity4D
     where algebra = ( \shape shader matrix -> Renderer.Simple shape matrix (inverse matrix) shader
                     , \o d1 d2 d3   matrix -> o (translate d1 d2 d3 !*! matrix)
@@ -21,3 +22,7 @@ toRenderObject = flip (GML.foldObject algebra) identity4D
                     , \o1 o2        matrix -> Renderer.Difference (o1 matrix) (o2 matrix)
                     )
 
+toWorld::GML.Scene->Renderer.World
+toWorld (GML.Scene (Vector3D amb) l obj dp fov w h fil) = 
+       Renderer.World (Renderer.RenderOptions (Colour amb) dp fov w h fil) (toRenderObject obj) l
+   
