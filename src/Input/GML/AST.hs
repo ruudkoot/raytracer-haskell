@@ -35,7 +35,7 @@ type Code      = GML
 type Closure   = (Env, Code)
 
 type Point     = Vector3D Double
-type Object    = GMLObject
+--type Object    = GMLObject
 type Light     = RenderLight
 
 data Value     = BaseValue BaseValue
