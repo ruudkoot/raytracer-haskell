@@ -1,6 +1,6 @@
 module Base.Light where
 
-import Shared.Vector
+import Data.Vector
 
 -- | RenderLight is used by both represantations, GML and OUrs                  
 data RenderLight

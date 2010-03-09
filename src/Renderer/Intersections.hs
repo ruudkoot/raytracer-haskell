@@ -1,13 +1,14 @@
 module Renderer.Intersections where
 
-import Shared.Vector
-import Shared.Matrix
+import Data.Ord
+import Data.Matrix
+import Data.Vector
 
-import Shared.RenderBase
+import Base.Miscellaneous
 import Base.Shape
 
 import Renderer.Datatypes
-import Data.Ord
+
 
 type Intersection = (Double, Double) -- Enters at x, leaves at y
 

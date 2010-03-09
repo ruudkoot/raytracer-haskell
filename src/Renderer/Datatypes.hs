@@ -1,8 +1,8 @@
 module Renderer.Datatypes where
   
-import Shared.Colour
-import Shared.Vector
-import Shared.Matrix (Matrix4D)
+import Data.Colour
+import Data.Vector
+import Data.Matrix (Matrix4D)
 
 
 

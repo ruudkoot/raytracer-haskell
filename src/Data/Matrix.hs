@@ -2,12 +2,12 @@
 -- | General purpose matrix module.
 --
 
-module Shared.Matrix where 
+module Data.Matrix where 
 
 
 import Control.Applicative
 import Data.List (intercalate, transpose)
-import Shared.Vector (Vector, Vector3D(..), Vector4D(..), (<.>), fromVector)
+import Data.Vector (Vector, Vector3D(..), Vector4D(..), (<.>), fromVector)
 
 
 -- * Matrices

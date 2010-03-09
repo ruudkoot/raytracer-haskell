@@ -9,10 +9,9 @@ import Control.Monad.Error
 
 import Data.Maybe
 import Data.Map                              hiding (map)
+import Data.Vector
 
-import           Shared.Vector
-
-import qualified Shared.RenderBase as RenderBase
+--import qualified Shared.RenderBase as RenderBase
 import qualified Base.Light        as Light
 import qualified Base.Shape        as Shape
 

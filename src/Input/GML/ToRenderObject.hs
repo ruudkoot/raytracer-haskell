@@ -1,16 +1,17 @@
 module Input.GML.ToRenderObject where
 
-import           Shared.Matrix
-import           Shared.Vector
+import           Data.Matrix
+import           Data.Vector
+import           Base.Shader
 import qualified Input.GML.Scene   as Scene
-import qualified Shared.RenderBase as Render
+import qualified Base.Miscellaneous as Render
 
-toRenderObject :: Scene.Object -> Render.ObjectTree Render.Shader
+toRenderObject :: Scene.Object -> Render.ObjectTree Shader
 toRenderObject = flip (Scene.foldObject algebra) identity4D
     where algebra = ( \shape shader matrix -> Render.RSimple shape matrix (inverse matrix) shader
                     , \o d1 d2 d3 matrix -> o ((translate d1 d2 d3) !*! matrix)
                     , \o d1 d2 d3 matrix -> o ((diagonal4D (Vector4D (d1, d2, d3, 1))) !*! matrix)
-                    , \o d matrix -> o ((scaleF d identity4D) !*! matrix)
+                    , \o d matrix -> o ((diagonal4D (Vector4D (d, d, d, 1))) !*! matrix)
                     , \o d matrix -> o ((rotateX d) !*! matrix)
                     , \o d matrix -> o ((rotateY d) !*! matrix)
                     , \o d matrix -> o ((rotateZ d) !*! matrix)
