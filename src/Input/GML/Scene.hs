@@ -1,11 +1,14 @@
 module Input.GML.Scene where
   
 import Shared.Vector
-import Shared.RenderBase
+
+import qualified Shared.RenderBase as Base
+import qualified Base.Light as Light
+import qualified Base.Shape as Shape
 
 data Scene = Scene
   { sceneAmbience :: Pt3D
-  , sceneLights   :: [RenderLight]
+  , sceneLights   :: [Light.RenderLight]
   , sceneObj      :: Object
   , sceneDepth    :: Int
   , sceneFov      :: Double        -- fov
@@ -15,7 +18,7 @@ data Scene = Scene
   }
   deriving (Show,Eq)
 
-data Object = Simple     Shape  Shader
+data Object = Simple     Shape.Shape  Base.Shader
             | Translate  Object Double Double Double
             | Scale      Object Double Double Double
             | UScale     Object Double 
@@ -28,7 +31,7 @@ data Object = Simple     Shape  Shader
             deriving (Show,Eq)
           
 type ObjectAlgebra r =
-    ( Shape -> Shader -> r
+    ( Shape.Shape -> Base.Shader -> r
     , r -> Double -> Double -> Double -> r
     , r -> Double -> Double -> Double -> r
     , r -> Double -> r

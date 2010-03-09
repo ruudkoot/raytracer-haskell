@@ -7,13 +7,13 @@ import qualified Data.Map        as Map
 
 import           Test.QuickCheck
 
-import           Input.GML.Scene
+import qualified Base.Light      as Light
+import qualified Input.GML.Scene as Scene
+
 import           Shared.Vector (Vector3D)
-import           Shared.RenderBase
 --AST defition following the specification in chapter 2.1 of the assignment
 
 -- * Parser
-type GML = [Token]
 
 data Token     = Function   [Token]
                | TArray     [Token]
@@ -32,20 +32,20 @@ data BaseValue = Int      Int
 -- * Stack
 type Id        = String
 type Env       = Map.Map Id Value
-type Code      = GML
+type Code      = [Token]
 type Closure   = (Env, Code)
 
 type Point     = Vector3D Double
---type Object    = GMLObject
-type Light     = RenderLight
+--type Object    = Scene.Object
+type Light     = Light.RenderLight
 
 data Value     = BaseValue BaseValue
                | Closure   Closure
                | Array     Array
                | Point     Point
-               | Object    Object
+               | Object    Scene.Object
                | Light     Light
-               | Scene     Scene
+               | Render    Scene.Scene
                deriving (Show, Eq)
                
 type Array     = [Value]
@@ -61,7 +61,7 @@ instance Eq BaseValue where
     (==) (Int i1)     (Int i2)       = i1 == i2
 
 --Algebra for folding GML AST's
-type GmlAlgebra tok bv = (([tok]     -> tok, --Function
+type CodeAlgebra tok bv = (([tok]     -> tok, --Function
                            [tok]     -> tok, --Array
                            String    -> tok, --Operator
                            String    -> tok, --Identifier
@@ -75,8 +75,8 @@ type GmlAlgebra tok bv = (([tok]     -> tok, --Function
                            ))
 
 --GML fold
-foldGML::GmlAlgebra tok bv -> GML -> [tok]
-foldGML ((func,arr,op,ident,bind,base),(int,real,string,bool)) = map foldToken
+foldCode:: CodeAlgebra tok bv -> Code -> [tok]
+foldCode ((func,arr,op,ident,bind,base),(int,real,string,bool)) = map foldToken
     where   foldToken (Function ls)     = func (map foldToken ls)
             foldToken (TArray ls)       = arr (map foldToken ls)        
             foldToken (Operator s)      = op s
@@ -90,7 +90,7 @@ foldGML ((func,arr,op,ident,bind,base),(int,real,string,bool)) = map foldToken
             foldBase  (Boolean b)       = bool b    
 
 --Algebra for printing GML, uses a very basic strategy, not pretty!
-simplePrintAlg::GmlAlgebra String String
+simplePrintAlg::CodeAlgebra String String
 simplePrintAlg = ((func,arr,op,ident,bind,base),(int,real,string,bool))
     where   func ls  = '{':concatMap (' ':) ls++"}\n"
             arr ls   = '[':concatMap (' ':) ls++"]"
@@ -106,8 +106,8 @@ simplePrintAlg = ((func,arr,op,ident,bind,base),(int,real,string,bool))
             bool False = "false"
 
 
-simplePrintGML::GML -> String
-simplePrintGML gml = concatMap (' ':) $ foldGML simplePrintAlg gml
+simplePrintGML::Code -> String
+simplePrintGML gml = concatMap (' ':) $ foldCode simplePrintAlg gml
 
 --Arbitrary instances for GML        
 

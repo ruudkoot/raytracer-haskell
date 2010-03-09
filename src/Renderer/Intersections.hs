@@ -2,7 +2,9 @@ module Renderer.Intersections where
 
 import Shared.Vector
 import Shared.Matrix
+
 import Shared.RenderBase
+import Base.Shape
 
 import Renderer.Datatypes
 import Data.Ord
@@ -22,16 +24,16 @@ hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      c = (k <.> k) - 1.0
                      d = b*b - 4.0*a*c
                      sqrd = sqrt d
-                     x1 = (-b + sqrd)/(2*a)
-                     x2 = (-b - sqrd)/(2*a)
-                     sideHit = (x1 <= 1 && x1 >= 0) || (x2 <= 1 && x2 >= 0)
+                     t1 = (-b + sqrd)/(2*a)
+                     t2 = (-b - sqrd)/(2*a)
                      oy = getY4D $ rOrigin r
                      dy = getY4D $ rDirection r
                      t = -oy / dy
-                     bottomHit = magnitudeSquared (k + dir * (Vector4D (t, t, t, 1))) < 1
                      t' = (1 - oy) / dy
-                     topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
-                 in (bottomHit || topHit || sideHit)
+                     sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
+                     bottomHit = magnitudeSquared (k + dir * (Vector4D (t, t, t, 1))) <= 1
+                     --topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
+                 in (sideHit || bottomHit)
 hit r Sphere   = let dir = dropW $ rDirection r
                      k = dropW $ rOrigin r
                      a = dir <.> dir
@@ -40,7 +42,23 @@ hit r Sphere   = let dir = dropW $ rDirection r
                      d = b*b - a*c
                   in d >= 0
                         
-hit r Cone     = undefined
+hit r Cone     = let dir = Vector4D (1, 0, 1, 0) * rDirection r
+                     k = Vector4D (1, 0, 1, 0) * rOrigin r
+                     a = dir <.> dir - dy * dy
+                     b = 2.0 * (k <.> dir) - 2 * oy * dy
+                     c = (k <.> k) - oy * oy
+                     d = b*b - 4.0*a*c
+                     sqrd = sqrt d
+                     t1 = (-b + sqrd)/(2*a)
+                     t2 = (-b - sqrd)/(2*a)
+                     oy = getY4D $ rOrigin r
+                     dy = getY4D $ rDirection r
+                     t = -oy / dy
+                     t' = (1 - oy) / dy
+                     sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
+                     --bottomHit = magnitudeSquared (k + dir * (Vector4D (t, t, t, 1))) <= 1
+                     --topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
+                 in (sideHit)
                  -- The 'unit' plane is the XZ plane, so we only have to consider the Y direction.
                  -- If oy == 0, we're in the plane, otherwise we hit it if we move 'downwards' on Y
                  -- when we start 'above' the plane, or vice versa.
