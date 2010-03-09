@@ -105,7 +105,10 @@ ai   :: (Array                      -> Int                         ) -> Operator
 co   :: (Closure                    -> Object                      ) -> Operator
 orrro:: (Object -> Double -> Double -> Double -> Object            ) -> Operator
 oro  :: (Object -> Double           -> Object                      ) -> Operator
-paoiriisR :: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render) -> Operator
+ppl  :: (Point -> Point             -> Light                       ) -> Operator
+ppprrl::(Point -> Point -> Point -> Double -> Double -> Light      ) -> Operator
+ooo  :: (Object -> Object           ->  Object                     ) -> Operator
+paoiriisR:: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render) -> Operator
 
 ii op   = (op <$> popi)                             >>= pushi
 iii op  = (op <$> popi <*> popi)                    >>= pushi
