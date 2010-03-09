@@ -258,4 +258,8 @@ normalize v1 = pure (1 / magnitude v1) * v1
 sumVector :: (Vector v, Floating a, Num (v a)) => v a -> a
 sumVector = foldVector sum
 
+-- | Downgrade 4D vector to 3D.
+--
+dropW :: (Vector4D a) -> (Vector3D a)
+dropW (Vector4D (x, y, z, _)) = Vector3D (x, y, z)
 
