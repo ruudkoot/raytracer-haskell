@@ -6,12 +6,10 @@ import Control.Monad.State
 import Control.Monad.Error
 import Control.Applicative
 import Control.Monad
-<<<<<<< HEAD
+
 import Data.Map
-import Data.Maybe
-=======
 import Data.Map hiding (map)
->>>>>>> 8f56b7289a19b8ce495fd922908e2f21900320b7
+
 import Data.Typeable
 
 import Shared.Vector
