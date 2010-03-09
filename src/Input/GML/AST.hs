@@ -109,7 +109,7 @@ simplePrintAlg = ((func,arr,op,ident,bind,base),(int,real,string,bool))
 
 
 simplePrintGML::Code -> String
-simplePrintGML gml = concatMap (' ':) $ foldCode simplePrintAlg gml
+simplePrintGML = concatMap (' ':) $ foldCode simplePrintAlg
 
 --Arbitrary instances for GML        
 

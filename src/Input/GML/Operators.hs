@@ -194,10 +194,10 @@ operators = fromList [ ( "addi"      ,       iii (+)                    ) -- num
 
 --Convert light array types
 renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Scene
-renderF p a = Scene p (map (\(Light l) -> l) a)
+renderF p = Scene p . map (\(Light l) -> l)
 
 runOp::(String,Operator) -> Stack -> Stack
-runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e++(show st))
+runOp (nm,op) st = let er e = error ("error running operator " ++ nm ++ ": " ++e ++ show st)
                    in either er id (execStateT op st)
 
 clampf :: Double -> Double
