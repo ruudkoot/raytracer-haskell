@@ -33,22 +33,4 @@ renderTest something = maybe bad save (makePPM scene)
          save = writeFile "output.ppm"
          makePPM = Output.PPM.toPPM (Size 800) (Size 400)
          scene = renderScene sphere (Size 800) (Size 400) 1
-         sphere = Intersect (Union (Simple Cone m minv ()) (Simple Sphere m2 m2inv ())) (Simple Cylinder m3 m3inv ())
-         m = Data.Matrix.Matrix4D ( (Data.Vector.Vector4D (0.2, 0, 0, 0))
-                                  , (Data.Vector.Vector4D (0, 0.2, 0, 0.1))
-                                  , (Data.Vector.Vector4D (0, 0, 0.2, 0))
-                                  , (Data.Vector.Vector4D (0, 0, 0, 1))
-                                  )
-         minv = inverse m
-         m2 = Data.Matrix.Matrix4D ( (Data.Vector.Vector4D (0.2, 0, 0, 0))
-                                   , (Data.Vector.Vector4D (0, 0.2, 0, -0.1))
-                                   , (Data.Vector.Vector4D (0, 0, 0.2, 0))
-                                   , (Data.Vector.Vector4D (0, 0, 0, 1))
-                                   )
-         m2inv = inverse m2
-         m3 = Data.Matrix.Matrix4D ( (Data.Vector.Vector4D (0.1, 0, 0, 0))
-                                   , (Data.Vector.Vector4D (0, 10, 0, -0.2))
-                                   , (Data.Vector.Vector4D (0, 0, 0.1, 0))
-                                   , (Data.Vector.Vector4D (0, 0, 0, 1))
-                                   )
-         m3inv = inverse m3
+         sphere = something
