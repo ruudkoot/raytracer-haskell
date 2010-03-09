@@ -1,12 +1,13 @@
 {-# OPTIONS_GHC -XFlexibleInstances #-}
 
-module Input.GML.Operators (operators,runOp,Operator) where
+module Input.GML.Operators (operators,runOp,Operator,cf) where
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Error
 import Control.Applicative
 import Control.Monad
 import Data.Map
+import Data.Maybe
 import Data.Typeable
 
 import Shared.Vector
@@ -95,8 +96,19 @@ popc = let cf (Closure a) = return a
            cf _           = lift (throwError "Expected Type: Closure")
        in pop >>= cf
 pops = let cf (BaseValue (String s)) = return s
-           cf _                      = lift (throwError "Expected Type: String")
+           cf _                      = lift (throwError "Expected Type: String") 
        in pop >>= cf
+
+-- cf x = case x of (BaseValue (String s)) -> Just s; _ -> Nothing
+ 
+
+popt :: (Value -> Maybe a) -> String -> Value -> Op a
+popt match emsg v = pop >>= (maybe (lift.throwError emsg) (return) $ match v)
+
+popi' = f `popt` "Int"
+  where f x = case x of (BaseValue (Int s)) -> Just s; _ -> Nothing
+  
+
 
 push v = do cs <- get
             put (v:cs)
