@@ -34,3 +34,6 @@ renderTest something = maybe bad save (makePPM scene)
          makePPM = Output.PPM.toPPM (Size 800) (Size 400)
          scene = renderScene sphere (Size 800) (Size 400) 1
          sphere = something
+
+trace :: World -> Ray -> ColourD
+trace w = undefined

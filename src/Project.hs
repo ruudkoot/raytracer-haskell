@@ -9,7 +9,6 @@ import Base.Shape
 import Input.GML.Evaluate
 import Input.GML.ToRenderObject
 --
-import Renderer.Datatypes
 import Renderer.Intersections
 import Renderer.Shaders
 import Renderer.Renderer
@@ -26,12 +25,12 @@ doParseGML::IO GML
 doParseGML = do parseResult <- parseGML <$> getContents
                 case parseResult of
                   Left err -> error $ "Parse error on " ++ show err
-                  Right (tks) -> return tks
+                  Right tks -> return tks
 
 doEvaluateGML::GML->Scene
 doEvaluateGML gml = case evaluate (M.empty,[],gml) of
-                        (_,(Render s:_),_) -> s
-                        _            -> error "No render object found"
+                        (_, Render s:_, _) -> s
+                        _                  -> error "No render object found"
            
 main :: IO()
 main = do gml <- doParseGML          
