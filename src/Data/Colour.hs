@@ -37,3 +37,4 @@ clampColour mi ma (Colour (r, g, b)) = Colour (c r, c g, c b)
 --
 clampedList :: Ord a => a -> a -> Colour a -> [a]
 clampedList mi ma = colourToList . clampColour mi ma
+

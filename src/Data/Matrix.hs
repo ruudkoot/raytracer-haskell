@@ -127,7 +127,7 @@ diagonal4D (Vector4D (x,y,z,w)) = Matrix4D (Vector4D(x, 0, 0, 0),
                                             Vector4D(0, 0, z, 0), 
                                             Vector4D(0, 0, 0, w))
 
--- ** Rotations
+-- ** Rotations and translations
 --
 rotateX :: Floating a => a -> Matrix4D a
 rotateX d = Matrix4D(Vector4D( 1,      0,       0,  0),
@@ -147,6 +147,11 @@ rotateZ d = Matrix4D(Vector4D( cos d, -sin d,  0,  0),
                      Vector4D(     0,      0,  1,  0),
                      Vector4D(     0,      0,  0,  1))
 
+translate :: Num a => a -> a -> a -> Matrix4D a
+translate a b c = Matrix4D( Vector4D(1, 0, 0, a)
+                          , Vector4D(0, 1, 0, b)
+                          , Vector4D(0, 0, 1, c)
+                          , Vector4D(0, 0, 0, 1))
 
 -- * Matrix Operations
 --

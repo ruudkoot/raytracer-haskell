@@ -1,11 +1,10 @@
 module Input.GML.Evaluate (evaluate) where
 
 import qualified Data.Map      as Map
+
 import           Input.GML.AST
 import           Input.GML.Operators
 
---type Operator = 
-               
 evaluate :: State -> State
 evaluate = until (null . \(_, _ , x) -> x) evaluate'
 
