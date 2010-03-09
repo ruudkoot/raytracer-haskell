@@ -86,7 +86,7 @@ pushp = push.Point
 pushb = push.BaseValue .Boolean
 pusho = push.Object
 pushl = push.Light
-pushR = push.Render
+pushR = push.Input.GML.Render
 
 type Operator = Op Value
 
