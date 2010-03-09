@@ -1,7 +1,7 @@
 module Input.GML.Shaders where
 
 import Shared.Colour
-import Shared.RenderBase
+import Base.Shader
 
 import Input.GML.AST
 

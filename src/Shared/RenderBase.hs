@@ -9,23 +9,6 @@ import Shared.Matrix (Matrix4D)
 
 -- * Types
 
--- ** Shaders
-type ShaderCoord = (Double,Double,Int)
-data ShaderResult = ShaderResult
-    {
-     srColor::ColourD
-    ,srKd::Double
-    ,srKs::Double
-    ,srPhong::Double
-    }
-
-newtype Shader = Shader (ShaderCoord -> ShaderResult)
-instance Show Shader where
-    show s = "Shader function"
-instance Eq Shader where
-    (==) a b = error "Alessandro" --True
-    
-
 -- ** World
 data World surface = World 
   {

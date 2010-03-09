@@ -4,7 +4,7 @@ module Renderer.Shaders where
 
 
 import Shared.Colour
-import Shared.RenderBase
+import Base.Shader
 
 
 
