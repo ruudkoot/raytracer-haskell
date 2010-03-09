@@ -1,6 +1,6 @@
 module Input.GML.Scene where
   
-import Shared.Vector
+import Data.Vector
 
 import qualified Base.Light  as Light
 import qualified Base.Shader as Shader

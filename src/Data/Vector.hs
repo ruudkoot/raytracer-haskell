@@ -1,15 +1,13 @@
 -- | Provides general (perhaps too general) data structures 
 -- and functions for 2D, 3D and 4D vectors. 
 --
-module Shared.Vector where
-
-
+module Data.Vector where
   
 import Control.Applicative 
 
 -- * Synonyms
-type Pt3D  = Shared.Vector.Vector3D Double
-type Vec4D = Shared.Vector.Vector4D Double
+type Pt3D  = Vector3D Double
+type Vec4D = Vector4D Double
 
 
 -- * Vectors 

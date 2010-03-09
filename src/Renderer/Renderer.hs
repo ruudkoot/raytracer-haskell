@@ -1,16 +1,18 @@
 module Renderer.Renderer where
 
-import Output.PPM
-import Shared.Vector
-import Shared.Colour
-import Shared.Matrix
+import Data.Colour
+import Data.Vector
+import Data.Matrix
 
-import Shared.RenderBase
+import Base.Miscellaneous
 import Base.Shape
 
-import Output.Output
-
 import Renderer.Intersections
+
+import Output.Output
+import Output.PPM
+
+
 
 renderScene :: ObjectTree a -> Width -> Height -> Double -> Colours Int
 renderScene t w h fov = [if hit' (ray i j) t
@@ -31,22 +33,22 @@ renderTest = maybe bad save (makePPM scene)
          save = writeFile "output.ppm"
          makePPM = Output.PPM.toPPM (Size 800) (Size 800)
          scene = renderScene sphere (Size 800) (Size 800) 1
-         sphere = Shared.RenderBase.RIntersect (Shared.RenderBase.RUnion (Shared.RenderBase.RSimple Cone m minv ()) (Shared.RenderBase.RSimple Sphere m2 m2inv ())) (Shared.RenderBase.RSimple Cylinder m3 m3inv ())
-         m = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.2, 0, 0, 0))
-                                    , (Shared.Vector.Vector4D (0, 0.2, 0, 0.1))
-                                    , (Shared.Vector.Vector4D (0, 0, 0.2, 0))
-                                    , (Shared.Vector.Vector4D (0, 0, 0, 1))
+         sphere = Base.Miscellaneous.RIntersect (Base.Miscellaneous.RUnion (Base.Miscellaneous.RSimple Cone m minv ()) (Base.Miscellaneous.RSimple Sphere m2 m2inv ())) (Base.Miscellaneous.RSimple Cylinder m3 m3inv ())
+         m = Data.Matrix.Matrix4D ( (Data.Vector.Vector4D (0.2, 0, 0, 0))
+                                    , (Data.Vector.Vector4D (0, 0.2, 0, 0.1))
+                                    , (Data.Vector.Vector4D (0, 0, 0.2, 0))
+                                    , (Data.Vector.Vector4D (0, 0, 0, 1))
                                     )
          minv = inverse m
-         m2 = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.2, 0, 0, 0))
-                                     , (Shared.Vector.Vector4D (0, 0.2, 0, -0.1))
-                                     , (Shared.Vector.Vector4D (0, 0, 0.2, 0))
-                                     , (Shared.Vector.Vector4D (0, 0, 0, 1))
+         m2 = Data.Matrix.Matrix4D ( (Data.Vector.Vector4D (0.2, 0, 0, 0))
+                                     , (Data.Vector.Vector4D (0, 0.2, 0, -0.1))
+                                     , (Data.Vector.Vector4D (0, 0, 0.2, 0))
+                                     , (Data.Vector.Vector4D (0, 0, 0, 1))
                                      )
          m2inv = inverse m2
-         m3 = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.1, 0, 0, 0))
-                                     , (Shared.Vector.Vector4D (0, 10, 0, -0.2))
-                                     , (Shared.Vector.Vector4D (0, 0, 0.1, 0))
-                                     , (Shared.Vector.Vector4D (0, 0, 0, 1))
+         m3 = Data.Matrix.Matrix4D ( (Data.Vector.Vector4D (0.1, 0, 0, 0))
+                                     , (Data.Vector.Vector4D (0, 10, 0, -0.2))
+                                     , (Data.Vector.Vector4D (0, 0, 0.1, 0))
+                                     , (Data.Vector.Vector4D (0, 0, 0, 1))
                                      )
          m3inv = inverse m3

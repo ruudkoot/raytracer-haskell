@@ -4,13 +4,14 @@ import           Control.Monad
 
 import           Data.Char
 import qualified Data.Map        as Map
-
-import           Test.QuickCheck
+import           Data.Vector            (Vector3D)
 
 import qualified Base.Light      as Light
 import qualified Input.GML.Scene as Scene
 
-import           Shared.Vector (Vector3D)
+import           Test.QuickCheck
+
+
 --AST defition following the specification in chapter 2.1 of the assignment
 
 -- * Parser

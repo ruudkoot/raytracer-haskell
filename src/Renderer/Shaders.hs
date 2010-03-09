@@ -2,11 +2,9 @@
 --   for testing purposes.
 module Renderer.Shaders where
 
+import Data.Colour
 
-import Shared.Colour
 import Base.Shader
-
-
 
 
 -- | Basic colors.
