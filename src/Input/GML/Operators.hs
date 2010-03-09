@@ -105,7 +105,7 @@ ai   :: (Array                      -> Int                         ) -> Operator
 co   :: (Closure                    -> Object                      ) -> Operator
 orrro:: (Object -> Double -> Double -> Double -> Object            ) -> Operator
 oro  :: (Object -> Double           -> Object                      ) -> Operator
-paoiriisR :: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> GMLRender) -> Operator
+paoiriisR :: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render) -> Operator
 
 ii op   = (op <$> popi)                             >>= pushi
 iii op  = (op <$> popi <*> popi)                    >>= pushi
@@ -180,8 +180,8 @@ operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
                      ]
 
 --Convert light array types
-renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> GMLRender
-renderF p a = GMLRender p (map (\(Light l) -> l) a)
+renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render
+renderF p a = Render p (map (\(Light l) -> l) a)
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)

@@ -10,8 +10,8 @@ import Data.Ord
 type Intersection = (Double, Double) -- Enters at x, leaves at y
 
 hit' :: Ray -> ObjectTree a -> Bool
-hit' (Ray o d) (RSimple s _ minv) = hit (Ray (minv !*! o) (minv !*! d)) s
-hit' ray       (RUnion  l r)      = hit' ray l || hit' ray r
+hit' (Ray o d) (RSimple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
+hit' ray       (RUnion  l r)        = hit' ray l || hit' ray r
 
 hit :: Ray -> Shape -> Bool
 hit r Cube     = undefined
