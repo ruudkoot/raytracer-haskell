@@ -21,7 +21,7 @@ evaluate' (g, Closure (g2, c2) : Closure (g1, c1) : BaseValue (Boolean True ) : 
                                                                in (g, b, c)
 evaluate' (g, Closure (g2, c2) : Closure (g1, c1) : BaseValue (Boolean False) : a, Operator   "if"    : c) = let (g'', b, []) = evaluate (g2, a, c2)
                                                                in (g, b, c)
-evaluate' (g,                    b, Operator   o       : c) = (g, runOp (o,(operator o)) b, c)
+evaluate' (g,                    b, Operator   o       : c) = (g, runOp (o, operator o) b, c)
 evaluate' st                                                = error ("Error in evaluation, state dump:\n"++show st)
                                                              
 operator :: String -> Operator
