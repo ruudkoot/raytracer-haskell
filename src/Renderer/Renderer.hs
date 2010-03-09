@@ -29,7 +29,7 @@ renderTest = maybe bad save (makePPM scene)
          save = writeFile "output.ppm"
          makePPM = Output.PPM.toPPM (Size 800) (Size 800)
          scene = renderScene sphere (Size 800) (Size 800) 1
-         sphere = Shared.RenderBase.RSimple Sphere m minv
+         sphere = Shared.RenderBase.RSimple Sphere m minv ()
          m = Shared.Matrix.Matrix4D ( (Shared.Vector.Vector4D (0.1, 0, 0, 0))
                                     , (Shared.Vector.Vector4D (0, 0.3, 0, 0.2))
                                     , (Shared.Vector.Vector4D (0, 0, 0.3, 0))

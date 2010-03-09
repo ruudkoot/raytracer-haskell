@@ -94,7 +94,7 @@ data Ray = Ray
 
 data Shape = Cube | Cylinder | Sphere | Cone | Plane deriving (Show,Eq)
   
-data ObjectTree a = RSimple Shape (Matrix4D Double) (Matrix4D Double) -- Shape, transformation and inverse of transformation matrix
+data ObjectTree a = RSimple Shape (Matrix4D Double) (Matrix4D Double) a -- Shape, transformation and inverse of transformation matrix
                   | RUnion (ObjectTree a) (ObjectTree a)
                   | RIntersect (ObjectTree a) (ObjectTree a)
                   | RDifference (ObjectTree a) (ObjectTree a)
