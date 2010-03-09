@@ -1,4 +1,4 @@
-module Base.Miscellaneous where
+module Renderer.Scene where
 
 import Data.Colour
 import Data.Vector
@@ -13,7 +13,7 @@ import Base.Shape
 data World surface = World 
   {
     wOptions :: RenderOptions
-  , wObject  :: ObjectTree surface
+  , wObject  :: Object surface
   , wLights  :: [RenderLight]
   }
   
@@ -43,7 +43,8 @@ data Ray = Ray
 
 
   
-data ObjectTree a = RSimple Shape (Matrix4D Double) (Matrix4D Double) a -- Shape, transformation and inverse of transformation matrix
-                  | RUnion (ObjectTree a) (ObjectTree a)
-                  | RIntersect (ObjectTree a) (ObjectTree a)
-                  | RDifference (ObjectTree a) (ObjectTree a) deriving Show
+data Object a = Simple Shape (Matrix4D Double) (Matrix4D Double) a -- Shape, transformation and inverse of transformation matrix
+              | Union      (Object a) (Object a)
+              | Intersect  (Object a) (Object a)
+              | Difference (Object a) (Object a)
+              deriving Show

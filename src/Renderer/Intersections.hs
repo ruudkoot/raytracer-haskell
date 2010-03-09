@@ -4,19 +4,19 @@ import Data.Ord
 import Data.Matrix
 import Data.Vector
 
-import Base.Miscellaneous
 import Base.Shape
 
 import Renderer.Datatypes
+import Renderer.Scene
 
 
 type Intersection = (Double, Double) -- Enters at x, leaves at y
 
-hit' :: Ray -> ObjectTree a -> Bool
-hit' (Ray o d) (RSimple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
-hit' ray       (RUnion  l r)        = hit' ray l || hit' ray r
-hit' ray       (RDifference  l r)   = hit' ray l && not (hit' ray r)
-hit' ray       (RIntersect  l r)    = hit' ray l && (hit' ray r)
+hit' :: Ray -> Object a -> Bool
+hit' (Ray o d) (Simple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
+hit' ray       (Union  l r)        = hit' ray l || hit' ray r
+hit' ray       (Difference  l r)   = hit' ray l && not (hit' ray r)
+hit' ray       (Intersect  l r)    = hit' ray l && (hit' ray r)
 
 hit :: Ray -> Shape -> Bool
 hit r Cube     = undefined
