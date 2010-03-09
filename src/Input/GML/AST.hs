@@ -15,6 +15,7 @@ import           Test.QuickCheck
 --AST defition following the specification in chapter 2.1 of the assignment
 
 -- * Parser
+type GML = [Token]
 
 data Token     = Function   [Token]
                | TArray     [Token]
