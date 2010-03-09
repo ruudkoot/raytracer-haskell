@@ -4,7 +4,9 @@ import Output.PPM
 import Shared.Vector
 import Shared.Colour
 import Shared.Matrix
+
 import Shared.RenderBase
+import Base.Shape
 
 import Output.Output
 
