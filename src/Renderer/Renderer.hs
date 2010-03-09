@@ -15,7 +15,7 @@ import Output.PPM
 
 
 renderScene :: World -> IO ()
-renderScene world = maybe bad elseSave $ Output.PPM.toPPM (Size 800) (Size 400)
+renderScene world = maybe bad elseSave $ Output.PPM.toPPM (Size $ fromIntegral w) (Size $ fromIntegral h)
                             [if hit' (ray i j) (wObject world)
                              then Colour (255,255,255)
                              else Colour (0,0,0)
