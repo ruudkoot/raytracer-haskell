@@ -1,23 +1,24 @@
-{-# OPTIONS_GHC -XFlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Input.GML.Operators (operators,runOp,Operator) where
+
+import Control.Applicative
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Error
-import Control.Applicative
-import Control.Monad
 
 import Data.Maybe
-import Data.Map hiding (map)
+import Data.Map                              hiding (map)
 
-import Data.Typeable
+import           Shared.Vector
 
-import Shared.Vector
-import Shared.RenderBase
+import qualified Shared.RenderBase as RenderBase
+import qualified Base.Light        as Light
+import qualified Base.Shape        as Shape
 
-import Input.GML.AST hiding (State)
-import Input.GML.Render
-import Input.GML.Shaders
+import           Input.GML.AST               hiding (State)
+import           Input.GML.Scene
+import           Input.GML.Shaders
 
 type Op = StateT Stack (Either String) 
 
@@ -80,32 +81,35 @@ push v = do cs <- get
             put (v:cs)
             return v
 
-pushi = push.BaseValue .Int
-pushr = push.BaseValue .Real
-pushp = push.Point
-pushb = push.BaseValue .Boolean
-pusho = push.Object
-pushl = push.Light
-pushR = push.Input.GML.Render
+pushi = push . BaseValue . Int
+pushr = push . BaseValue . Real
+pushp = push . Point
+pushb = push . BaseValue . Boolean
+pusho = push . Object
+pushl = push . Light
+pushR = push . Render
 
 type Operator = Op Value
 
-ii   :: (Int                        -> Int                         ) -> Operator
-iii  :: (Int    -> Int              -> Int                         ) -> Operator
-rrr  :: (Double -> Double           -> Double                      ) -> Operator
-rr   :: (Double                     -> Double                      ) -> Operator
-ri   :: (Double                     -> Int                         ) -> Operator
-ir   :: (Int                        -> Double                      ) -> Operator
-pr   :: (Point                      -> Double                      ) -> Operator
-rrrp :: (Double -> Double -> Double -> Point                       ) -> Operator
-iib  :: (Int    -> Int              -> Bool                        ) -> Operator
-rrb  :: (Double -> Double           -> Bool                        ) -> Operator
-aiv  :: (Array  -> Int              -> Value                       ) -> Operator
-ai   :: (Array                      -> Int                         ) -> Operator
-co   :: (Closure                    -> Object                      ) -> Operator
-orrro:: (Object -> Double -> Double -> Double -> Object            ) -> Operator
-oro  :: (Object -> Double           -> Object                      ) -> Operator
-paoiriisR :: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render) -> Operator
+ii     :: (Int                                            -> Int   ) -> Operator
+iii    :: (Int    -> Int                                  -> Int   ) -> Operator
+rrr    :: (Double -> Double                               -> Double) -> Operator
+rr     :: (Double                                         -> Double) -> Operator
+ri     :: (Double                                         -> Int   ) -> Operator
+ir     :: (Int                                            -> Double) -> Operator
+pr     :: (Point                                          -> Double) -> Operator
+rrrp   :: (Double -> Double -> Double                     -> Point ) -> Operator
+iib    :: (Int    -> Int                                  -> Bool  ) -> Operator
+rrb    :: (Double -> Double                               -> Bool  ) -> Operator
+aiv    :: (Array  -> Int                                  -> Value ) -> Operator
+ai     :: (Array                                          -> Int   ) -> Operator
+co     :: (Closure                                        -> Object) -> Operator
+orrro  :: (Object -> Double -> Double -> Double           -> Object) -> Operator
+oro    :: (Object -> Double                               -> Object) -> Operator
+ppl    :: (Point  -> Point                                -> Light ) -> Operator
+ppprrl :: (Point  -> Point  -> Point  -> Double -> Double -> Light ) -> Operator
+ooo    :: (Object -> Object                               -> Object) -> Operator
+paoiriisR :: (Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Scene) -> Operator
 
 ii op   = (op <$> popi)                             >>= pushi
 iii op  = (op <$> popi <*> popi)                    >>= pushi
@@ -127,61 +131,60 @@ ppprrl op = (op <$> popp <*> popp <*> popp <*> popr <*> popr) >>= pushl
 ooo op  = (op <$> popo <*> popo)                    >>= pusho
 paoiriisR op = (op <$> popp <*> popa <*> popo <*> popi <*> popr <*> popi <*> popi <*> pops) >>= pushR
 
--- applicative??
 operators :: Map String Operator
-operators = fromList [ ( "addi"  ,  iii (+)                    ) -- numbers
-                     , ( "addf"  ,  rrr (+)                    )
-                     , ( "acos"  ,   rr acos                   )
-                     , ( "asin"  ,   rr asin                   )
-                     , ( "clampf",   rr clampf                 )
-                     , ( "cos"   ,   rr cos                    )
-                     , ( "divi"  ,  iii div                    )
-                     , ( "divf"  ,  rrr (/)                    )
-                     , ( "eqi"   ,  iib (==)                   )
-                     , ( "eqf"   ,  rrb (==)                   )
-                     , ( "floor" ,   ri floor                  )
-                     , ( "frac"  ,   rr (snd . properFraction) ) -- ???
-                     , ( "lessi" ,  iib (>)                    )
-                     , ( "lessf" ,  rrb (>)                    )
-                     , ( "modi"  ,  iii mod                    )
-                     , ( "muli"  ,  iii (*)                    )
-                     , ( "mulf"  ,  rrr (*)                    )
-                     , ( "negi"  ,   ii negate                 )
-                     , ( "negf"  ,   rr negate                 )
-                     , ( "real"  ,   ir fromIntegral           )
-                     , ( "sin"   ,   rr sin                    )
-                     , ( "sqrt"  ,   rr sqrt                   )
-                     , ( "subi"  ,  iii (-)                    )
-                     , ( "subf"  ,  rrr (-)                    )
-                     , ( "getx"  ,   pr getX3D                 ) -- points
-                     , ( "gety"  ,   pr getY3D                 )
-                     , ( "getz"  ,   pr getZ3D                 )
-                     , ( "point" , rrrp (\x y z -> Vector3D (x, y, z)))
-                     , ( "get"   ,  aiv (!!)                   ) -- arrays
-                     , ( "length",   ai length                 )
-                     , ( "sphere",   co (Simple Sphere .gmlShader)) -- Primitive Objects
-                     , ( "cube"  ,   co (Simple Cube .gmlShader)   )
-                     , ( "cylinder", co (Simple Cylinder .gmlShader))
-                     , ( "cone"  ,   co (Simple Cone .gmlShader) )
-                     , ( "plane" ,    co (Simple Plane .gmlShader))
-                     , ( "translate",orrro Translate           ) --Transformations
-                     , ( "scale" ,   orrro  Scale              ) 
-                     , ( "uscale",   oro  UScale               )
-                     , ( "rotatex",  oro RotateX               )
-                     , ( "rotatey",  oro RotateY               )
-                     , ( "rotatez",  oro RotateZ               )
-                     , ( "light"  ,  ppl DirectLight           ) --Lights
-                     , ( "pointlight", ppl PointLight          )                            
-                     , ( "spotlight", ppprrl SpotLight         )
-                     , ( "union"  ,  ooo Union                 ) --Boolean operators
-                     , ( "intersect", ooo Intersect            )
-                     , ( "difference", ooo Difference          )
-                     , ( "render", paoiriisR renderF         )
+operators = fromList [ ( "addi"      ,       iii (+)                    ) -- numbers
+                     , ( "addf"      ,       rrr (+)                    )
+                     , ( "acos"      ,        rr acos                   )
+                     , ( "asin"      ,        rr asin                   )
+                     , ( "clampf"    ,        rr clampf                 )
+                     , ( "cos"       ,        rr cos                    )
+                     , ( "divi"      ,       iii div                    )
+                     , ( "divf"      ,       rrr (/)                    )
+                     , ( "eqi"       ,       iib (==)                   )
+                     , ( "eqf"       ,       rrb (==)                   )
+                     , ( "floor"     ,        ri floor                  )
+                     , ( "frac"      ,        rr (snd . properFraction) ) -- ???
+                     , ( "lessi"     ,       iib (>)                    )
+                     , ( "lessf"     ,       rrb (>)                    )
+                     , ( "modi"      ,       iii mod                    )
+                     , ( "muli"      ,       iii (*)                    )
+                     , ( "mulf"      ,       rrr (*)                    )
+                     , ( "negi"      ,        ii negate                 )
+                     , ( "negf"      ,        rr negate                 )
+                     , ( "real"      ,        ir fromIntegral           )
+                     , ( "sin"       ,        rr sin                    )
+                     , ( "sqrt"      ,        rr sqrt                   )
+                     , ( "subi"      ,       iii (-)                    )
+                     , ( "subf"      ,       rrr (-)                    )
+                     , ( "getx"      ,        pr getX3D                 ) -- points
+                     , ( "gety"      ,        pr getY3D                 )
+                     , ( "getz"      ,        pr getZ3D                 )
+                     , ( "point"     ,      rrrp (\x y z -> Vector3D (x, y, z)))
+                     , ( "get"       ,       aiv (!!)                   ) -- arrays
+                     , ( "length"    ,        ai length                 )
+                     , ( "sphere"    ,        co (Simple Shape.Sphere   . gmlShader)) -- Primitive Objects
+                     , ( "cube"      ,        co (Simple Shape.Cube     . gmlShader))
+                     , ( "cylinder"  ,        co (Simple Shape.Cylinder . gmlShader))
+                     , ( "cone"      ,        co (Simple Shape.Cone     . gmlShader))
+                     , ( "plane"     ,        co (Simple Shape.Plane    . gmlShader))
+                     , ( "translate" ,     orrro Translate              ) --Transformations
+                     , ( "scale"     ,     orrro Scale                  ) 
+                     , ( "uscale"    ,       oro UScale                 )
+                     , ( "rotatex"   ,       oro RotateX                )
+                     , ( "rotatey"   ,       oro RotateY                )
+                     , ( "rotatez"   ,       oro RotateZ                )
+                     , ( "light"     ,       ppl Light.DirectLight      ) --Lights
+                     , ( "pointlight",       ppl Light.PointLight       )
+                     , ( "spotlight" ,    ppprrl Light.SpotLight        )
+                     , ( "union"     ,       ooo Union                  ) --Boolean operators
+                     , ( "intersect" ,       ooo Intersect              )
+                     , ( "difference",       ooo Difference             )
+                     , ( "render"    , paoiriisR renderF                )
                      ]
 
 --Convert light array types
-renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Render
-renderF p a = Render p (map (\(Light l) -> l) a)
+renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Scene
+renderF p a = Scene p (map (\(Light l) -> l) a)
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator "++nm++": "++e)
