@@ -10,8 +10,8 @@ import Data.Ord
 type Intersection = (Double, Double) -- Enters at x, leaves at y
 
 hit' :: Ray -> ObjectTree a -> Bool
-hit' (Ray o d) (RSimple s m) = hit (Ray ((inverse m) !*! o) ((inverse m) !*! d)) s
-hit' ray       (RUnion  l r) = hit' ray l || hit' ray r
+hit' (Ray o d) (RSimple s _ minv) = hit (Ray (minv !*! o) (minv !*! d)) s
+hit' ray       (RUnion  l r)      = hit' ray l || hit' ray r
 
 hit :: Ray -> Shape -> Bool
 hit r Cube     = undefined
@@ -32,12 +32,12 @@ hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      t' = (1 - oy) / dy
                      topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
                  in (bottomHit || topHit || sideHit)
-hit r Sphere   = let dir = Vector4D (1, 1, 1, 0) * rDirection r
-                     k = Vector4D (1, 1, 1, 0) * rOrigin r
+hit r Sphere   = let dir = dropW $ rDirection r
+                     k = dropW $ rOrigin r
                      a = dir <.> dir
-                     b = 2.0 * (k <.> dir)
+                     b = k <.> dir
                      c = (k <.> k) - 1.0
-                     d = b*b - 4.0*a*c
+                     d = b*b - a*c
                   in d >= 0
                         
 hit r Cone     = undefined

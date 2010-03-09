@@ -27,7 +27,7 @@ instance Eq Shader where
 data World surface = World 
   {
     wOptions :: RenderOptions
-  , wObject  :: RenderObject surface
+  , wObject  :: ObjectTree surface
   , wLights  :: [RenderLight]
   }
   
@@ -93,17 +93,8 @@ data Ray = Ray
   }
 
 data Shape = Cube | Cylinder | Sphere | Cone | Plane deriving (Show,Eq)
-
-data RenderObject a = RenderObject
-  {
-    moShape          :: Shape
-  , moSurface        :: Shader
-  , moTransformation :: Matrix4D Double
-  , moIntersections  :: [ObjectTree a]
-  , moDifferences    :: [ObjectTree a]
-  }
   
-data ObjectTree a = RSimple Shape (Matrix4D Double)
+data ObjectTree a = RSimple Shape (Matrix4D Double) (Matrix4D Double) -- Shape, transformation and inverse of transformation matrix
                   | RUnion (ObjectTree a) (ObjectTree a)
                   | RIntersect (ObjectTree a) (ObjectTree a)
                   | RDifference (ObjectTree a) (ObjectTree a)
