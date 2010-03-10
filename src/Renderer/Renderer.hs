@@ -1,35 +1,33 @@
-module Renderer.Renderer where
+-- * Renderer 
+--
+module Renderer.Renderer (renderScene) where
 
-import Data.Colour
-import Data.Vector
-import Data.Matrix
+import Data.Colour (Colour(..))
+import Data.Vector (Vector4D(..))
 
-import Base.Shape
+import Renderer.Intersections (hit')
+import Renderer.Scene (World(..), Ray(..), RenderOptions(..))
 
-import Renderer.Intersections
-import Renderer.Scene
+import Output.Output (Size(..))
+import Output.PPM (toPPM)
 
-import Output.Output
-import Output.PPM
+type Threads = Int
 
-
-
-renderScene :: World -> IO ()
-renderScene world = maybe bad elseSave $ Output.PPM.toPPM (Size $ fromIntegral w) (Size $ fromIntegral h)
+renderScene :: Threads -> World -> IO ()
+renderScene threads world = maybe bad elseSave $ toPPM (Size $ fromIntegral w) (Size $ fromIntegral h)
                             [if hit' (ray i j) (wObject world)
                              then Colour (255,255,255)
                              else Colour (0,0,0)
                              | i <- [0..h-1],
                                j <- [0..w-1]]
-  where ray i j = Ray eye
-                      (Vector4D (x - (fromIntegral j + 0.5) * delta,
-                                 y - (fromIntegral i + 0.5) * delta, 1, 1))
-        x = tan(0.5 * fov)
-        y = x * fromIntegral h / fromIntegral w
+  where 
+        ray i j = Ray eye (Vector4D (x - (fromIntegral j + 0.5) * delta,
+                                     y - (fromIntegral i + 0.5) * delta, 1, 1))
         delta = 2 * x / fromIntegral w
-        eye = Vector4D (0,0,-1,1)
-        w = roWidth (wOptions world)
-        h = roHeight (wOptions world)
+        (w,h) = (roWidth (wOptions world), roHeight (wOptions world))
+        (x, y) = (tan(0.5 * fov), x * fromIntegral h / fromIntegral w)
         fov = roFov (wOptions world)
-        bad = error "errorz"
+        eye = Vector4D (0,0,-1,1)
+        bad = error "Error: didn't produce a valid PPM image."
         elseSave = writeFile $ roFile (wOptions world)
+
