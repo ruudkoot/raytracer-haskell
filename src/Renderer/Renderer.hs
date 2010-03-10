@@ -122,7 +122,7 @@ renderThread raymaker obj = do
   empty <- isEmptyChan work 
   unless empty $ 
     do (i,j) <- readChan work -- blocks indefinitely, if other thread made chan empty
-       colour <- return $ renderPixel i j raymaker obj
+       let colour = renderPixel i j raymaker obj
        writeChan result (i, j, colour)
        renderThread raymaker obj 
 
