@@ -169,8 +169,6 @@ waitForChildren world = do
     m:ms -> do putMVar children ms 
                takeMVar m 
                waitForChildren world
-
-
 -- | Takes the result and saves it.
 -- The result MVar is not emptied here, 
 -- and instead gets reset when a new image gets 

@@ -31,7 +31,7 @@
           `..::!8888888888888888888888888888888899fT|!^"'
             `' !!988888888888888888888888899fT|!^"'
                 `!!8888888888888888899fT|!^"'
-                  `!988888888899fT|!^"'         writeCode >>= putStrLn
+                  `!988888888899fT|!^"'      thinkOfCode >>= putStrLn
                     `!9899fT|!^"'
                       `!^"'
 
@@ -40,11 +40,11 @@
 
   Join #teamtherayteam on irc.freenode.net
 
+
   Bug Tracker
   -----------
  
   http://redmine.projects.spockz.nl/
-
 
 
   Haddock Documentation
