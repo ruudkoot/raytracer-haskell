@@ -16,12 +16,12 @@ type RayMaker = Int -> Int -> Ray
 
 
 renderScene :: Threads -> World -> IO ()
-renderScene threads world = maybe bad save $ toPPM (toSize w) (toSize h)
+renderScene threads world = maybe bad save $ toPPM (toSize w) (toSize h) pixels
   where raymaker = getRayMaker world w h
         (w,h) = (roWidth (wOptions world), roHeight (wOptions world))
         bad = error "Error: didn't produce a valid PPM image."
         save = writeFile $ roFile (wOptions world)
-        colours = [renderPixel i j raymaker (wObject world) | 
+        pixels = [renderPixel i j raymaker (wObject world) | 
                    i <- [0..h-1], 
                    j <- [0..w-1]]
 
