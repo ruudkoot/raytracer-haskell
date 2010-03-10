@@ -10,11 +10,9 @@ import Renderer.Intersections (hit')
 import Renderer.Scene 
 
 
-import Control.Concurrent (forkIO, yield)
-import Control.Concurrent.Chan 
+import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
 import Control.Exception (finally)
-import Control.Monad (unless)
 import Data.List (sort)
 import System.IO.Unsafe
 
@@ -30,7 +28,10 @@ type Threads = Int
 type RayMaker = Int -> Int -> Ray
 
 
-type RenderResult = Chan (Int, Int, Colour Int)
+-- | The RenderResult is a list of triples: 
+-- [(pixelY, pixelX, colour)]
+-- 
+type RenderResult = MVar [(Int, Int, Colour Int)]
 
 -- | Used to wait for worker threads. 
 -- See the Control.Concurrent documentation
@@ -40,13 +41,17 @@ type Children = MVar [MVar ()]
 
 {-# NOINLINE result #-}
 result :: RenderResult 
-result = unsafePerformIO newChan
+result = unsafePerformIO $ newMVar []
 
 {-# NOINLINE children #-}
 children :: Children 
 children = unsafePerformIO $ newMVar []
 
 
+-- | High level render function that uses renderScene 
+-- when Thread is zero or one; and renderSceneConc otherwise.  
+-- This is useful because renderSceneConc has a greater overhead.
+--
 render :: Threads -> World -> IO () 
 render 0 = renderScene 
 render 1 = renderScene 
@@ -64,11 +69,47 @@ renderScene world = saveRendering world pixels
                   j <- [0..w-1]]
 
 
+-- | Calculates the colour for a single pixel position.
+--
+renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
+renderPixel x y ray object = if hit' (ray x y) object then white else black 
+  where (white, black) = (Colour (255,255,255), Colour(0,0,0))
+
+
+-- | Saves the calculated colours to a PPM file (the 
+-- location of which is specified in the GML)
+--
 saveRendering :: World -> Colours Int -> IO ()
 saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
   where bad = error "Error: didn't produce a valid PPM image."
         save = writeFile $ roFile (wOptions world)
         (w,h) = getDimensions world
+
+
+-- | Creates the RayMaker for the given world.
+--
+getRayMaker :: World -> RayMaker 
+getRayMaker world = mkRayMaker x y delta
+  where (w,h) = getDimensions world
+        (x,y) = (tan(0.5 * fov), x * fromIntegral h / fromIntegral w)
+        delta = 2 * x / fromIntegral w
+        fov = roFov (wOptions world)
+
+
+-- | A RayMakerMaker, if you will; but you won't.
+--
+mkRayMaker :: Double -> Double -> Double -> RayMaker 
+mkRayMaker x y delta i j = Ray eye dir
+  where eye = Vector4D (0, 0, -1, 1)
+        dir = Vector4D (x - (fromIntegral j + 0.5) * delta,
+                        y - (fromIntegral i + 0.5) * delta, 1, 1)
+
+
+
+
+-- * Concurrent Rendering
+--
+
 
 -- | Renders the World using the given 
 -- number of threads and saves the PPM 
@@ -76,28 +117,50 @@ saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
 --
 renderSceneConc :: Threads -> World -> IO ()
 renderSceneConc threads world = 
-  do  runThreads threads work world `finally` waitForChildren world
+  do modifyMVar_ result (\_ -> return [])
+     runThreads threads work world `finally` waitForChildren world
   where (w,h) = getDimensions world
         work = [(i, j) | i <- [0..h-1], j <- [0..w-1]]
 
 
+-- | Divides the workload (a list of pixel coordinates) 
+-- between a given number of threads.
+--
 runThreads :: Threads -> [(Int, Int)] -> World -> IO ()
 runThreads n work world = runThreads' n work 
-  where runThreads' 0 _ = return () 
-        runThreads' 1 w = thread w
-        runThreads' i w = do let (wt, w') = splitAt part w
-                             thread wt
+  where partSize        = length work `div` n
+        runThreads' 1 w = newThread world w
+        runThreads' i w = do let (wt, w') = splitAt partSize w
+                             newThread world wt
                              runThreads' (i - 1) w'
-        part = (length work) `div` n
-        raymaker = getRayMaker world 
-        object = wObject world
-        thread wrk = do mvar <- newEmptyMVar
-                        modifyMVar_ children (\cs -> return $ mvar:cs)
-                        forkIO (renderThread raymaker object wrk
-                            `finally` putMVar mvar ())
-                        return ()
+
+
+-- | Creates a new lock and spawns a new thread 
+-- for the given workload.
+--
+newThread :: World -> [(Int, Int)] -> IO ()
+newThread world work = 
+  do let (raymaker, object) = (getRayMaker world, wObject world)
+     mvar <- newEmptyMVar
+     modifyMVar_ children (\cs -> return $ mvar:cs)
+     forkIO (renderThread raymaker object work `finally` putMVar mvar ())
+     return ()
         
 
+-- | This function takes a workload of pixel locations 
+-- and calculates their colour; pushing it to the result MVar.
+--
+renderThread :: RayMaker -> Object -> [(Int, Int)] -> IO ()
+renderThread _ _ [] = return ()
+renderThread raymaker obj ((i,j):work) = 
+  do let colour = renderPixel i j raymaker obj
+     modifyMVar_ result (\cs -> return $ (i, j, colour) : cs)
+     renderThread raymaker obj work
+
+
+-- | Waits for the threads to finish, 
+-- and then saves the result.
+--
 waitForChildren :: World -> IO ()
 waitForChildren world = do 
   cs <- takeMVar children 
@@ -108,41 +171,13 @@ waitForChildren world = do
                waitForChildren world
 
 
+-- | Takes the result and saves it.
+-- The result MVar is not emptied here, 
+-- and instead gets reset when a new image gets 
+-- rendered (in renderSceneConc)
+--
 saveResult :: World -> IO ()
 saveResult world = do 
-  res <- mkList []
+  res <- readMVar result
   saveRendering world (map (\(_,_,c) -> c) $ sort res)
-  where mkList r = do empty <- isEmptyChan result
-                      if empty then return r 
-                               else do c <- readChan result
-                                       mkList (c:r)
-                                 
-  
-
-renderThread :: RayMaker -> Object -> [(Int, Int)] -> IO ()
-renderThread _ _ [] = return ()
-renderThread raymaker obj ((i,j):work) = 
-  do let colour = renderPixel i j raymaker obj
-     writeChan result (i, j, colour)
-     renderThread raymaker obj work
-
-
-renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
-renderPixel x y ray object = if hit' (ray x y) object then white else black 
-  where (white, black) = (Colour (255,255,255), Colour(0,0,0))
-
-
-getRayMaker :: World -> RayMaker 
-getRayMaker world = mkRayMaker x y delta
-  where (w,h) = getDimensions world
-        (x,y) = (tan(0.5 * fov), x * fromIntegral h / fromIntegral w)
-        delta = 2 * x / fromIntegral w
-        fov = roFov (wOptions world)
-
-
-mkRayMaker :: Double -> Double -> Double -> RayMaker 
-mkRayMaker x y delta i j = Ray eye dir
-  where eye = Vector4D (0, 0, -1, 1)
-        dir = Vector4D (x - (fromIntegral j + 0.5) * delta,
-                        y - (fromIntegral i + 0.5) * delta, 1, 1)
 
