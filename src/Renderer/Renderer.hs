@@ -7,7 +7,7 @@ import Output.Output (toSize)
 import Output.PPM (toPPM)
 
 import Renderer.Intersections (hit')
-import Renderer.Scene (World(..), Ray(..), RenderOptions(..), Object(..))
+import Renderer.Scene 
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.Chan 
@@ -39,9 +39,9 @@ type Children = MVar [MVar ()]
 -- | Renders the World, but uses no threads.
 --
 renderScene :: World -> IO ()
-renderScene threads world = maybe bad save $ toPPM (toSize w) (toSize h) pixels
-  where raymaker = getRayMaker world w h
-        (w,h) = (roWidth (wOptions world), roHeight (wOptions world))
+renderScene world = maybe bad save $ toPPM (toSize w) (toSize h) pixels
+  where raymaker = getRayMaker world
+        (w,h) = getDimensions world
         bad = error "Error: didn't produce a valid PPM image."
         save = writeFile $ roFile (wOptions world)
         pixels = [renderPixel i j raymaker (wObject world) | 
@@ -59,8 +59,9 @@ renderSceneConc threads world =
      result <- newChan :: IO RenderResult
      children <- newMVar [] :: IO (MVar [MVar ()])
      writeList2Chan work [(i, j) | i <- [0..h-1], 
-                                   j <- [0..w-1]]
+                                   j <- [0..w-1]] -- should i and j be reversed for ease of sorting?
      runThreads threads children work result world
+  where (w,h) = getDimensions world
 
 
 runThreads :: Threads -> Children -> WorkLoad -> RenderResult -> World -> IO ()
@@ -69,7 +70,7 @@ runThreads n children work res world =
   do mvar <- newEmptyMVar :: IO (MVar ())
      childs <- takeMVar children 
      putMVar children (mvar:childs)
-     forkIO (renderThread work res `finally` putMVar mvar ())
+     forkIO (renderThread (getRayMaker world) (wObject world) work res `finally` putMVar mvar ())
      runThreads (n -1) children work res world
 
 
@@ -88,18 +89,26 @@ saveResult :: RenderResult -> World -> IO ()
 saveResult res world = undefined
   
 
-renderThread :: WorkLoad -> RenderResult -> IO()
-renderThread work res = return ()
+renderThread :: RayMaker -> Object -> WorkLoad -> RenderResult -> IO()
+renderThread raymaker obj work res = do 
+  empty <- isEmptyChan work 
+  if empty 
+    then return () 
+    else do (i,j) <- readChan work
+            let colour = renderPixel i j raymaker obj
+            writeChan res (i, j, colour)
+            renderThread raymaker obj work res
 
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
 renderPixel x y ray object = if hit' (ray x y) object then white else black 
   where (white, black) = (Colour (255,255,255), Colour(0,0,0))
 
 
-getRayMaker :: World -> Int -> Int -> RayMaker 
-getRayMaker world w h = mkRayMaker x y delta
-  where delta = 2 * x / fromIntegral w
+getRayMaker :: World -> RayMaker 
+getRayMaker world = mkRayMaker x y delta
+  where (w,h) = getDimensions world
         (x,y) = (tan(0.5 * fov), x * fromIntegral h / fromIntegral w)
+        delta = 2 * x / fromIntegral w
         fov = roFov (wOptions world)
 
 

@@ -19,7 +19,6 @@ data World = World
   }
   
 
-
 -- | The global datatype, also referenced to as `scene'. We pushed down some
 -- of the parameters as stated in the render function of gml for ease. We are
 -- not entirely sure whether the `union' representation of the objects is 
@@ -49,3 +48,12 @@ data Object   = Simple Shape (Matrix4D Double) (Matrix4D Double) Shader -- Shape
               | Intersect  Object Object
               | Difference Object Object
               deriving Show
+
+
+-- | Returns the width and height of 
+-- the World as defined in its RenderOptions.
+--
+getDimensions :: World -> (Int, Int)
+getDimensions w = (roWidth opts, roHeight opts)
+  where opts = wOptions w
+
