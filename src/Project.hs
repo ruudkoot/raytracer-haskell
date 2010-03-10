@@ -7,7 +7,7 @@ import Input.GML.Scene
 import Input.GML.Evaluate
 import Input.GML.ToRenderObject
 --
-import Renderer.Renderer
+import Renderer.Renderer (renderScene)
 --
 import System
 import System.IO
@@ -31,8 +31,7 @@ main = do args <- getArgs
                       then return stdin
                       else readHandle $ head args 
           gml <- doParseGML handler
-          threads <- return 1 -- TODO: add command line options to set nr of threads?
-          renderScene threads . toWorld $ doEvaluateGML gml      
+          renderScene . toWorld $ doEvaluateGML gml      
 
 readHandle :: FilePath -> IO Handle
 readHandle = flip openFile ReadMode 
