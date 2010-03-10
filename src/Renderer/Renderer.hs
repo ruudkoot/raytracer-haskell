@@ -30,7 +30,6 @@ type Threads = Int
 type RayMaker = Int -> Int -> Ray
 
 
-type WorkLoad = Chan (Int, Int)
 type RenderResult = Chan (Int, Int, Colour Int)
 
 -- | Used to wait for worker threads. 
@@ -38,10 +37,6 @@ type RenderResult = Chan (Int, Int, Colour Int)
 -- for more details. 
 --
 type Children = MVar [MVar ()]
-
-{-# NOINLINE work #-}
-work :: WorkLoad 
-work = unsafePerformIO newChan
 
 {-# NOINLINE result #-}
 result :: RenderResult 
@@ -81,20 +76,27 @@ saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
 --
 renderSceneConc :: Threads -> World -> IO ()
 renderSceneConc threads world = 
-  do writeList2Chan work [(i, j) | i <- [0..h-1], j <- [0..w-1]] 
-     runThreads threads world `finally` waitForChildren world
+  do  runThreads threads work world `finally` waitForChildren world
   where (w,h) = getDimensions world
+        work = [(i, j) | i <- [0..h-1], j <- [0..w-1]]
 
 
-runThreads :: Threads -> World -> IO ()
-runThreads 0 _     = return () 
-runThreads n world = 
-  do mvar <- newEmptyMVar
-     modifyMVar_ children (\cs -> return $ mvar:cs)
-     forkIO (renderThread (getRayMaker world) (wObject world) 
-              `finally` putMVar mvar ())
-     runThreads (n - 1) world
-
+runThreads :: Threads -> [(Int, Int)] -> World -> IO ()
+runThreads n work world = runThreads' n work 
+  where runThreads' 0 _ = return () 
+        runThreads' 1 w = thread w
+        runThreads' i w = do let (wt, w') = splitAt part w
+                             thread wt
+                             runThreads' (i - 1) w'
+        part = (length work) `div` n
+        raymaker = getRayMaker world 
+        object = wObject world
+        thread wrk = do mvar <- newEmptyMVar
+                        modifyMVar_ children (\cs -> return $ mvar:cs)
+                        forkIO (renderThread raymaker object wrk
+                            `finally` putMVar mvar ())
+                        return ()
+        
 
 waitForChildren :: World -> IO ()
 waitForChildren world = do 
@@ -117,14 +119,12 @@ saveResult world = do
                                  
   
 
-renderThread :: RayMaker -> Object -> IO ()
-renderThread raymaker obj = do 
-  empty <- isEmptyChan work 
-  unless empty $ 
-    do (i,j) <- readChan work -- blocks indefinitely, if other thread made chan empty
-       let colour = renderPixel i j raymaker obj
-       writeChan result (i, j, colour)
-       renderThread raymaker obj 
+renderThread :: RayMaker -> Object -> [(Int, Int)] -> IO ()
+renderThread _ _ [] = return ()
+renderThread raymaker obj ((i,j):work) = 
+  do let colour = renderPixel i j raymaker obj
+     writeChan result (i, j, colour)
+     renderThread raymaker obj work
 
 
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int

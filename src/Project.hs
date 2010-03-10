@@ -31,7 +31,7 @@ main = do args <- getArgs
                       then return stdin
                       else readHandle $ head args 
           gml <- doParseGML handler
-          let threads = 2 -- TODO: specify number of threads via command line arguments
+          let threads = 4 -- TODO: specify number of threads via command line arguments
           render threads . toWorld $ doEvaluateGML gml      
 
 readHandle :: FilePath -> IO Handle
