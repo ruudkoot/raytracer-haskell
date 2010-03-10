@@ -31,7 +31,8 @@ main = do args <- getArgs
                       then return stdin
                       else readHandle $ head args 
           gml <- doParseGML handler
-          renderScene . toWorld $ doEvaluateGML gml      
+          threads <- return 1 -- TODO: add command line options to set nr of threads?
+          renderScene threads . toWorld $ doEvaluateGML gml      
 
 readHandle :: FilePath -> IO Handle
 readHandle = flip openFile ReadMode 
