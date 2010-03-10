@@ -1,4 +1,4 @@
-module Renderer.Renderer (renderScene, renderSceneConc) where
+module Renderer.Renderer (render) where
 
 import Data.Colour (Colour(..), Colours)
 import Data.Vector (Vector4D(..))
@@ -10,11 +10,13 @@ import Renderer.Intersections (hit')
 import Renderer.Scene 
 
 
-import Control.Concurrent (forkIO)
+import Control.Concurrent (forkIO, yield)
 import Control.Concurrent.Chan 
 import Control.Concurrent.MVar
 import Control.Exception (finally)
+import Control.Monad (unless)
 import Data.List (sort)
+import System.IO.Unsafe
 
 
 -- | The number of threads to use in 
@@ -36,6 +38,24 @@ type RenderResult = Chan (Int, Int, Colour Int)
 -- for more details. 
 --
 type Children = MVar [MVar ()]
+
+{-# NOINLINE work #-}
+work :: WorkLoad 
+work = unsafePerformIO newChan
+
+{-# NOINLINE result #-}
+result :: RenderResult 
+result = unsafePerformIO newChan
+
+{-# NOINLINE children #-}
+children :: Children 
+children = unsafePerformIO $ newMVar []
+
+
+render :: Threads -> World -> IO () 
+render 0 = renderScene 
+render 1 = renderScene 
+render n = renderSceneConc n
 
 
 -- | Renders the World without using threads.
@@ -61,51 +81,51 @@ saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
 --
 renderSceneConc :: Threads -> World -> IO ()
 renderSceneConc threads world = 
-  do work <- newChan :: IO WorkLoad
-     result <- newChan :: IO RenderResult
-     children <- newMVar [] :: IO (MVar [MVar ()])
-     writeList2Chan work [(i, j) | i <- [0..h-1], 
-                                   j <- [0..w-1]] 
-     runThreads threads children work result world
+  do writeList2Chan work [(i, j) | i <- [0..h-1], j <- [0..w-1]] 
+     runThreads threads world `finally` waitForChildren world
   where (w,h) = getDimensions world
 
 
-runThreads :: Threads -> Children -> WorkLoad -> RenderResult -> World -> IO ()
-runThreads 0 children work res world = waitForChildren children res world
-runThreads n children work res world = 
-  do mvar <- newEmptyMVar :: IO (MVar ())
-     childs <- takeMVar children 
-     putMVar children (mvar:childs)
-     forkIO (renderThread (getRayMaker world) (wObject world) work res `finally` putMVar mvar ())
-     runThreads (n -1) children work res world
+runThreads :: Threads -> World -> IO ()
+runThreads 0 _     = return () 
+runThreads n world = 
+  do mvar <- newEmptyMVar
+     modifyMVar_ children (\cs -> return $ mvar:cs)
+     forkIO (renderThread (getRayMaker world) (wObject world) 
+              `finally` putMVar mvar ())
+     runThreads (n - 1) world
 
 
-waitForChildren :: Children -> RenderResult -> World -> IO ()
-waitForChildren children res world = do 
+waitForChildren :: World -> IO ()
+waitForChildren world = do 
   cs <- takeMVar children 
   case cs of 
-    []   -> saveResult res world
-    m:ms -> do 
-      putMVar children ms 
-      takeMVar m 
-      waitForChildren children res world
- 
+    []   -> saveResult world
+    m:ms -> do putMVar children ms 
+               takeMVar m 
+               waitForChildren world
 
-saveResult :: RenderResult -> World -> IO ()
-saveResult res world = do 
-  result <- getChanContents res 
-  saveRendering world (map (\(_,_,c) -> c) $ sort result)
+
+saveResult :: World -> IO ()
+saveResult world = do 
+  res <- mkList []
+  saveRendering world (map (\(_,_,c) -> c) $ sort res)
+  where mkList r = do empty <- isEmptyChan result
+                      if empty then return r 
+                               else do c <- readChan result
+                                       mkList (c:r)
+                                 
   
 
-renderThread :: RayMaker -> Object -> WorkLoad -> RenderResult -> IO()
-renderThread raymaker obj work res = do 
+renderThread :: RayMaker -> Object -> IO ()
+renderThread raymaker obj = do 
   empty <- isEmptyChan work 
-  if empty 
-    then return () 
-    else do (i,j) <- readChan work
-            let colour = renderPixel i j raymaker obj
-            writeChan res (i, j, colour)
-            renderThread raymaker obj work res
+  unless empty $ 
+    do (i,j) <- readChan work -- blocks indefinitely, if other thread made chan empty
+       colour <- return $ renderPixel i j raymaker obj
+       writeChan result (i, j, colour)
+       renderThread raymaker obj 
+
 
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
 renderPixel x y ray object = if hit' (ray x y) object then white else black 
