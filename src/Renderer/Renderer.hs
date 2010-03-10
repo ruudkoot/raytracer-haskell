@@ -179,5 +179,5 @@ waitForChildren world = do
 saveResult :: World -> IO ()
 saveResult world = do 
   res <- readMVar result
-  saveRendering world (map (\(_,_,c) -> c) $ sort res)
+  saveRendering world (map (\(_,_,c) -> c) res)
 
