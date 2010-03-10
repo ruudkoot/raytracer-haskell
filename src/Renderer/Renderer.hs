@@ -1,6 +1,6 @@
-module Renderer.Renderer (renderScene) where
+module Renderer.Renderer (renderScene, renderSceneConc) where
 
-import Data.Colour (Colour(..))
+import Data.Colour (Colour(..), Colours)
 import Data.Vector (Vector4D(..))
 
 import Output.Output (toSize)
@@ -9,10 +9,12 @@ import Output.PPM (toPPM)
 import Renderer.Intersections (hit')
 import Renderer.Scene 
 
+
 import Control.Concurrent (forkIO)
 import Control.Concurrent.Chan 
 import Control.Concurrent.MVar
 import Control.Exception (finally)
+import Data.List (sort)
 
 
 -- | The number of threads to use in 
@@ -36,18 +38,22 @@ type RenderResult = Chan (Int, Int, Colour Int)
 type Children = MVar [MVar ()]
 
 
--- | Renders the World, but uses no threads.
+-- | Renders the World without using threads.
 --
 renderScene :: World -> IO ()
-renderScene world = maybe bad save $ toPPM (toSize w) (toSize h) pixels
+renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
-        bad = error "Error: didn't produce a valid PPM image."
-        save = writeFile $ roFile (wOptions world)
         pixels = [renderPixel i j raymaker (wObject world) | 
                   i <- [0..h-1],
                   j <- [0..w-1]]
 
+
+saveRendering :: World -> Colours Int -> IO ()
+saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
+  where bad = error "Error: didn't produce a valid PPM image."
+        save = writeFile $ roFile (wOptions world)
+        (w,h) = getDimensions world
 
 -- | Renders the World using the given 
 -- number of threads and saves the PPM 
@@ -59,7 +65,7 @@ renderSceneConc threads world =
      result <- newChan :: IO RenderResult
      children <- newMVar [] :: IO (MVar [MVar ()])
      writeList2Chan work [(i, j) | i <- [0..h-1], 
-                                   j <- [0..w-1]] -- should i and j be reversed for ease of sorting?
+                                   j <- [0..w-1]] 
      runThreads threads children work result world
   where (w,h) = getDimensions world
 
@@ -86,7 +92,9 @@ waitForChildren children res world = do
  
 
 saveResult :: RenderResult -> World -> IO ()
-saveResult res world = undefined
+saveResult res world = do 
+  result <- getChanContents res 
+  saveRendering world (map (\(_,_,c) -> c) $ sort result)
   
 
 renderThread :: RayMaker -> Object -> WorkLoad -> RenderResult -> IO()
