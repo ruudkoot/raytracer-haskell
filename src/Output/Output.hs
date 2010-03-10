@@ -1,4 +1,4 @@
-module Output.Output ( Size(..), fromSize,
+module Output.Output ( Size(..), fromSize, toSize, 
 		       Width, Height, ImageWriter,
 		       module Data.Colour
                      ) where
@@ -18,6 +18,8 @@ instance Show Size where
 fromSize :: Size -> Integer
 fromSize (Size s) = s
 
+toSize :: Int -> Size 
+toSize = Size . fromIntegral
 
 type Width = Size
 type Height = Size

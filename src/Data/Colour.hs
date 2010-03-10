@@ -9,7 +9,7 @@ type ColourD = Colour Double
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 
-newtype Colour a = Colour (a, a, a)
+newtype Colour a = Colour (a, a, a) deriving (Show, Eq, Ord)
 type Colours a = [Colour a]
 
 
