@@ -18,7 +18,19 @@ hit' ray       (Difference  l r)   = hit' ray l && not (hit' ray r)
 hit' ray       (Intersect  l r)    = hit' ray l && hit' ray r
 
 hit :: Ray -> Shape -> Bool
-hit r Cube     = undefined
+hit r Cube     = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
+                     (dx,dy,dz,_) = fromVector4D $ rDirection r
+                     calcMinMax o d = let div = 1.0/d
+                                          t1 = -o*div
+                                          t2 = (1.0-o)*div
+                                      in if d >= 0.0 then (t1,t2) else (t2,t1)
+                     (txl,txh) = calcMinMax ox dx
+                     (tyl,tyh) = calcMinMax oy dy
+                     (tzl,tzh) = calcMinMax oz dz
+                     tmin = max txl $ max tyl tzl
+                     tmax = min txh $ min tyh tzh
+                 in tmin < tmax && tmin < 1.0 && tmax > 0.0
+                                         
 hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      k = Vector4D (1, 0, 1, 0) * rOrigin r
                      a = dir <.> dir
@@ -68,7 +80,6 @@ hit r Plane    = let oy = getY4D $ rOrigin r
                      dy = getY4D $ rDirection r
                  in (oy == 0) || (oy * dy < 0)
 
-
 hitSquareZ::Ray->Bool
 hitSquareZ r = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                    (dx,dy,dz,_) = fromVector4D $ rDirection r
@@ -77,7 +88,7 @@ hitSquareZ r = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                   else let t = -oz/dz
                            u = ox + t*dx
                            v = oy + t*dy
-                       in u < 1.0 && v < 1.0
+                       in u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0
                 
 intersection :: Ray -> Shape -> [Intersection]
 intersection r Cube     = undefined
