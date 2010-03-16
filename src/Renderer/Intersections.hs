@@ -178,10 +178,9 @@ intersectionInfo ray object = IntersectionInfo
         distance = fst . head $ intersection ray Sphere
         loc      = instantiate ray distance
 
-test (Ray o d) = map (\(x,y) -> (x, o + scaleF x d, y, o + scaleF y d)) (intersection (Ray o d) Cylinder)
-
 -- | Instantiates a ray starting on some point and calculates the ending point
 --   given a certain t.
 instantiate :: Ray -> Double -> Vec4D
 instantiate (Ray origin direction) t = origin + fmap (t *) direction
 
+test (Ray o d) = map (\(x,y) -> (x, magnitude $ Vector4D (1, 0, 1, 0) * (o + scaleF x d), y, magnitude $ Vector4D (1, 0, 1, 0) * (o + scaleF y d))) (intersection (Ray o d) Cylinder)
