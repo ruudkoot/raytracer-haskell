@@ -14,7 +14,7 @@ green = solid 0    1.0  0
 blue  = solid 0    0    1.0
 
 solid :: Double -> Double -> Double -> Shader
-solid r g b = Shader ( const SurfaceProperty { colour                        = Colour (r, g, b)
+solid r g b = Shader ( const SurfaceProperty { surfaceColour                 = Colour (r, g, b)
                                              , diffuseReflectionCoefficient  = 1.0
                                              , specularReflectionCoefficient = 0.0
                                              , phongExponent                 = 1.0
@@ -43,9 +43,11 @@ gradient3D c1 c2 c3 = undefined
 
 {------------------------------------------------------------------------------}
 
-uvShader :: (Face, Double, Double) -> Colour Int
-uvShader (face, u, v) = Colour (round $ 255.0 * u, round $ 255.0 * v, 0)
-
---gmlShader :: Closure -> (Face, Double, Double) -> Shader
---gmlShader closure (face, u, v) = 
+uvShader :: Shader
+uvShader = Shader { runShader = \(face, u, v) -> SurfaceProperty { surfaceColour                 = Colour (u, v, 0)
+                                                                 , diffuseReflectionCoefficient  = 1.0
+                                                                 , specularReflectionCoefficient = 0.0
+                                                                 , phongExponent                 = 1.0
+                                                                 }
+                  }
 

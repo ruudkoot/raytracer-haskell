@@ -40,6 +40,9 @@ clampColour mi ma (Colour (r, g, b)) = Colour (c r, c g, c b)
 clampedList :: Ord a => a -> a -> Colour a -> [a]
 clampedList mi ma = colourToList . clampColour mi ma
 
+toRGB :: ColourD -> Colour Int
+toRGB (Colour (r, g, b)) = Colour (round (255.0*r), round (255.0*g), round (255.0*b))
 
 fromVector :: Vector3D a -> Colour a
 fromVector (Vector3D (a, b, c)) = Colour (a, b, c)
+

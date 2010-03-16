@@ -4,13 +4,71 @@ import           Control.Monad
 
 import           Data.Char
 import qualified Data.Map        as Map
-import           Data.Vector            (Vector3D)
+import           Data.Vector
 
 import qualified Base.Light      as Light
-import qualified Input.GML.Scene as Scene
+import qualified Base.Shape      as Shape
 
 import           Test.QuickCheck
 
+
+
+---------------------- Input.GML.Scene -----------------------------------------
+
+data Scene = Scene
+  { sceneAmbience :: Pt3D
+  , sceneLights   :: [Light.RenderLight]
+  , sceneObj      :: Object
+  , sceneDepth    :: Int
+  , sceneFov      :: Double        -- fov
+  , sceneWidth    :: Int           -- wid
+  , sceneHeight   :: Int           -- ht
+  , sceneFile     :: FilePath
+  }
+  deriving (Show,Eq)
+
+data Object = Simple     Shape.Shape   Closure
+            | Translate  Object Double Double Double
+            | Scale      Object Double Double Double
+            | UScale     Object Double 
+            | RotateX    Object Double
+            | RotateY    Object Double
+            | RotateZ    Object Double
+            | Union      Object Object
+            | Intersect  Object Object
+            | Difference Object Object
+            deriving (Show,Eq)
+          
+type ObjectAlgebra r =
+    ( Shape.Shape -> Closure -> r
+    , r -> Double -> Double -> Double -> r
+    , r -> Double -> Double -> Double -> r
+    , r -> Double -> r
+    , r -> Double -> r
+    , r -> Double -> r
+    , r -> Double -> r
+    , r -> r -> r
+    , r -> r -> r
+    , r -> r -> r
+    )
+
+foldObject :: ObjectAlgebra r -> Object -> r
+foldObject (simple, translate, scale, uscale, rotatex, rotatey, rotatez, union,
+              intersect, difference) = fold
+    where fold x = case x of {
+        Simple     shape   shader   -> simple     shape          shader;
+        Translate  object  d1 d2 d3 -> translate  (fold object ) d1 d2 d3;
+        Scale      object  d1 d2 d3 -> scale      (fold object ) d1 d2 d3;
+        UScale     object  double   -> uscale     (fold object ) double;
+        RotateX    object  double   -> rotatex    (fold object ) double;
+        RotateY    object  double   -> rotatey    (fold object ) double;
+        RotateZ    object  double   -> rotatez    (fold object ) double;
+        Union      object1 object2  -> union      (fold object1) (fold object2);
+        Intersect  object1 object2  -> intersect  (fold object1) (fold object2);
+        Difference object1 object2  -> difference (fold object1) (fold object2);
+      }
+      
+---------------------------------[]---------------------------------------------
 
 --AST defition following the specification in chapter 2.1 of the assignment
 
@@ -38,16 +96,15 @@ type Code      = [Token]
 type Closure   = (Env, Code)
 
 type Point     = Vector3D Double
---type Object    = Scene.Object
 type Light     = Light.RenderLight
 
 data Value     = BaseValue BaseValue
                | Closure   Closure
                | Array     Array
                | Point     Point
-               | Object    Scene.Object
+               | Object    Object
                | Light     Light
-               | Render    Scene.Scene
+               | Render    Scene
                deriving (Show, Eq)
                
 type Array     = [Value]
