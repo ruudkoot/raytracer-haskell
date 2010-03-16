@@ -8,17 +8,25 @@ import Data.Vector
 import Debug.Trace
 ------------------------------------------------------------------------------
 
+-- uvSphere :: Pt3D -> SurfaceCoord
+-- uvSphere loc = let theta = acos  ( getY3D loc )
+--                    phi   = atan2 ( getX3D loc ) (getZ3D loc) - pi
+--                    pi2   = 2*pi
+--                    u     = phi / pi2
+--                    v     = pi - theta / pi
+--                in trace (show loc  ++ " -> " ++ show u ++ " " ++ show v) 
+--                   $ ( 0               -- face
+--                   , phi / pi2       -- u
+--                   , pi - theta / pi -- v
+--                   )
+
 uvSphere :: Pt3D -> SurfaceCoord
-uvSphere loc = let theta = acos  ( getY3D loc )
-                   phi   = atan2 ( getX3D loc ) (getZ3D loc) - pi
-                   pi2   = 2*pi
-                   u     = phi / pi2
-                   v     = pi - theta / pi
-               in trace (show loc  ++ " -> " ++ show u ++ " " ++ show v) 
-                  $ ( 0               -- face
-                  , phi / pi2       -- u
-                  , pi - theta / pi -- v
-                  )
+uvSphere loc = let y = getY3D loc
+                   z = getZ3D loc
+                   v = 2*y + 2
+                   u = acos (z / sqrt (1 - y*y)) / 360
+                in (0, u, v)
+
 
 uvPlane :: Pt3D -> SurfaceCoord
 uvPlane loc = (0, getX3D loc, getZ3D loc)
