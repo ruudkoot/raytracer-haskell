@@ -18,7 +18,11 @@ data IntersectionInfo = IntersectionInfo
     , distance :: Double
     , uv       :: (Double, Double)
     }
+    deriving Eq
 
+instance Ord IntersectionInfo where
+        compare = compare.distance
+        
 hit' :: Ray -> Object -> Bool
 hit' (Ray o d) (Simple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
 hit' ray       (Union  l r)        = hit' ray l || hit' ray r
@@ -91,7 +95,54 @@ hit r Plane    = let oy = getY4D $ rOrigin r
                      dy = getY4D $ rDirection r
                  in (oy == 0) || (oy * dy < 0)
 
-                
+type IntersectionRange = (IntersectionInfo,IntersectionInfo)
+
+intersect' :: Ray -> Object -> Bool
+intersect' (Ray o d) (Simple s _ minv _) = intersect (Ray (minv !*! o) (minv !*! d)) s
+intersect' ray       (Union  l r)        = intersect' ray l ++ intersect' ray r
+intersect' ray       (Difference  l r)   = intersect' ray l && not (intersect' ray r)
+intersect' ray       (Intersect  l r)    = intersect' ray l && intersect' ray r
+
+unionRange::IntersectionRange -> IntersectionRange -> [IntersectionRange]
+unionRange (i1l,i1h) (i2l, i2h) = if i1l < i2l --Which one is lowest?
+                                  then if i1h > i2l --Overlap?
+                                       then if i1h > i2h --Complete overlap?
+                                            then [(i1l,i1h)] --i1 Encapsulates i2
+                                            else [(i1l,i2h)] 
+                                       else [(i1l,i1h),(i2l, i2h)] --No overlap
+                                  else if i2h > i1l --Overlap?
+                                       then if i2h > i1h --Complete overlap?
+                                            then [(i2l,i2h)] --i2 Encapsulates i1
+                                            else [(i2l,i1h)] 
+                                       else [(i1l,i1h),(i2l, i2h)] --No overlap
+
+intersectionRange::IntersectionRange -> IntersectionRange -> [IntersectionRange]
+intersectionRange (i1l,i1h) (i2l, i2h) =  if i1l < i2l --Which one is lowest?
+                                          then if i1h > i2l --Overlap?
+                                               then if i1h > i2h --Complete overlap?
+                                                    then [(i2l,i2h)] --i1 Encapsulates i2
+                                                    else [(i1h,i2l)] 
+                                               else [] --No overlap
+                                          else if i2h > i1l --Overlap?
+                                               then if i2h > i1h --Complete overlap?
+                                                    then [(i1l,i1h)] --i2 Encapsulates i1
+                                                    else [(i2h,i1l)] 
+                                               else [] --No overlap
+
+differenceRange::IntersectionRange -> IntersectionRange -> [IntersectionRange]
+differenceRange (i1l,i1h) (i2l, i2h) =  if i1l < i2l --Which one is lowest?
+                                        then if i1h > i2l --Overlap?
+                                             then if i1h > i2h --Complete overlap?
+                                                  then [(i1l,i2l),(i1h,i2h)] --i1 Encapsulates i2
+                                                  else [(i1l,i2l)] 
+                                             else [(i1l,i1h)] --No overlap
+                                        else if i2h > i1l --Overlap?
+                                             then if i2h > i1h --Complete overlap?
+                                                  then [] --i2 Encapsulates i1
+                                                  else [(i1h,i2h)] 
+                                             else [(i1l,i2l)] --No overlap
+
+
 intersection :: Ray -> Shape -> [Intersection]
 
 --Source: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.64.7663&rep=rep1&type=pdf
@@ -112,15 +163,15 @@ intersection r Cube    = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                          in if ishit
                             then [IntersectionInfo { distance = tmin
                                                    , isAHit   = ishitrange
-                                                   , position = 
-                                                   , normal   =
-                                                   , uv       =
+                                                   , position = undefined
+                                                   , normal   = undefined
+                                                   , uv       = undefined
                                                    }
                                  ,IntersectionInfo { distance = tmax
                                                    , isAHit   = ishitrange
-                                                   , position =
-                                                   , normal   =
-                                                   , uv       =
+                                                   , position = undefined
+                                                   , normal   = undefined
+                                                   , uv       = undefined
                                                    }]
                             else []
 
