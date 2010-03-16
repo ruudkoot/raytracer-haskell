@@ -41,9 +41,9 @@ hit r Cube     = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
 
 hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      k = Vector4D (1, 0, 1, 0) * rOrigin r
-                     a = dir <.> dir
-                     b = 2.0 * (k <.> dir)
-                     c = (k <.> k) - 1.0
+                     a = dir !.! dir
+                     b = 2.0 * (k !.! dir)
+                     c = (k !.! k) - 1.0
                      d = b*b - 4.0*a*c
                      sqrd = sqrt d
                      t1 = (-b + sqrd)/(2*a)
@@ -58,9 +58,9 @@ hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                  in sideHit || bottomHit
 hit r Sphere   = let dir = dropW $ rDirection r
                      k = dropW $ rOrigin r
-                     a = dir <.> dir
-                     b = 2.0 * (k <.> dir)
-                     c = (k <.> k) - 1.0
+                     a = dir !.! dir
+                     b = 2.0 * (k !.! dir)
+                     c = (k !.! k) - 1.0
                      d = b*b - 4*a*c
                      sqrd = sqrt d
                      t1 = (-b + sqrd)/(2*a)
@@ -69,9 +69,9 @@ hit r Sphere   = let dir = dropW $ rDirection r
                         
 hit r Cone     = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      k = Vector4D (1, 0, 1, 0) * rOrigin r
-                     a = dir <.> dir - dy * dy
-                     b = 2.0 * (k <.> dir) - 2 * oy * dy
-                     c = (k <.> k) - oy * oy
+                     a = dir !.! dir - dy * dy
+                     b = 2.0 * (k !.! dir) - 2 * oy * dy
+                     c = (k !.! k) - oy * oy
                      d = b*b - 4.0*a*c
                      sqrd = sqrt d
                      t1 = (-b + sqrd)/(2*a)
@@ -110,9 +110,9 @@ intersection r Cylinder = undefined
 
 intersection r Sphere   = let dir = rDirection r
                               k = rOrigin r
-                              a = dir <.> dir
-                              b = 2.0 * (k <.> dir)
-                              c = (k <.> k) - 1.0
+                              a = dir !.! dir
+                              b = 2.0 * (k !.! dir)
+                              c = (k !.! k) - 1.0
                               d = b*b - 4.0*a*c
                           in case compare d 0.0 of
                                 EQ -> [(-b/(2*a),-b/(2*a))]
