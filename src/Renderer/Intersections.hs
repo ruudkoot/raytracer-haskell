@@ -122,7 +122,7 @@ intersection r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
                               topHit = magnitudeSquared (k + scaleF t' dir)
                               i1 = if topHit < 1.0 then t' else if t2 <= t' && t2 >= t then t2 else t1
                               i2 = if bottomHit < 1.0 then t else if t1 <= t' && t1 >= t then t1 else t2
-                          in [(i1, i2)]
+                          in if i1 < 0 || i2 < 0 then [] else [(i1 `min` i2, i1 `max` i2)]
                           
 --Formula from http://www.devmaster.net/wiki/Ray-sphere_intersection, took out the k = (o-c) constant with c = (0,0,0).
 
