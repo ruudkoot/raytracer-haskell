@@ -4,6 +4,7 @@
 module Data.Vector where
   
 import Control.Applicative 
+import Test.QuickCheck
 
 -- * Synonyms
 type Pt3D  = Vector3D Double

@@ -112,3 +112,5 @@ intersection r Cone     = undefined
 intersection r Plane    = let oy = getY4D $ rOrigin r
                               dy = getY4D $ rDirection r
                           in if (oy == 0) || (oy * dy >= 0) then [] else [(- oy / dy, - oy / dy)]
+
+
