@@ -38,7 +38,7 @@ hit r Cube     = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                      tmin = max txl $ max tyl tzl
                      tmax = min txh $ min tyh tzh
                  in tmin < tmax && tmin < 1.0 && tmax > 0.0
-                                         
+
 hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      k = Vector4D (1, 0, 1, 0) * rOrigin r
                      a = dir <.> dir
@@ -91,6 +91,7 @@ hit r Plane    = let oy = getY4D $ rOrigin r
 hitSquareZ::Ray->Bool
 hitSquareZ r = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                    (dx,dy,dz,_) = fromVector4D $ rDirection r
+                   
                in if (oz == 0) || (oz * dz >= 0) 
                   then False
                   else let t = -oz/dz
