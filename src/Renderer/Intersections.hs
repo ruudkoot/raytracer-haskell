@@ -88,19 +88,39 @@ hit r Plane    = let oy = getY4D $ rOrigin r
                      dy = getY4D $ rDirection r
                  in (oy == 0) || (oy * dy < 0)
 
-hitSquareZ::Ray->Bool
-hitSquareZ r = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
-                   (dx,dy,dz,_) = fromVector4D $ rDirection r
-                   
-               in if (oz == 0) || (oz * dz >= 0) 
-                  then False
-                  else let t = -oz/dz
-                           u = ox + t*dx
-                           v = oy + t*dy
-                       in u >= 0.0 && u <= 1.0 && v >= 0.0 && v <= 1.0
                 
 intersection :: Ray -> Shape -> [Intersection]
-intersection r Cube     = undefined
+
+--Source: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.64.7663&rep=rep1&type=pdf
+
+intersection r Cube    = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
+                             (dx,dy,dz,_) = fromVector4D $ rDirection r
+                             calcMinMax o d = let div = 1.0/d
+                                                  t1 = -o*div
+                                                  t2 = (1.0-o)*div
+                                              in if d >= 0.0 then (t1,t2) else (t2,t1)
+                             (txl,txh) = calcMinMax ox dx
+                             (tyl,tyh) = calcMinMax oy dy
+                             (tzl,tzh) = calcMinMax oz dz
+                             tmin = max txl $ max tyl tzl
+                             tmax = min txh $ min tyh tzh
+                             ishit = tmin <= tmax
+                             ishitrange = ishit && tmin <= 1.0 && tmax >= 0.0
+                         in if ishit
+                            then [IntersectionInfo { distance = tmin
+                                                   , isAHit   = ishitrange
+                                                   , position = 
+                                                   , normal   =
+                                                   , uv       =
+                                                   }
+                                 ,IntersectionInfo { distance = tmax
+                                                   , isAHit   = ishitrange
+                                                   , position =
+                                                   , normal   =
+                                                   , uv       =
+                                                   }]
+                            else []
+
 intersection r Cylinder = undefined
 
 --Formula from http://www.devmaster.net/wiki/Ray-sphere_intersection, took out the k = (o-c) constant with c = (0,0,0).
