@@ -99,6 +99,17 @@ instance Arbitrary a => Arbitrary (Vector4D a) where
   arbitrary = liftM4 (\x y z w -> Vector4D (x, y, z, w)) arbitrary arbitrary arbitrary arbitrary
 
 
+-- * Into the Vector* context 
+--
+toVec2D :: a -> a -> Vector2D a
+toVec2D = curry Vector2D
+
+toVec3D :: a -> a -> a -> Vector3D a
+toVec3D a b c = Vector3D (a, b, c)
+
+toVec4D :: a -> a -> a -> a -> Vector4D a 
+toVec4D a b c d = Vector4D (a, b, c, d)
+
 -- * Out of the Vector* context
 --
 fromVector2D :: Vector2D a -> (a, a)
