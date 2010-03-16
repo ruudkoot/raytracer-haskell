@@ -1,6 +1,9 @@
 module Input.GML.Evaluate (evaluate) where
 
+import           Data.Colour
 import qualified Data.Map      as Map
+
+import           Base.Shader
 
 import           Input.GML.AST
 import           Input.GML.Operators
@@ -29,3 +32,17 @@ operator o = Map.findWithDefault (error ("unknown operator "++o)) o operators
 
 set = Map.insert
 get = Map.findWithDefault (error "unknown identifier")
+
+
+
+gmlShader :: Closure -> Shader
+gmlShader (e, c) = Shader { runShader = \(face, u, v) -> let s                                                                       = [BaseValue (Int face), BaseValue (Real u), BaseValue (Real v)]
+                                                             (e', s', c')                                                            = evaluate (e, s, c)
+                                                             [Point p, BaseValue (Real kd), BaseValue (Real ks), BaseValue (Real n)] = s'
+                                                          in SurfaceProperty { colour                        = fromPoint p
+                                                                             , diffuseReflectionCoefficient  = kd
+                                                                             , specularReflectionCoefficient = ks
+                                                                             , phongExponent                 = n
+                                                                             }
+                          }
+
