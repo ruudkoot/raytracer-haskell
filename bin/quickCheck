@@ -33,7 +33,7 @@ process opts file =
           if null names then
 	      putStr (file++": no properties to check\n")
 	    else do writeFile "hugsin"$
-	              unlines ((":l "++file):[":m +Test.QuickCheck"] ++
+	              unlines ((":l "++file):
 	                       [(if namesOpt=="+names" then 
 			           "putStr \""++p++": \" >> "
 				 else "") ++

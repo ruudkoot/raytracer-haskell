@@ -41,4 +41,5 @@ find -name "*.hs" | xargs hlint
 
 # Run tests (configure with UserHooks)
 title "Running Tests..COMING SOON" &&
-#find -name "*.hs" src/Tests | xargs ../../bin/quickCheck
+cd src &&
+find Tests -name "*.hs" | xargs ../bin/quickCheck

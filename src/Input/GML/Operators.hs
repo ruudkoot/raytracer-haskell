@@ -1,11 +1,11 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances, PackageImports #-}
 
 module Input.GML.Operators (operators,runOp,Operator) where
 
 import Control.Applicative
 import Control.Monad
-import Control.Monad.State
-import Control.Monad.Error
+import "mtl" Control.Monad.State
+import "mtl" Control.Monad.Error
 
 import Data.Maybe
 import Data.Map                              hiding (map)
