@@ -60,7 +60,7 @@ hit r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
                      dy = getY4D $ rDirection r
                      t = min (-oy / dy) ((1 - oy) / dy)
                      t' = max (-oy / dy) ((1 - oy) / dy)
-                     sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
+                     sideHit = ((t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)) && (t1 < 0 || t2 < 0)
                      bottomHit = magnitudeSquared (k + scaleF t dir) <= 1
                      --topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
                  in sideHit || bottomHit
@@ -69,11 +69,11 @@ hit r Sphere   = let dir = dropW $ rDirection r
                      a = dir !.! dir
                      b = 2.0 * (k !.! dir)
                      c = (k !.! k) - 1.0
-                     d = b*b - 4*a*c
+                     d = b*b - 4.0*a*c
                      sqrd = sqrt d
                      t1 = (-b + sqrd)/(2*a)
                      t2 = (-b - sqrd)/(2*a)
-                  in d >= 0 -- && (t1 >= 0 || t2 >= 0)
+                  in d >= 0 && (t1 < 0 || t2 < 0)
                         
 hit r Cone     = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      k = Vector4D (1, 0, 1, 0) * rOrigin r
@@ -91,7 +91,7 @@ hit r Cone     = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
                      --bottomHit = magnitudeSquared (k + dir * (Vector4D (t, t, t, 1))) <= 1
                      --topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
-                 in sideHit
+                 in d >= 0 && sideHit && (t1 < 0 || t2 < 0)
                  -- The 'unit' plane is the XZ plane, so we only have to consider the Y direction.
                  -- If oy == 0, we're in the plane, otherwise we hit it if we move 'downwards' on Y
                  -- when we start 'above' the plane, or vice versa.
