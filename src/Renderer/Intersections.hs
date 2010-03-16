@@ -21,7 +21,7 @@ data IntersectionInfo = IntersectionInfo
     deriving Eq
 
 instance Ord IntersectionInfo where
-        compare = compare.distance
+        compare i i2 = compare (distance i) (distance i2)
         
 hit' :: Ray -> Object -> Bool
 hit' (Ray o d) (Simple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
@@ -98,7 +98,7 @@ hit r Plane    = let oy = getY4D $ rOrigin r
 type IntersectionRange = (IntersectionInfo,IntersectionInfo)
 
 intersect' :: Ray -> Object -> Bool
-intersect' (Ray o d) (Simple s _ minv _) = intersect (Ray (minv !*! o) (minv !*! d)) s
+intersect' (Ray o d) (Simple s _ minv _) = intersection (Ray (minv !*! o) (minv !*! d)) s
 intersect' ray       (Union  l r)        = intersect' ray l ++ intersect' ray r
 intersect' ray       (Difference  l r)   = intersect' ray l && not (intersect' ray r)
 intersect' ray       (Intersect  l r)    = intersect' ray l && intersect' ray r
@@ -163,13 +163,13 @@ intersection r Cube    = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                          in if ishit
                             then [IntersectionInfo { distance = tmin
                                                    , isAHit   = ishitrange
-                                                   , position = undefined
+                                                   , location = undefined
                                                    , normal   = undefined
                                                    , uv       = undefined
                                                    }
                                  ,IntersectionInfo { distance = tmax
                                                    , isAHit   = ishitrange
-                                                   , position = undefined
+                                                   , location = undefined
                                                    , normal   = undefined
                                                    , uv       = undefined
                                                    }]
