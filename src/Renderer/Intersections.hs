@@ -115,14 +115,16 @@ intersection r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
                               t2 = (-b - sqrd)/(2*a)
                               oy = getY4D $ rOrigin r
                               dy = getY4D $ rDirection r
-                              t = min (-oy / dy) ((1 - oy) / dy)
-                              t' = max (-oy / dy) ((1 - oy) / dy)
-                              sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
-                              bottomHit = magnitudeSquared (k + scaleF t dir)
-                              topHit = magnitudeSquared (k + scaleF t' dir)
-                              i1 = if topHit < 1.0 then t' else if t2 <= t' && t2 >= t then t2 else t1
-                              i2 = if bottomHit < 1.0 then t else if t1 <= t' && t1 >= t then t1 else t2
-                          in [(i1, i2)]
+                              delta1 = min (-oy / dy) ((1 - oy) / dy)
+                              delta2 = max (-oy / dy) ((1 - oy) / dy)
+                              tBottom = delta1 * (magnitudeSquared $ dropW $ rDirection r)
+                              tTop = delta2 * (magnitudeSquared $ dropW $ rDirection r)
+                              sideHit = (t1 <= tTop && t1 >= tBottom) || (t2 <= tTop && t2 >= tBottom)
+                              bottomHit = magnitudeSquared (k + scaleF tBottom dir)
+                              topHit = magnitudeSquared (k + scaleF tTop dir)
+                              i1 = if topHit < 1.0 then tTop else if t2 <= tTop && t2 >= tBottom then t2 else t1
+                              i2 = if bottomHit < 1.0 then tBottom else if t1 <= tTop && t1 >= tBottom then t1 else t2
+                          in if i1 < 0 || i2 < 0 then [] else [(i1 `min` i2, i1 `max` i2)]
                           
 --Formula from http://www.devmaster.net/wiki/Ray-sphere_intersection, took out the k = (o-c) constant with c = (0,0,0).
 
@@ -151,3 +153,5 @@ intersectionInfo ray object = IntersectionInfo
                                 , distance = undefined --fst . head $ intersection r Sphere
                                 , uv       = (0.5, 0.5)
                                 }
+
+test (Ray o d) = map (\(x,y) -> (x, o + scaleF x d, y, o + scaleF y d)) (intersection (Ray o d) Cylinder)
