@@ -6,8 +6,9 @@ import Data.Vector (Vector4D(..))
 import Output.Output (toSize)
 import Output.PPM (toPPM)
 
-import Renderer.Intersections (hit')
+import Renderer.Intersections -- (hit')
 import Renderer.Scene 
+import Renderer.Shaders
 
 
 import Control.Concurrent (forkIO)
@@ -72,9 +73,12 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position.
 --
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
-renderPixel x y ray object = if hit' (ray x y) object then white else black 
-  where (white, black) = (Colour (255,255,255), Colour(0,0,0))
-
+renderPixel x y ray object = let info = intersectionInfo (ray x y) object
+                              in if isAHit info
+                                 then let (u, v) = uv info
+                                          colour = uvShader (undefined, u, v)
+                                       in colour
+                                 else Colour (  0,   0,   0)
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
