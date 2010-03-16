@@ -7,7 +7,6 @@ import qualified Data.Map        as Map
 import           Data.Vector
 
 import qualified Base.Light      as Light
-import qualified Base.Shader     as Shader
 import qualified Base.Shape      as Shape
 
 import           Test.QuickCheck

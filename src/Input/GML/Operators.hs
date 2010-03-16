@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, PackageImports #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Input.GML.Operators (operators,runOp,Operator) where
 
@@ -15,8 +15,6 @@ import qualified Base.Light        as Light
 import qualified Base.Shape        as Shape
 
 import           Input.GML.AST               hiding (State)
-import           Input.GML.Scene
-import           Input.GML.Shaders
 
 type Op = StateT Stack (Either String) 
 

@@ -3,7 +3,6 @@ module Main where
 import Control.Applicative ((<$>))
 
 import Input.GML.Parser
-import Input.GML.Scene
 import Input.GML.Evaluate
 import Input.GML.ToRenderObject
 --

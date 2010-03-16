@@ -9,7 +9,7 @@ import Output.PPM (toPPM)
 
 import Base.Shader
 
-import Renderer.Intersections -- (hit')
+import Renderer.Intersections
 import Renderer.Scene 
 import Renderer.Shaders
 
@@ -80,7 +80,7 @@ renderPixel x y ray object = let info = intersectionInfo (ray x y) object
                               in if isAHit info
                                  then let (u, v)          = uv info
                                           surfaceProperty = runShader uvShader (undefined, u, v)
-                                       in toRGB $ colour surfaceProperty
+                                       in toRGB $ surfaceColour surfaceProperty
                                  else if even (x+y)
                                       then Colour (  0,   0,   0)
                                       else Colour (255,   0, 255)
