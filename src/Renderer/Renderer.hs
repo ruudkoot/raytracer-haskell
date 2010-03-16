@@ -2,6 +2,7 @@ module Renderer.Renderer (render) where
 
 import Data.Colour (Colour(..), Colours, toRGB)
 import Data.Vector (Vector4D(..))
+import Data.Radians
 
 import Output.Output (toSize)
 import Output.PPM (toPPM)
@@ -99,7 +100,7 @@ saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
 getRayMaker :: World -> RayMaker 
 getRayMaker world = mkRayMaker x y delta
   where (w,h) = getDimensions world
-        (x,y) = (tan(0.5 * fov), x * fromIntegral h / fromIntegral w)
+        (x,y) = (tan(0.5 * (radians fov)), x * fromIntegral h / fromIntegral w)
         delta = 2 * x / fromIntegral w
         fov = roFov (wOptions world)
 

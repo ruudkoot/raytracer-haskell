@@ -6,12 +6,12 @@ import           Data.Colour
 import           Data.Radians
 
 import qualified Input.GML.AST      as GML
-import qualified Input.GML.Evaluate as GML.Shader
+import qualified Input.GML.Evaluate as Evil
 import qualified Renderer.Scene     as Renderer
 
 toRenderObject :: GML.Object -> Renderer.Object
 toRenderObject = flip (GML.foldObject algebra) identity4D
-    where algebra = ( \shape closure matrix -> Renderer.Simple shape matrix (inverse matrix) (GML.Shader.gmlShader closure)
+    where algebra = ( \shape closure matrix -> Renderer.Simple shape matrix (inverse matrix) (Evil.shader closure)
                     , \o d1 d2 d3    matrix -> o (matrix !*! translate d1 d2 d3)
                     , \o d1 d2 d3    matrix -> o (matrix !*! diagonal4D (Vector4D (d1, d2, d3, 1)))
                     , \o d           matrix -> o (matrix !*! diagonal4D (Vector4D (d, d, d, 1)))
