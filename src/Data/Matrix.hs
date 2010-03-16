@@ -6,10 +6,10 @@ module Data.Matrix where
 
 
 import Control.Applicative
-import Control.Monad
+import Control.Monad (liftM3, liftM4)
 import Test.QuickCheck
 import Data.List (intercalate, transpose)
-import Data.Vector (Vector, Vector3D(..), Vector4D(..), (<.>), fromVector)
+import Data.Vector (Vector, Vector3D(..), Vector4D(..), (!.!), fromVector)
 
 
 -- * Matrices
@@ -195,10 +195,10 @@ class Multiplicable a b where
 -- | Matrix * Vector
 --
 instance (Num a) => Multiplicable (Matrix3D a) (Vector3D a) where 
-  Matrix3D (mx, my, mz) !*! v = Vector3D (mx <.> v, my <.> v, mz <.> v)
+  Matrix3D (mx, my, mz) !*! v = Vector3D (mx !.! v, my !.! v, mz !.! v)
 
 instance (Num a) => Multiplicable (Matrix4D a) (Vector4D a) where 
-  Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
+  Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx !.! v, my !.! v, mz !.! v, mw !.! v)
 
 
 -- | Matrix * Matrix

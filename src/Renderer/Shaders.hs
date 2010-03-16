@@ -35,3 +35,14 @@ perlin c1 c2 = undefined
 gradient3D :: ColourD -> ColourD -> ColourD -> Shader
 gradient3D c1 c2 c3 = undefined
 
+
+{------------------------------------------------------------------------------}
+
+type Face = Int
+
+uvShader :: (Face, Double, Double) -> Colour Int
+uvShader (face, u, v) = Colour (round $ 255.0 * u, round $ 255.0 * v, 0)
+
+--gmlShader :: Closure -> (Face, Double, Double) -> Shader
+--gmlShader closure (face, u, v) = 
+
