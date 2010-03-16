@@ -1,10 +1,13 @@
 module Renderer.Renderer (render) where
 
-import Data.Colour (Colour(..), Colours)
+import Data.Colour (Colour(..), Colours, toRGB)
 import Data.Vector (Vector4D(..))
+import Data.Radians
 
 import Output.Output (toSize)
 import Output.PPM (toPPM)
+
+import Base.Shader
 
 import Renderer.Intersections -- (hit')
 import Renderer.Scene 
@@ -75,10 +78,12 @@ renderScene world = saveRendering world pixels
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
 renderPixel x y ray object = let info = intersectionInfo (ray x y) object
                               in if isAHit info
-                                 then let (u, v) = uv info
-                                          colour = uvShader (undefined, u, v)
-                                       in colour
-                                 else Colour (  0,   0,   0)
+                                 then let (u, v)          = uv info
+                                          surfaceProperty = runShader uvShader (undefined, u, v)
+                                       in toRGB $ colour surfaceProperty
+                                 else if even (x+y)
+                                      then Colour (  0,   0,   0)
+                                      else Colour (255,   0, 255)
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
@@ -95,7 +100,7 @@ saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
 getRayMaker :: World -> RayMaker 
 getRayMaker world = mkRayMaker x y delta
   where (w,h) = getDimensions world
-        (x,y) = (tan(0.5 * fov), x * fromIntegral h / fromIntegral w)
+        (x,y) = (tan(0.5 * (radians fov)), x * fromIntegral h / fromIntegral w)
         delta = 2 * x / fromIntegral w
         fov = roFov (wOptions world)
 

@@ -4,8 +4,8 @@ module Input.GML.Operators (operators,runOp,Operator) where
 
 import Control.Applicative
 import Control.Monad
-import "mtl" Control.Monad.State
-import "mtl" Control.Monad.Error
+import Control.Monad.State
+import Control.Monad.Error
 
 import Data.Maybe
 import Data.Map                              hiding (map)
@@ -172,11 +172,11 @@ operators = fromList [ ( "addi"      ,       iii (+)                    ) -- num
                      , ( "point"     ,      rrrp (\x y z -> Vector3D (x, y, z)))
                      , ( "get"       ,       aiv (!!)                   ) -- arrays
                      , ( "length"    ,        ai length                 )
-                     , ( "sphere"    ,        co (Simple Shape.Sphere   . gmlShader)) -- Primitive Objects
-                     , ( "cube"      ,        co (Simple Shape.Cube     . gmlShader))
-                     , ( "cylinder"  ,        co (Simple Shape.Cylinder . gmlShader))
-                     , ( "cone"      ,        co (Simple Shape.Cone     . gmlShader))
-                     , ( "plane"     ,        co (Simple Shape.Plane    . gmlShader))
+                     , ( "sphere"    ,        co (Simple Shape.Sphere  )) -- Primitive Objects
+                     , ( "cube"      ,        co (Simple Shape.Cube    ))
+                     , ( "cylinder"  ,        co (Simple Shape.Cylinder))
+                     , ( "cone"      ,        co (Simple Shape.Cone    ))
+                     , ( "plane"     ,        co (Simple Shape.Plane   ))
                      , ( "translate" ,     orrro Translate              ) --Transformations
                      , ( "scale"     ,     orrro Scale                  ) 
                      , ( "uscale"    ,       oro UScale                 )
