@@ -9,7 +9,15 @@ import Base.Shape
 import Renderer.Scene
 
 
-type Intersection = (Double, Double) -- Enters at x, leaves at y
+type Intersection      = (Double, Double) -- Enters at x, leaves at y
+
+data IntersectionInfo = IntersectionInfo
+    { isAHit   :: Bool
+    , location :: Pt3D
+    , normal   :: Pt3D
+    , distance :: Double
+    , uv       :: (Double, Double)
+    }
 
 hit' :: Ray -> Object -> Bool
 hit' (Ray o d) (Simple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
@@ -30,7 +38,7 @@ hit r Cube     = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                      tmin = max txl $ max tyl tzl
                      tmax = min txh $ min tyh tzh
                  in tmin < tmax && tmin < 1.0 && tmax > 0.0
-                                         
+
 hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      k = Vector4D (1, 0, 1, 0) * rOrigin r
                      a = dir <.> dir
@@ -83,6 +91,7 @@ hit r Plane    = let oy = getY4D $ rOrigin r
 hitSquareZ::Ray->Bool
 hitSquareZ r = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                    (dx,dy,dz,_) = fromVector4D $ rDirection r
+                   
                in if (oz == 0) || (oz * dz >= 0) 
                   then False
                   else let t = -oz/dz
@@ -112,5 +121,13 @@ intersection r Cone     = undefined
 intersection r Plane    = let oy = getY4D $ rOrigin r
                               dy = getY4D $ rDirection r
                           in if (oy == 0) || (oy * dy >= 0) then [] else [(- oy / dy, - oy / dy)]
+                          
 
-
+intersectionInfo :: Ray -> Shape -> IntersectionInfo
+intersectionInfo r Sphere = IntersectionInfo
+                                { isAHit   = hit r Sphere
+                                , location = undefined
+                                , normal   = undefined
+                                , distance = fst . head $ intersection r Sphere
+                                , uv       = (0.5, 0.5)
+                                }

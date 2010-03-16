@@ -4,7 +4,6 @@ import           Data.Matrix
 import           Data.Vector
 import           Data.Colour
 
-import           Base.Shader
 import qualified Input.GML.Scene as GML
 import qualified Renderer.Scene  as Renderer
 
