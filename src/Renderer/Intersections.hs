@@ -11,6 +11,8 @@ import Data.Vector
 import Renderer.Scene
 import Renderer.UV
 
+import Debug.Trace
+
 type Intersection      = (Double, Double) -- Enters at x, leaves at y
 
 data IntersectionInfo = IntersectionInfo
@@ -172,11 +174,13 @@ intersectionInfo ray object = IntersectionInfo
                                 , distance = undefined --fst . head $ intersection r Sphere
                                 , uv       = (u,v)
                                 }
-  where (_, u, v) = uvSphere . (\v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) $ loc
-        distance = case intersection ray Sphere of
-                        []        -> 8
-                        ((a,_):_) -> a
-        loc      = instantiate ray distance
+  where (_, u, v) = trace (show its ++ "hit: " ++ (show (hit' ray object))) $
+                    case its of
+                      []        -> (0, 0, 0)
+                      ((a,_):_) -> uvSphere loc
+        its = intersection ray Sphere
+        loc = (\ v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) 
+                $ instantiate ray (fst $ head its)
 
 -- | Instantiates a ray starting on some point and calculates the ending point
 --   given a certain t.

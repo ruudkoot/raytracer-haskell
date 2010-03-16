@@ -5,14 +5,17 @@ import Base.Shape
 
 import Data.Vector
 
-
+import Debug.Trace
 ------------------------------------------------------------------------------
 
 uvSphere :: Pt3D -> SurfaceCoord
 uvSphere loc = let theta = acos  ( getY3D loc )
                    phi   = atan2 ( getX3D loc ) (getZ3D loc) - pi
                    pi2   = 2*pi
-               in ( 0               -- face
+                   u     = phi / pi2
+                   v     = pi - theta / pi
+               in trace (show loc  ++ " -> " ++ show u ++ " " ++ show v) 
+                  $ ( 0               -- face
                   , phi / pi2       -- u
                   , pi - theta / pi -- v
                   )

@@ -15,5 +15,5 @@ scene
 60.0
 200
 200
-"foo.ppm"
+"target/foo.ppm"
 render
