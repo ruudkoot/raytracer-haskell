@@ -125,12 +125,11 @@ intersection r Plane    = let oy = getY4D $ rOrigin r
                               dy = getY4D $ rDirection r
                           in if (oy == 0) || (oy * dy >= 0) then [] else [(- oy / dy, - oy / dy)]
                           
-
-intersectionInfo :: Ray -> Shape -> IntersectionInfo
-intersectionInfo r Sphere = IntersectionInfo
-                                { isAHit   = hit r Sphere
+intersectionInfo :: Ray -> Object -> IntersectionInfo
+intersectionInfo ray object = IntersectionInfo
+                                { isAHit   = hit' ray object
                                 , location = undefined
                                 , normal   = undefined
-                                , distance = fst . head $ intersection r Sphere
+                                , distance = undefined --fst . head $ intersection r Sphere
                                 , uv       = (0.5, 0.5)
                                 }
