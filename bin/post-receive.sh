@@ -40,6 +40,6 @@ title "Linting" &&
 find -name "*.hs" | xargs hlint 
 
 # Run tests (configure with UserHooks)
-title "Running Tests..COMING SOON" &&
+title "Running Tests." &&
 cd src &&
 find Tests -name "*.hs" | xargs ../bin/quickCheck
