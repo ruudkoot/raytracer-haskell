@@ -4,6 +4,8 @@
 -- 
 module Data.Colour where 
 
+import Data.Vector (Vector3D(..))
+
 -- * Synonyms
 type ColourD = Colour Double
 
@@ -38,3 +40,6 @@ clampColour mi ma (Colour (r, g, b)) = Colour (c r, c g, c b)
 clampedList :: Ord a => a -> a -> Colour a -> [a]
 clampedList mi ma = colourToList . clampColour mi ma
 
+
+fromVector :: Vector3D a -> Colour a
+fromVector (Vector3D (a, b, c)) = Colour (a, b, c)

@@ -43,8 +43,8 @@ hit r Cube     = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                      tmax = min txh $ min tyh tzh
                  in tmin < tmax && tmin < 1.0 && tmax > 0.0
 
-hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
-                     k = Vector4D (1, 0, 1, 0) * rOrigin r
+hit r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
+                     k = dropW $ Vector4D (1, 0, 1, 0) * rOrigin r
                      a = dir !.! dir
                      b = 2.0 * (k !.! dir)
                      c = (k !.! k) - 1.0
@@ -57,7 +57,7 @@ hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      t = min (-oy / dy) ((1 - oy) / dy)
                      t' = max (-oy / dy) ((1 - oy) / dy)
                      sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
-                     bottomHit = magnitudeSquared (k + dir * Vector4D (t, t, t, 1)) <= 1
+                     bottomHit = magnitudeSquared (k + scaleF t dir) <= 1
                      --topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
                  in sideHit || bottomHit
 hit r Sphere   = let dir = dropW $ rDirection r
@@ -94,7 +94,7 @@ hit r Cone     = let dir = Vector4D (1, 0, 1, 0) * rDirection r
 hit r Plane    = let oy = getY4D $ rOrigin r
                      dy = getY4D $ rDirection r
                  in (oy == 0) || (oy * dy < 0)
-
+{-
 type IntersectionRange = (IntersectionInfo,IntersectionInfo)
 
 intersect' :: Ray -> Object -> Bool
@@ -102,46 +102,7 @@ intersect' (Ray o d) (Simple s _ minv _) = intersection (Ray (minv !*! o) (minv 
 intersect' ray       (Union  l r)        = intersect' ray l ++ intersect' ray r
 intersect' ray       (Difference  l r)   = intersect' ray l && not (intersect' ray r)
 intersect' ray       (Intersect  l r)    = intersect' ray l && intersect' ray r
-
-unionRange::IntersectionRange -> IntersectionRange -> [IntersectionRange]
-unionRange (i1l,i1h) (i2l, i2h) = if i1l < i2l --Which one is lowest?
-                                  then if i1h > i2l --Overlap?
-                                       then if i1h > i2h --Complete overlap?
-                                            then [(i1l,i1h)] --i1 Encapsulates i2
-                                            else [(i1l,i2h)] 
-                                       else [(i1l,i1h),(i2l, i2h)] --No overlap
-                                  else if i2h > i1l --Overlap?
-                                       then if i2h > i1h --Complete overlap?
-                                            then [(i2l,i2h)] --i2 Encapsulates i1
-                                            else [(i2l,i1h)] 
-                                       else [(i1l,i1h),(i2l, i2h)] --No overlap
-
-intersectionRange::IntersectionRange -> IntersectionRange -> [IntersectionRange]
-intersectionRange (i1l,i1h) (i2l, i2h) =  if i1l < i2l --Which one is lowest?
-                                          then if i1h > i2l --Overlap?
-                                               then if i1h > i2h --Complete overlap?
-                                                    then [(i2l,i2h)] --i1 Encapsulates i2
-                                                    else [(i1h,i2l)] 
-                                               else [] --No overlap
-                                          else if i2h > i1l --Overlap?
-                                               then if i2h > i1h --Complete overlap?
-                                                    then [(i1l,i1h)] --i2 Encapsulates i1
-                                                    else [(i2h,i1l)] 
-                                               else [] --No overlap
-
-differenceRange::IntersectionRange -> IntersectionRange -> [IntersectionRange]
-differenceRange (i1l,i1h) (i2l, i2h) =  if i1l < i2l --Which one is lowest?
-                                        then if i1h > i2l --Overlap?
-                                             then if i1h > i2h --Complete overlap?
-                                                  then [(i1l,i2l),(i1h,i2h)] --i1 Encapsulates i2
-                                                  else [(i1l,i2l)] 
-                                             else [(i1l,i1h)] --No overlap
-                                        else if i2h > i1l --Overlap?
-                                             then if i2h > i1h --Complete overlap?
-                                                  then [] --i2 Encapsulates i1
-                                                  else [(i1h,i2h)] 
-                                             else [(i1l,i2l)] --No overlap
-
+-}
 
 intersection :: Ray -> Shape -> [Intersection]
 
@@ -158,25 +119,28 @@ intersection r Cube    = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                              (tzl,tzh) = calcMinMax oz dz
                              tmin = max txl $ max tyl tzl
                              tmax = min txh $ min tyh tzh
-                             ishit = tmin <= tmax
-                             ishitrange = ishit && tmin <= 1.0 && tmax >= 0.0
-                         in if ishit
-                            then [IntersectionInfo { distance = tmin
-                                                   , isAHit   = ishitrange
-                                                   , location = undefined
-                                                   , normal   = undefined
-                                                   , uv       = undefined
-                                                   }
-                                 ,IntersectionInfo { distance = tmax
-                                                   , isAHit   = ishitrange
-                                                   , location = undefined
-                                                   , normal   = undefined
-                                                   , uv       = undefined
-                                                   }]
-                            else []
+                         in if tmin<=tmax then [(tmin,tmax)] else []
 
-intersection r Cylinder = undefined
-
+intersection r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
+                              k = dropW $ Vector4D (1, 0, 1, 0) * rOrigin r
+                              a = dir !.! dir
+                              b = 2.0 * (k !.! dir)
+                              c = (k !.! k) - 1.0
+                              d = b*b - 4.0*a*c
+                              sqrd = sqrt d
+                              t1 = (-b + sqrd)/(2*a)
+                              t2 = (-b - sqrd)/(2*a)
+                              oy = getY4D $ rOrigin r
+                              dy = getY4D $ rDirection r
+                              t = min (-oy / dy) ((1 - oy) / dy)
+                              t' = max (-oy / dy) ((1 - oy) / dy)
+                              sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
+                              bottomHit = magnitudeSquared (k + scaleF t dir)
+                              topHit = magnitudeSquared (k + scaleF t' dir)
+                              i1 = if topHit < 1.0 then t' else if t2 <= t' && t2 >= t then t2 else t1
+                              i2 = if bottomHit < 1.0 then t else if t1 <= t' && t1 >= t then t1 else t2
+                          in [(i1, i2)]
+                          
 --Formula from http://www.devmaster.net/wiki/Ray-sphere_intersection, took out the k = (o-c) constant with c = (0,0,0).
 
 intersection r Sphere   = let dir = rDirection r
