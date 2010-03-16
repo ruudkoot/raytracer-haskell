@@ -4,6 +4,8 @@
 module Data.Vector where
   
 import Control.Applicative 
+import Control.Monad
+import Test.QuickCheck
 
 -- * Synonyms
 type Pt3D  = Vector3D Double
@@ -85,6 +87,16 @@ instance Applicative Vector4D where
   pure x = Vector4D (x, x, x, x)
   Vector4D (f1, f2, f3, f4) <*> Vector4D (x, y, z, w) = Vector4D (f1 x, f2 y, f3 z, f4 w)
 
+
+
+instance Arbitrary a => Arbitrary (Vector2D a) where 
+  arbitrary = liftM2 (curry Vector2D) arbitrary arbitrary
+
+instance Arbitrary a => Arbitrary (Vector3D a) where 
+  arbitrary = liftM3 (\x y z -> Vector3D (x, y, z)) arbitrary arbitrary arbitrary 
+
+instance Arbitrary a => Arbitrary (Vector4D a) where 
+  arbitrary = liftM4 (\x y z w -> Vector4D (x, y, z, w)) arbitrary arbitrary arbitrary arbitrary
 
 
 -- * Out of the Vector* context
