@@ -43,7 +43,7 @@ data Ray = Ray
 
 
   
-data Object   = Simple Shape (Matrix4D Double) (Matrix4D Double) Shader -- Shape, transformation and inverse of transformation matrix
+data Object   = Simple { shape :: Shape, m1 :: (Matrix4D Double), m2 :: (Matrix4D Double), getShader :: Shader } -- Shape, transformation and inverse of transformation matrix
               | Union      Object Object
               | Intersect  Object Object
               | Difference Object Object

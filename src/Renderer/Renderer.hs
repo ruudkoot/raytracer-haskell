@@ -79,6 +79,7 @@ renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
 renderPixel x y ray object = let info = intersectionInfo (ray x y) object
                               in if isAHit info
                                  then let (u, v)          = uv info
+                                          lalaShader      = getShader object
                                           surfaceProperty = runShader uvShader (undefined, u, v)
                                        in toRGB $ surfaceColour surfaceProperty
                                  else if even (x+y)

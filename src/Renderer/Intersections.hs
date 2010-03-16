@@ -8,8 +8,6 @@ import Data.Ord
 import Data.Matrix
 import Data.Vector
 
-
-
 import Renderer.Scene
 import Renderer.UV
 
@@ -174,8 +172,10 @@ intersectionInfo ray object = IntersectionInfo
                                 , distance = undefined --fst . head $ intersection r Sphere
                                 , uv       = (u,v)
                                 }
-  where (_, u, v) = undefined
-        distance = fst . head $ intersection ray Sphere
+  where (_, u, v) = uvSphere . (\v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) $ loc
+        distance = case intersection ray Sphere of
+                        []        -> 8
+                        ((a,_):_) -> a
         loc      = instantiate ray distance
 
 -- | Instantiates a ray starting on some point and calculates the ending point
