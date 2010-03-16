@@ -7,6 +7,7 @@ import Data.Vector
 import Base.Shape
 
 import Renderer.Scene
+import Renderer.UV
 
 
 type Intersection      = (Double, Double) -- Enters at x, leaves at y
@@ -151,7 +152,7 @@ intersectionInfo ray object = IntersectionInfo
                                 , location = undefined
                                 , normal   = undefined
                                 , distance = undefined --fst . head $ intersection r Sphere
-                                , uv       = (0.5, 0.5)
+                                , uv       = uvSphere location
                                 }
 
 test (Ray o d) = map (\(x,y) -> (x, o + scaleF x d, y, o + scaleF y d)) (intersection (Ray o d) Cylinder)
