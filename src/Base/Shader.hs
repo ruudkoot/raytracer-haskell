@@ -14,7 +14,8 @@ data ShaderResult = ShaderResult
 
 newtype Shader = Shader (ShaderCoord -> ShaderResult)
 instance Show Shader where
-    show s = "Shader function"
+    show _ = "Shader function"
+
 instance Eq Shader where
-    (==) a b = error "Alessandro" --True
+    (==) _ _ = error "Alessandro" --True
 
