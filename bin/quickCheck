@@ -33,12 +33,12 @@ process opts file =
           if null names then
 	      putStr (file++": no properties to check\n")
 	    else do writeFile "hugsin"$
-	              unlines ((":l "++file):
+	              unlines ((":l "++file):[":m +Test.QuickCheck"] ++
 	                       [(if namesOpt=="+names" then 
 			           "putStr \""++p++": \" >> "
 				 else "") ++
-				"QuickCheck.quickCheck "++p | p<-names])
-	            system ("./ghci "++options opts'++" <hugsin")
+				"Test.QuickCheck.quickCheck "++p | p<-names])
+	            system ("ghci "++options opts'++" <hugsin")
 	            return ()
 
 isOption xs = head xs `elem` "-+"
