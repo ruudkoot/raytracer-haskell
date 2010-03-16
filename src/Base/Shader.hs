@@ -5,13 +5,13 @@ import Data.Colour
 type Face            = Int
 type SurfaceCoord    = (Face, Double, Double)
 data SurfaceProperty = SurfaceProperty
-    { colour                       :: ColourD
-    , diffuseReflectionCoefficient :: Double
+    { colour                        :: ColourD
+    , diffuseReflectionCoefficient  :: Double
     , specularReflectionCoefficient :: Double
-    , phongExponent                :: Double
+    , phongExponent                 :: Double
     }
 
-newtype Shader = Shader (SurfaceCoord -> SurfaceProperty)
+newtype Shader = Shader { runShader :: SurfaceCoord -> SurfaceProperty }
 
 instance Show Shader where
     show = const "<<shader>>"
