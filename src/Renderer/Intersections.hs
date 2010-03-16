@@ -65,7 +65,7 @@ hit r Sphere   = let dir = dropW $ rDirection r
                      sqrd = sqrt d
                      t1 = (-b + sqrd)/(2*a)
                      t2 = (-b - sqrd)/(2*a)
-                  in d >= 0 && (t1 >= 0 || t2 >= 0)
+                  in d >= 0 -- && (t1 >= 0 || t2 >= 0)
                         
 hit r Cone     = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      k = Vector4D (1, 0, 1, 0) * rOrigin r

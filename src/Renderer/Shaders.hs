@@ -14,7 +14,12 @@ green = solid 0    1.0  0
 blue  = solid 0    0    1.0
 
 solid :: Double -> Double -> Double -> Shader
-solid r g b = Shader (\_ -> ShaderResult (Colour (r,g,b)) 1.0 0.0 1.0)
+solid r g b = Shader ( const SurfaceProperty { colour                        = Colour (r, g, b)
+                                             , diffuseReflectionCoefficient  = 1.0
+                                             , specularReflectionCoefficient = 0.0
+                                             , phongExponent                 = 1.0
+                                             }
+                     )
 
 
 -- * 2D shaders
@@ -37,8 +42,6 @@ gradient3D c1 c2 c3 = undefined
 
 
 {------------------------------------------------------------------------------}
-
-type Face = Int
 
 uvShader :: (Face, Double, Double) -> Colour Int
 uvShader (face, u, v) = Colour (round $ 255.0 * u, round $ 255.0 * v, 0)
