@@ -6,6 +6,7 @@ module Data.Matrix where
 
 
 import Control.Applicative
+import Control.Monad (liftM3, liftM4)
 import Test.QuickCheck
 import Data.List (intercalate, transpose)
 import Data.Vector (Vector, Vector3D(..), Vector4D(..), (<.>), fromVector)

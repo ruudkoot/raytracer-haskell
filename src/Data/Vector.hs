@@ -4,7 +4,7 @@
 module Data.Vector where
   
 import Control.Applicative 
-import Control.Monad
+import Control.Monad (liftM2, liftM3, liftM4)
 import Test.QuickCheck
 
 -- * Synonyms
