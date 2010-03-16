@@ -90,13 +90,13 @@ instance Applicative Vector4D where
 
 
 instance Arbitrary a => Arbitrary (Vector2D a) where 
-  arbitrary = liftM2 (curry Vector2D) arbitrary arbitrary
+  arbitrary = liftM2 toVec2D arbitrary arbitrary
 
 instance Arbitrary a => Arbitrary (Vector3D a) where 
-  arbitrary = liftM3 (\x y z -> Vector3D (x, y, z)) arbitrary arbitrary arbitrary 
+  arbitrary = liftM3 toVec3D arbitrary arbitrary arbitrary 
 
 instance Arbitrary a => Arbitrary (Vector4D a) where 
-  arbitrary = liftM4 (\x y z w -> Vector4D (x, y, z, w)) arbitrary arbitrary arbitrary arbitrary
+  arbitrary = liftM4 toVec4D arbitrary arbitrary arbitrary arbitrary
 
 
 -- * Into the Vector* context 
