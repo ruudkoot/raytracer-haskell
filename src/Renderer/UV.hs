@@ -1,7 +1,6 @@
 module Renderer.UV where
 
 import Base.Shader
-import Base.Shape
 
 import Data.Vector
 
@@ -25,7 +24,8 @@ uvSphere loc = let y = getY3D loc
                    z = getZ3D loc
                    v = 2*y + 2
                    u = acos (z / sqrt (1 - y*y)) / 360
-                in (0, u, v)
+                in trace (show loc ++ " -> " ++ show (u,v)) $ 
+                         (0, u, v)
 
 
 uvPlane :: Pt3D -> SurfaceCoord
@@ -39,4 +39,6 @@ uvCube loc = case fromVector3D loc of
                (1, v, u) -> (3, u, v) -- right
                (u, 0, v) -> (4, u, v) -- top
                (u, 1, v) -> (5, u, v) -- bottom 
-
+               _         -> error $ "Loc (" ++ show loc ++ ") is not a valid "
+                                    ++ "cube coordinate... What where you "
+                                    ++ "thinking?"
