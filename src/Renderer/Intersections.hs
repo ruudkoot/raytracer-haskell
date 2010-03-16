@@ -39,8 +39,8 @@ hit r Cube     = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                      tmax = min txh $ min tyh tzh
                  in tmin < tmax && tmin < 1.0 && tmax > 0.0
 
-hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
-                     k = Vector4D (1, 0, 1, 0) * rOrigin r
+hit r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
+                     k = dropW $ Vector4D (1, 0, 1, 0) * rOrigin r
                      a = dir !.! dir
                      b = 2.0 * (k !.! dir)
                      c = (k !.! k) - 1.0
@@ -53,7 +53,7 @@ hit r Cylinder = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      t = min (-oy / dy) ((1 - oy) / dy)
                      t' = max (-oy / dy) ((1 - oy) / dy)
                      sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
-                     bottomHit = magnitudeSquared (k + dir * Vector4D (t, t, t, 1)) <= 1
+                     bottomHit = magnitudeSquared (k + scaleF t dir) <= 1
                      --topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
                  in sideHit || bottomHit
 hit r Sphere   = let dir = dropW $ rDirection r
@@ -104,8 +104,26 @@ hitSquareZ r = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                 
 intersection :: Ray -> Shape -> [Intersection]
 intersection r Cube     = undefined
-intersection r Cylinder = undefined
-
+intersection r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
+                              k = dropW $ Vector4D (1, 0, 1, 0) * rOrigin r
+                              a = dir !.! dir
+                              b = 2.0 * (k !.! dir)
+                              c = (k !.! k) - 1.0
+                              d = b*b - 4.0*a*c
+                              sqrd = sqrt d
+                              t1 = (-b + sqrd)/(2*a)
+                              t2 = (-b - sqrd)/(2*a)
+                              oy = getY4D $ rOrigin r
+                              dy = getY4D $ rDirection r
+                              t = min (-oy / dy) ((1 - oy) / dy)
+                              t' = max (-oy / dy) ((1 - oy) / dy)
+                              sideHit = (t1 <= t' && t1 >= t) || (t2 <= t' && t2 >= t)
+                              bottomHit = magnitudeSquared (k + scaleF t dir)
+                              topHit = magnitudeSquared (k + scaleF t' dir)
+                              i1 = if topHit < 1.0 then t' else if t2 <= t' && t2 >= t then t2 else t1
+                              i2 = if bottomHit < 1.0 then t else if t1 <= t' && t1 >= t then t1 else t2
+                          in [(i1, i2)]
+                          
 --Formula from http://www.devmaster.net/wiki/Ray-sphere_intersection, took out the k = (o-c) constant with c = (0,0,0).
 
 intersection r Sphere   = let dir = rDirection r
