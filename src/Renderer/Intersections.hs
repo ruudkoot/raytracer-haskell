@@ -1,14 +1,15 @@
 module Renderer.Intersections where
 
+import Base.Shape
+
+import Control.Applicative
+
 import Data.Ord
 import Data.Matrix
 import Data.Vector
 
-import Base.Shape
-
 import Renderer.Scene
 import Renderer.UV
-
 
 type Intersection      = (Double, Double) -- Enters at x, leaves at y
 
@@ -152,7 +153,18 @@ intersectionInfo ray object = IntersectionInfo
                                 , location = undefined
                                 , normal   = undefined
                                 , distance = undefined --fst . head $ intersection r Sphere
-                                , uv       = uvSphere location
+                                , uv       = (u,v)
                                 }
+  where (_, u, v) = uvSphere . (\v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) $ loc
+        distance = case intersection ray Sphere of
+                        []        -> 8
+                        ((a,_):_) -> a
+        loc      = instantiate ray distance
 
 test (Ray o d) = map (\(x,y) -> (x, o + scaleF x d, y, o + scaleF y d)) (intersection (Ray o d) Cylinder)
+
+-- | Instantiates a ray starting on some point and calculates the ending point
+--   given a certain t.
+instantiate :: Ray -> Double -> Vec4D
+instantiate (Ray origin direction) t = origin + fmap (t *) direction
+
