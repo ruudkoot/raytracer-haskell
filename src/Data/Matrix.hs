@@ -6,10 +6,10 @@ module Data.Matrix where
 
 
 import Control.Applicative
-import Control.Monad
+import Control.Monad (liftM3, liftM4)
 import Test.QuickCheck
 import Data.List (intercalate, transpose)
-import Data.Vector (Vector, Vector3D(..), Vector4D(..), (<.>), fromVector)
+import Data.Vector (Vector, Vector3D(..), Vector4D(..), (!.!), fromVector)
 
 
 -- * Matrices
@@ -157,8 +157,8 @@ rotateZ d = Matrix4D(Vector4D( cos d, -sin d,  0,  0),
 
 translate :: Num a => a -> a -> a -> Matrix4D a
 translate a b c = Matrix4D( Vector4D(1, 0, 0, a)
-                          , Vector4D(0, 1, 0, b)
-                          , Vector4D(0, 0, 1, c)
+                          , Vector4D(0, 1, 0, -b)
+                          , Vector4D(0, 0, 1, -c)
                           , Vector4D(0, 0, 0, 1))
 
 -- * Matrix Operations
@@ -195,10 +195,10 @@ class Multiplicable a b where
 -- | Matrix * Vector
 --
 instance (Num a) => Multiplicable (Matrix3D a) (Vector3D a) where 
-  Matrix3D (mx, my, mz) !*! v = Vector3D (mx <.> v, my <.> v, mz <.> v)
+  Matrix3D (mx, my, mz) !*! v = Vector3D (mx !.! v, my !.! v, mz !.! v)
 
 instance (Num a) => Multiplicable (Matrix4D a) (Vector4D a) where 
-  Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
+  Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx !.! v, my !.! v, mz !.! v, mw !.! v)
 
 
 -- | Matrix * Matrix

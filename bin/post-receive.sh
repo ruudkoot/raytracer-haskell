@@ -22,9 +22,6 @@ title "Building Program" &&
 cd .. && 
 cabal install --enable-executable-profiling && 
 
-# Run tests (configure with UserHooks)
-title "Running Tests [TODO]" &&
-
 # Generate Haddock documentation
 title "Generating Haddock Documentation" &&
 cabal --executable haddock &&
@@ -42,3 +39,7 @@ echo "  Browse haddock documentation at: http://projects.spockz.nl/projects/afp2
 title "Linting" && 
 find -name "*.hs" | xargs hlint 
 
+# Run tests (configure with UserHooks)
+title "Running Tests." &&
+cd src &&
+find Tests -name "*.hs" | xargs ../bin/quickCheck
