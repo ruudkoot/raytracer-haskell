@@ -4,6 +4,8 @@
 module Data.Vector where
   
 import Control.Applicative 
+import Control.Monad (liftM2, liftM3, liftM4)
+import Test.QuickCheck
 
 -- * Synonyms
 type Pt3D  = Vector3D Double
@@ -85,6 +87,16 @@ instance Applicative Vector4D where
   pure x = Vector4D (x, x, x, x)
   Vector4D (f1, f2, f3, f4) <*> Vector4D (x, y, z, w) = Vector4D (f1 x, f2 y, f3 z, f4 w)
 
+
+
+instance Arbitrary a => Arbitrary (Vector2D a) where 
+  arbitrary = liftM2 (curry Vector2D) arbitrary arbitrary
+
+instance Arbitrary a => Arbitrary (Vector3D a) where 
+  arbitrary = liftM3 (\x y z -> Vector3D (x, y, z)) arbitrary arbitrary arbitrary 
+
+instance Arbitrary a => Arbitrary (Vector4D a) where 
+  arbitrary = liftM4 (\x y z w -> Vector4D (x, y, z, w)) arbitrary arbitrary arbitrary arbitrary
 
 
 -- * Out of the Vector* context
@@ -215,8 +227,8 @@ instance (Fractional a) => Fractional (Vector4D a) where
 -- of numbers  and returns a single number obtained by multiplying 
 -- corresponding entries and adding up those products. 
 --
-(<.>) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
-v1 <.> v2 = foldVector sum (v1 * v2)
+(!.!) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
+v1 !.! v2 = foldVector sum (v1 * v2)
 
 -- | The cross product is a binary operation on two 3D vectors 
 -- that results in another vector which is perpendicular to 
@@ -232,12 +244,12 @@ cross (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) =
 -- | Calculates the length or magnitude of the given Vector.
 --
 magnitude :: (Vector v, Floating a, Num (v a)) => v a -> a
-magnitude v = sqrt (v <.> v)
+magnitude v = sqrt (v !.! v)
 
 -- | Calculates the length or magnitude squared of the given Vector.
 --
 magnitudeSquared :: (Vector v, Floating a, Num (v a)) => v a -> a
-magnitudeSquared v = v <.> v
+magnitudeSquared v = v !.! v
 
 -- | A version of magnitude for Integrals. 
 -- Probably not needed.

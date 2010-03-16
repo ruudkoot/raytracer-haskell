@@ -6,8 +6,10 @@ module Data.Matrix where
 
 
 import Control.Applicative
+import Control.Monad (liftM3, liftM4)
+import Test.QuickCheck
 import Data.List (intercalate, transpose)
-import Data.Vector (Vector, Vector3D(..), Vector4D(..), (<.>), fromVector)
+import Data.Vector (Vector, Vector3D(..), Vector4D(..), (!.!), fromVector)
 
 
 -- * Matrices
@@ -61,6 +63,12 @@ instance Applicative Matrix4D where
   Matrix4D (fx, fy, fz, fa) <*> Matrix4D (x, y, z, a) = 
     Matrix4D (fx <*> x, fy <*> y, fz <*> z, fa <*> a)
 
+
+instance Arbitrary a => Arbitrary (Matrix3D a) where 
+  arbitrary = liftM3 (\x y z -> Matrix3D (x, y, z)) arbitrary arbitrary arbitrary
+
+instance Arbitrary a => Arbitrary (Matrix4D a) where 
+  arbitrary = liftM4 (\x y z w -> Matrix4D (x, y, z, w)) arbitrary arbitrary arbitrary arbitrary
 
 -- | Instance declarations for Nums.
 -- Note that (*) doesn't do proper matrix multiplication, 
@@ -187,10 +195,10 @@ class Multiplicable a b where
 -- | Matrix * Vector
 --
 instance (Num a) => Multiplicable (Matrix3D a) (Vector3D a) where 
-  Matrix3D (mx, my, mz) !*! v = Vector3D (mx <.> v, my <.> v, mz <.> v)
+  Matrix3D (mx, my, mz) !*! v = Vector3D (mx !.! v, my !.! v, mz !.! v)
 
 instance (Num a) => Multiplicable (Matrix4D a) (Vector4D a) where 
-  Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx <.> v, my <.> v, mz <.> v, mw <.> v)
+  Matrix4D (mx, my, mz, mw) !*! v = Vector4D (mx !.! v, my !.! v, mz !.! v, mw !.! v)
 
 
 -- | Matrix * Matrix
