@@ -20,7 +20,7 @@ title "Updating RedMine Clone" &&
 # Build programme
 title "Building Program" &&
 cd .. && 
-cabal install && 
+cabal install --enable-executable-profiling && 
 
 # Run tests (configure with UserHooks)
 title "Running Tests [TODO]" &&
