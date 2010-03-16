@@ -2,20 +2,19 @@ module Base.Shader where
 
 import Data.Colour
 
--- ** Shaders
-type ShaderCoord = (Double,Double,Int)
-data ShaderResult = ShaderResult
-    {
-     srColor::ColourD
-    ,srKd::Double
-    ,srKs::Double
-    ,srPhong::Double
+type Face            = Int
+type SurfaceCoord    = (Face, Double, Double)
+data SurfaceProperty = SurfaceProperty
+    { colour                       :: ColourD
+    , diffuseReflectionCoefficient :: Double
+    , specularReflectionCoefficient :: Double
+    , phongExponent                :: Double
     }
 
-newtype Shader = Shader (ShaderCoord -> ShaderResult)
+newtype Shader = Shader (SurfaceCoord -> SurfaceProperty)
+
 instance Show Shader where
-    show _ = "Shader function"
+    show = const "<<shader>>"
 
 instance Eq Shader where
-    (==) _ _ = error "Alessandro" --True
-
+    (==) = error "cannot compare equality of shaders"

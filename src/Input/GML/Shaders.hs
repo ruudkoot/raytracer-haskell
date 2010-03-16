@@ -5,10 +5,13 @@ import Base.Shader
 
 import Input.GML.AST
 
-gmlShader::Closure -> Shader
-gmlShader (env,c) = Shader sf
-        where sf (u,v,face) = let 
-                              in ShaderResult (Colour (1.0,1.0,1.0)) 1.0 0.0 1.0
+gmlShader :: Closure -> Shader
+gmlShader (env, c) = Shader sf
+    where sf (face, u, v) = SurfaceProperty { colour                        = Colour (1.0, 1.0, 1.0)
+                                            , diffuseReflectionCoefficient  = undefined
+                                            , specularReflectionCoefficient = undefined
+                                            , phongExponent                 = undefined
+                                            }
 {-
 gmlShader::Closure -> Shader
 gmlShader (env,c) = Shader sf
