@@ -1,17 +1,19 @@
 module Renderer.Renderer (render) where
 
 import Data.Colour (Colour(..), Colours, toRGB)
-import Data.Vector (Vector4D(..))
+import Data.Vector (Vector4D(..), toVec3D, normalize)
 import Data.Radians
 
 import Output.Output (toSize)
 import Output.PPM (toPPM)
 
+import Base.Light
 import Base.Shader
 
 import Renderer.Intersections
 import Renderer.Scene 
 import Renderer.Shaders
+import Renderer.Lightning
 
 
 import Control.Concurrent (forkIO)
@@ -19,6 +21,10 @@ import Control.Concurrent.MVar
 import Control.Exception (finally)
 import Data.List (sort)
 import System.IO.Unsafe
+ 
+
+--- REMOVE@!!!! --- -
+import Debug.Trace
 
 
 -- | The number of threads to use in 
@@ -76,14 +82,21 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position.
 --
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
-renderPixel x y ray object = let info = intersectionInfo (ray x y) object
-                              in if isAHit info
-                                 then let (u, v)          = uv info
-                                          surfaceProperty = runShader uvShader (undefined, u, v)
-                                       in toRGB $ surfaceColour surfaceProperty
-                                 else if even (x+y)
-                                      then Colour (  0,   0,   0)
-                                      else Colour (255,   0, 255)
+renderPixel x y ray object 
+  = let info = intersectionInfo (ray x y) object
+    in if isAHit info
+       then let texturecoord    = textureCoord info
+                lalaShader      = getShader object
+                surfaceProperty = trace (show texturecoord) 
+                                        (runShader uvShader texturecoord)                                        
+             in toRGB $ localLightning info
+                                       [PointLight (toVec3D (-4) 4 0) (toVec3D 1 1 1)]   -- visible lights
+                                       surfaceProperty
+                                       -- (runShader lalaShader texturecoord)
+       else Colour (255, 255, 255)   
+       -- else if even (x+y)
+       --      then Colour (  0,   0,   0)
+       --      else Colour (255,   0, 255)
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
@@ -109,9 +122,10 @@ getRayMaker world = mkRayMaker x y delta
 --
 mkRayMaker :: Double -> Double -> Double -> RayMaker 
 mkRayMaker x y delta i j = Ray eye dir
-  where eye = Vector4D (0, 0, -1, 1)
-        dir = Vector4D (x - (fromIntegral j + 0.5) * delta,
-                        y - (fromIntegral i + 0.5) * delta, 1, 1)
+  where eye = Vector4D (0, 0, -5, 0)
+        dir = normalize $
+              Vector4D (x - (fromIntegral j + 0.5) * delta,
+                        y - (fromIntegral i + 0.5) * delta, 1, 0)
 
 
 

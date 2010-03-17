@@ -3,7 +3,6 @@
 module Input.GML.Operators (operators,runOp,Operator) where
 
 import Control.Applicative
-import Control.Monad
 import Control.Monad.State
 import Control.Monad.Error
 
@@ -52,7 +51,8 @@ pop = let cf []     = lift (throwError "Empty stack")
       
 popt :: (Value -> Maybe a) -> String -> Op a
 popt match etype 
-  = pop >>= maybe ((lift.throwError) ("Expected type: " ++ etype)) return . match
+  = let giveError = (lift.throwError) ("Expected type: " ++ etype)
+    in  pop >>= maybe giveError return . match
       
 popi = popt (\x -> case x of (BaseValue (Int  i)) -> Just i; _ -> Nothing)
        "Int"
