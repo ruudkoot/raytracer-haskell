@@ -19,6 +19,10 @@ import Control.Concurrent.MVar
 import Control.Exception (finally)
 import Data.List (sort)
 import System.IO.Unsafe
+ 
+
+--- REMOVE@!!!! --- -
+import Debug.Trace
 
 
 -- | The number of threads to use in 
@@ -80,7 +84,8 @@ renderPixel x y ray object = let info = intersectionInfo (ray x y) object
                               in if isAHit info
                                  then let (u, v)          = uv info
                                           lalaShader      = getShader object
-                                          surfaceProperty = runShader uvShader (undefined, u, v)
+                                          surfaceProperty = trace (show (u,v)) 
+                                                                  (runShader uvShader (undefined, u, v))
                                        in toRGB $ surfaceColour surfaceProperty
                                  else if even (x+y)
                                       then Colour (  0,   0,   0)
@@ -110,9 +115,9 @@ getRayMaker world = mkRayMaker x y delta
 --
 mkRayMaker :: Double -> Double -> Double -> RayMaker 
 mkRayMaker x y delta i j = Ray eye dir
-  where eye = Vector4D (0, 0, -1, 1)
+  where eye = Vector4D (0, 0, -1, 0)
         dir = Vector4D (x - (fromIntegral j + 0.5) * delta,
-                        y - (fromIntegral i + 0.5) * delta, 1, 1)
+                        y - (fromIntegral i + 0.5) * delta, 1, 0)
 
 
 

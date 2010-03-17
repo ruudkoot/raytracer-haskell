@@ -40,7 +40,7 @@ data Ray = Ray
     rOrigin    :: Vec4D
   , rDirection :: Vec4D
   }
-
+  deriving Show
 
   
 data Object   = Simple { shape :: Shape, m1 :: (Matrix4D Double), m2 :: (Matrix4D Double), getShader :: Shader } -- Shape, transformation and inverse of transformation matrix
