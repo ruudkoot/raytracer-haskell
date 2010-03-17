@@ -15,7 +15,7 @@ import Base.Shader
 import Data.Colour
 import Data.Vector
   
-import Renderer.Intersections
+import Renderer.Intersections2
   
 -- | Applies a list of color transformations using the int. info, the 
 --   available lights (TODO: Where do we do occlusion testing??? Should this
