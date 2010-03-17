@@ -10,7 +10,7 @@ import Output.PPM (toPPM)
 import Base.Light
 import Base.Shader
 
-import Renderer.Intersections
+import Renderer.Intersections2
 import Renderer.Scene 
 import Renderer.Shaders
 import Renderer.Lightning
@@ -83,8 +83,8 @@ renderScene world = saveRendering world pixels
 --
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
 renderPixel x y ray object 
-  = let info = intersectionInfo (ray x y) object
-    in if isAHit info
+  = let info = intersect (ray x y) object
+    in if isHit info
        then let texturecoord    = textureCoord info
                 lalaShader      = getShader object
                 surfaceProperty = trace (show texturecoord) 
