@@ -25,18 +25,14 @@ import Renderer.Intersections
 localLightning :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> ColourD
 localLightning intersect lights surfaceproperty = 
   let diff = diffuse intersect lights surfaceproperty
-  in (fresnel . specular) diff -- Gaat pas werken als we de normaal hebben :)
-  -- in surfaceColour surfaceproperty
+  -- in (fresnel . specular) diff -- Gaat pas werken als we de normaal hebben :)
+                               -- En de location en ...
+  in surfaceColour surfaceproperty
   
 
 diffuse :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> ColourD
 diffuse intersect lights surfaceproperty =
-  sum $ map (diffuse') lights
-   -- light.color.times(light.intensity).times(
-   --             info.object.material.diffuse).times(
-   --             baseColor).times(
-   --             NdotL)
-
+  sum $ map diffuse' lights
   where
     diffuse' (PointLight pos colour) = 
       let l       = normalize $ pos - location intersect
@@ -45,7 +41,7 @@ diffuse intersect lights surfaceproperty =
           baseCol = toVector $ surfaceColour surfaceproperty 
       in Data.Colour.fromVector $ 
            fmap (ndotl * )  
-                ((fmap (dRC*) colour) * baseCol)
+                (fmap (dRC*) colour * baseCol)
     diffuse' l = error $ "No diffuse implementation yet for this light: "
                          ++ show l
 

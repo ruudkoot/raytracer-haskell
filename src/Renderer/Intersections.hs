@@ -1,5 +1,6 @@
 module Renderer.Intersections where
 
+import Base.Shader
 import Base.Shape
 
 import Control.Applicative
@@ -17,15 +18,15 @@ type Intersection      = (Double, Double) -- Enters at x, leaves at y
 
 data IntersectionInfo = IntersectionInfo
     { isAHit   :: Bool
-    , location :: Pt3D
-    , normal   :: Pt3D
-    , distance :: Double
-    , uv       :: (Double, Double)
+    , location :: Pt3D -- Real world location
+    , normal   :: Pt3D -- Real world normal
+    , distance :: Double -- ??
+    , textureCoord :: SurfaceCoord -- unit coord
     }
     deriving Eq
 
 instance Ord IntersectionInfo where
-        compare i i2 = compare (distance i) (distance i2)
+        compare i i2 = comparing distance i i2
         
 hit' :: Ray -> Object -> Bool
 hit' (Ray o d) (Simple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
@@ -170,13 +171,13 @@ intersection r Plane    = let oy = getY4D $ rOrigin r
                           
 intersectionInfo :: Ray -> Object -> IntersectionInfo
 intersectionInfo ray object = IntersectionInfo
-                                { isAHit   = hit' ray object
-                                , location = error "Don't have locations yet"
-                                , normal   = error "Don' 'v' locations 't"
-                                , distance = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
-                                , uv       = (u,v)
+                                { isAHit       = not $ null its
+                                , location     = loc --error "Don't have locations yet"
+                                , normal       = error "Don' 'v' normals 't"
+                                , distance     = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
+                                , textureCoord = textcoord
                                 }
-  where (_, u, v) = trace (show its ++ "hit: " ++ (show (hit' ray object))) $
+  where textcoord = trace (show its ++ "hit: " ++ (show (hit' ray object))) $
                     case its of
                       []        -> (0, 0, 0)
                       ((a,_):_) -> uvSphere loc

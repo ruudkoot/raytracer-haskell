@@ -44,7 +44,9 @@ gradient3D c1 c2 c3 = undefined
 {------------------------------------------------------------------------------}
 
 uvShader :: Shader
-uvShader = Shader { runShader = \(face, u, v) -> SurfaceProperty { surfaceColour                 = Colour (u, v, 0)
+uvShader = Shader { runShader = \(face, u, v) -> SurfaceProperty { surfaceColour                 = Colour ( u - (fromIntegral $ floor u)
+                                                                                                          , v - (fromIntegral $ floor v)
+                                                                                                          , 0)
                                                                  , diffuseReflectionCoefficient  = 1.0
                                                                  , specularReflectionCoefficient = 0.0
                                                                  , phongExponent                 = 1.0
