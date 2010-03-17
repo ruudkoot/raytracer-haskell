@@ -14,6 +14,16 @@ type ColourD = Colour Double
 newtype Colour a = Colour (a, a, a) deriving (Show, Eq, Ord)
 type Colours a = [Colour a]
 
+instance Num a => Num (Colour a) where
+  (+) a b = fromVector $ (+) (toVector a) (toVector b)
+  (*) a b = fromVector $ (*) (toVector a) (toVector b)
+  (-) a b = fromVector $ (-) (toVector a) (toVector b)
+  negate = fromVector . negate . toVector
+  abs    = fromVector . abs    . toVector
+  signum = fromVector . signum . toVector
+  fromInteger = fromVector . fromInteger
+  
+
 
 -- | Get the (r, g, b) value from Colour.
 --
@@ -46,3 +56,5 @@ toRGB (Colour (r, g, b)) = Colour (round (255.0*r), round (255.0*g), round (255.
 fromVector :: Vector3D a -> Colour a
 fromVector (Vector3D (a, b, c)) = Colour (a, b, c)
 
+toVector :: Colour a -> Vector3D a
+toVector (Colour (a, b, c)) = Vector3D (a, b, c)

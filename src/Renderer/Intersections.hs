@@ -171,9 +171,9 @@ intersection r Plane    = let oy = getY4D $ rOrigin r
 intersectionInfo :: Ray -> Object -> IntersectionInfo
 intersectionInfo ray object = IntersectionInfo
                                 { isAHit   = hit' ray object
-                                , location = undefined
-                                , normal   = undefined
-                                , distance = undefined --fst . head $ intersection r Sphere
+                                , location = error "Don't have locations yet"
+                                , normal   = error "Don' 'v' locations 't"
+                                , distance = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
                                 , uv       = (u,v)
                                 }
   where (_, u, v) = trace (show its ++ "hit: " ++ (show (hit' ray object))) $

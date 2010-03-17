@@ -1,17 +1,19 @@
 module Renderer.Renderer (render) where
 
 import Data.Colour (Colour(..), Colours, toRGB)
-import Data.Vector (Vector4D(..))
+import Data.Vector (Vector4D(..), toVec3D)
 import Data.Radians
 
 import Output.Output (toSize)
 import Output.PPM (toPPM)
 
+import Base.Light
 import Base.Shader
 
 import Renderer.Intersections
 import Renderer.Scene 
 import Renderer.Shaders
+import Renderer.Lightning
 
 
 import Control.Concurrent (forkIO)
@@ -80,16 +82,19 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position.
 --
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
-renderPixel x y ray object = let info = intersectionInfo (ray x y) object
-                              in if isAHit info
-                                 then let (u, v)          = uv info
-                                          lalaShader      = getShader object
-                                          surfaceProperty = trace (show (u,v)) 
-                                                                  (runShader uvShader (undefined, u, v))
-                                       in toRGB $ surfaceColour surfaceProperty
-                                 else if even (x+y)
-                                      then Colour (  0,   0,   0)
-                                      else Colour (255,   0, 255)
+renderPixel x y ray object 
+  = let info = intersectionInfo (ray x y) object
+    in if isAHit info
+       then let (u, v)          = uv info
+                lalaShader      = getShader object
+                surfaceProperty = trace (show (u,v)) 
+                                        (runShader uvShader (undefined, u, v))
+             in toRGB $ localLightning info
+                                       [PointLight (toVec3D (-4) 4 0) (toVec3D 1 1 1)]   -- visible lights
+                                       surfaceProperty
+       else if even (x+y)
+            then Colour (  0,   0,   0)
+            else Colour (255,   0, 255)
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
