@@ -13,23 +13,7 @@ uvSphere loc = let theta = acos  ( getY3D loc )
                    pi2   = 2*pi
                    u     = phi / pi2
                    v     = (pi - theta) / pi
-               in trace (show loc  ++ " -> " ++ show u ++ " " ++ show v) 
-                  $ ( 0               -- face
-                  , u       -- u
-                  , v -- v
-                  )
-
--- uvSphere :: Pt3D -> SurfaceCoord
--- uvSphere loc = let x = getX3D loc
---                    y = getY3D loc
---                    z = getZ3D loc
---                    -- v = 2*y + 2
---                    -- u = acos (z / sqrt (1 - y*y)) / 360
---                    u = x / sqrds
---                    v = y / sqrds
---                    sqrds = sqrt $ x * x + y * y + z * z
---                 in trace (show loc ++ " -> " ++ show (u,v)) $ 
---                          (0, u, v)
+               in ( 0, u, v )
 
 
 uvPlane :: Pt3D -> SurfaceCoord

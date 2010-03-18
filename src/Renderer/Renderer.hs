@@ -78,20 +78,22 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position.
 --
 renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
-renderPixel x y ray object 
-  = let info = intersect (ray x y) object
+renderPixel x y raymaker object 
+  = let ray  = raymaker x y
+        info = intersect (ray) object
     in if isHit info
        then let texturecoord    = textureCoord info
                 lalaShader      = getShader object
                 surfaceProperty = runShader uvShader texturecoord
              in toRGB $ localLightning info
-                                       [PointLight (toVec3D (-4) 4 0) (toVec3D 1 1 1)]   -- visible lights
+                                       [PointLight (toVec3D (0) (0) (-2)) (toVec3D 1 1 1)]   -- visible lights
                                        surfaceProperty
+                                       ray
                                        -- (runShader lalaShader texturecoord)
-       else colour 255 255 255
+       else colour 0 0 0
        -- else if even (x+y)
-       --      then Colour (  0,   0,   0)
-       --      else Colour (255,   0, 255)
+       --      then colour   0   0   0
+       --      else colour 255   0 255
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)

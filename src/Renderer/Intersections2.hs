@@ -1,5 +1,6 @@
 module Renderer.Intersections2 where
 ------------------------------------------------------------------------------
+import Base.Shader
 import Base.Shape
 
 import Data.Vector
@@ -33,16 +34,13 @@ intersect ray obj@(Simple (Sphere) m1 m2 shader) =
   IntersectionInfo
     { isHit        = not $ null its
     , location     = loc --error "Don't have locations yet"
-    , normal       = error "Don' 'v' normals 't"
+    , normal       = normalize loc -- error "Don' 'v' normals 't"
     -- , distance     = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
     , distance     = fst . head $ its
     , textureCoord = textcoord
     , tees         = its
     }
- where textcoord = trace (show its ++ "hit: " ++ (show (hit ray obj))) $
-                   case its of
-                     []        -> (0, 0, 0)
-                     ((a,_):_) -> uvSphere loc
+ where textcoord = uvmap its (uvSphere loc)
        its = intervals ray Sphere
        loc = (\ v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) 
                $ instantiate ray (fst $ head its)
@@ -52,6 +50,9 @@ intersect ray obj@(Simple (Sphere) m1 m2 shader) =
 -- ** Cube
 
 -- ** Cylinder
+
+intersect _ obj = error $ "Intersections of type \n" ++ show obj 
+                          ++ " are not supported yet."
 
 ------------------------------------------------------------------------------
 -- * Intersection Inner functions
@@ -98,3 +99,7 @@ hit r o = isHit $ intersect r o
 --   given a certain t.
 instantiate :: Ray -> Double -> Vec4D
 instantiate (Ray origin direction) t = origin + fmap (t *) direction
+
+uvmap :: [Intersection] -> SurfaceCoord -> SurfaceCoord
+uvmap [] _ = (0, 0, 0)
+uvmap _  a = a

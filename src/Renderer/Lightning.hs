@@ -7,7 +7,7 @@
 --       datastructuur. Als we dit hier mooier willen hebben moeten we
 --       misschien toch de structuren scheiden?
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-module Renderer.Lightning where
+module Renderer.Lightning (localLightning) where
 
 import Base.Light  
 import Base.Shader
@@ -16,32 +16,47 @@ import Data.Colour
 import Data.Vector
   
 import Renderer.Intersections2
+import Renderer.Scene
+
+import Debug.Trace
   
 -- | Applies a list of color transformations using the int. info, the 
 --   available lights (TODO: Where do we do occlusion testing??? Should this
 --   also contain soft shadows???) for the moment this assumes that the
 --   provided lights are the visible lights. :)
 --   TODO: Ambient color
-localLightning :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> ColourD
-localLightning intersect lights surfaceproperty = 
-  let diff = diffuse intersect lights surfaceproperty
-  -- in (fresnel . specular) diff -- Gaat pas werken als we de normaal hebben :)
-                               -- En de location en ...
-  in surfaceColour surfaceproperty
+--   TODO: Shadows, maybe [(Factor, RenderLight)]  to indicate how heavy a
+--         light weighs.
+localLightning :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
+localLightning = local
+  -- in surfaceColour surfaceproperty
   
 
-diffuse :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> ColourD
-diffuse intersect lights surfaceproperty =
-  toColour . sum $ map diffuse' lights
+local :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
+local intersect lights surface ray =
+  toColour . sum $ map (\l -> diffuse l + specular l) lights
   where
-    diffuse' (PointLight pos colour) = 
-      let l       = normalize $ pos - location intersect
-          ndotl   = normal intersect !.! l
-          dRC     = diffuseReflectionCoefficient surfaceproperty
-          baseCol = fromColour $ surfaceColour surfaceproperty 
-      in fmap (ndotl * ) (fmap (dRC*) colour * baseCol)
-    diffuse' l = error $ "No diffuse implementation yet for this light: "
-                         ++ show l
+    ----
+    diffuse (PointLight pos colour) = 
+      let n       = normal intersect
+          l       = normalize $ pos - location intersect
+          angle   = n !.! l
+          dRC     = diffuseReflectionCoefficient surface
+          baseCol = fromColour $ surfaceColour surface 
+      in fmap (angle * ) (fmap (dRC*) colour * baseCol)
+    diffuse l = error $ "No diffuse implementation yet for this light: "
+                        ++ show l
+    ----
+    specular (PointLight pos colour) =
+      let n     = normal intersect
+          l     = normalize $ pos - location intersect
+          angle = n !.! l
+          dir   = dropW $ rDirection ray
+          r     = normalize $ fmap (2*angle*) n - l
+          v     = normalize $ fmap negate dir
+          factor = (max (r !.! v) 0) ** phongExponent surface
+      in fmap (factor * specularReflectionCoefficient surface *) colour
+    specular l = error $ "No specular implementation yet for this light: "
+                          ++ show l
 
-specular = id
-fresnel = id
+

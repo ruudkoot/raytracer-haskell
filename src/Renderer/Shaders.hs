@@ -16,7 +16,7 @@ blue  = solid 0    0    1.0
 solid :: Double -> Double -> Double -> Shader
 solid r g b = Shader ( const SurfaceProperty { surfaceColour                 = colour r g b
                                              , diffuseReflectionCoefficient  = 1.0
-                                             , specularReflectionCoefficient = 0.0
+                                             , specularReflectionCoefficient = 0.5
                                              , phongExponent                 = 1.0
                                              }
                      )
@@ -50,7 +50,7 @@ uvShader = Shader { runShader =
                                             (v - (fromIntegral $ floor v))
                                             0
                      , diffuseReflectionCoefficient  = 1.0
-                     , specularReflectionCoefficient = 0.0
+                     , specularReflectionCoefficient = 0.5
                      , phongExponent                 = 1.0
                      }
                   }
