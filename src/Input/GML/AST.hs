@@ -11,8 +11,6 @@ import qualified Base.Shape      as Shape
 
 import           Test.QuickCheck
 
-
-
 ---------------------- Input.GML.Scene -----------------------------------------
 
 data Scene = Scene
@@ -20,9 +18,9 @@ data Scene = Scene
   , sceneLights   :: [Light.RenderLight]
   , sceneObj      :: Object
   , sceneDepth    :: Int
-  , sceneFov      :: Double        -- fov
-  , sceneWidth    :: Int           -- wid
-  , sceneHeight   :: Int           -- ht
+  , sceneFov      :: Double
+  , sceneWidth    :: Int
+  , sceneHeight   :: Int
   , sceneFile     :: FilePath
   }
   deriving (Show,Eq)

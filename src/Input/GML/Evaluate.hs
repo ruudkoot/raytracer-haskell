@@ -37,7 +37,7 @@ get = Map.findWithDefault (error "unknown identifier")
 shader :: Closure -> Shader
 shader (e, c) = Shader { runShader = \(face, u, v) -> let s                                                                       = [BaseValue (Int face), BaseValue (Real u), BaseValue (Real v)]
                                                           (e', s', c')                                                            = evaluate (e, s, c)
-                                                          [Point p, BaseValue (Real kd), BaseValue (Real ks), BaseValue (Real n)] = reverse s' -- TODO: quickfix, should maybe be fixed on another level?
+                                                          [BaseValue (Real n), BaseValue (Real ks), BaseValue (Real kd), Point p] = s'
                                                        in SurfaceProperty { surfaceColour                 = toColour p
                                                                           , diffuseReflectionCoefficient  = kd
                                                                           , specularReflectionCoefficient = ks
