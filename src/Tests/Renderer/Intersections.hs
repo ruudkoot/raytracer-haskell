@@ -15,7 +15,12 @@ margin :: Double
 margin = 0.0001
 
 instance Arbitrary Ray where
-  arbitrary = liftM (Ray (Vector4D (0, 0, -4, 0))) arbitrary
+--  Hitting the unit sphere from a random point in a random direction is rather
+--  unlikely, so, to properly test spheres, use:
+-- arbitrary = liftM (Ray (Vector4D (0, 0, -4, 0))) arbitrary
+--  On the other hand, rays starting from the y = 0-plane, will never hit our
+--  unit plane, so for planes use:
+  arbitrary = liftM2 Ray arbitrary arbitrary
 
 prop_cylinderIntersect :: Ray -> Property
 prop_cylinderIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnCylinder (mkPoint x) && isOnCylinder (mkPoint y)) intersections
@@ -31,3 +36,9 @@ prop_sphereIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d 
   where isOnSphere v   = abs ((magnitudeSquared v) - 1.0) < margin
         mkPoint t      = dropW (o + scaleF t d)
         intersections  = trace (show $ map (\(x,y) -> (magnitudeSquared $ mkPoint x, magnitudeSquared $ mkPoint y)) $ intervals (Ray o d) Sphere) intervals (Ray o d) Sphere
+        
+prop_planeIntersect :: Ray -> Property
+prop_planeIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnPlane (mkPoint x) && isOnPlane (mkPoint y)) intersections
+  where isOnPlane v    = (abs $ getY3D v) < margin
+        mkPoint t      = dropW (o + scaleF t d)
+        intersections  = trace (show $ map (\(x,y) -> (getY3D $ mkPoint x, getY3D $ mkPoint y)) $ intervals (Ray o d) Plane) intervals (Ray o d) Plane
