@@ -87,10 +87,11 @@ renderPixel x y raymaker object
                 surface      = runShader uvShader texturecoord
              in toRGB $ localLightning info
                                        [PointLight (toVec3D (0) (0) (-2)) (toVec3D 1 1 1)]   -- visible lights
-                                       (runShader lalaShader texturecoord)-- surface
+                                       (runShader lalaShader texturecoord)
+                                       -- surface
                                        ray
                                        
-       else colour 0 0 0
+       else colour 255 255 255
        -- else if even (x+y)
        --      then colour   0   0   0
        --      else colour 255   0 255

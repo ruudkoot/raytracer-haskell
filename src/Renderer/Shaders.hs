@@ -50,7 +50,7 @@ uvShader = Shader { runShader =
                                             (v - (fromIntegral $ floor v))
                                             0
                      , diffuseReflectionCoefficient  = 1.0
-                     , specularReflectionCoefficient = 0.5
+                     , specularReflectionCoefficient = 1.0
                      , phongExponent                 = 1.0
                      }
                   }

@@ -43,8 +43,9 @@ local intersect lights surface ray =
           dRC     = diffuseReflectionCoefficient surface
           baseCol = fromColour $ surfaceColour surface 
       in fmap (angle * ) (fmap (dRC*) colour * baseCol)
-    diffuse l = error $ "No diffuse implementation yet for this light: "
-                        ++ show l
+    diffuse _ = toVec3D 0 0 0
+    -- diffuse l = error $ "No diffuse implementation yet for this light: "
+    --                     ++ show l
     ----
     specular (PointLight pos colour) =
       let n     = normal intersect
@@ -55,7 +56,8 @@ local intersect lights surface ray =
           v     = normalize $ fmap negate dir
           factor = (max (r !.! v) 0) ** phongExponent surface
       in fmap (factor * specularReflectionCoefficient surface *) colour
-    specular l = error $ "No specular implementation yet for this light: "
-                          ++ show l
+    specular _ = toVec3D 0 0 0
+    -- specular l = error $ "No specular implementation yet for this light: "
+    --                       ++ show l
 
 
