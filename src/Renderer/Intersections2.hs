@@ -60,8 +60,8 @@ intervals :: Ray -> Shape -> [Intersection]
 
 
 -- ** Sphere
-intervals r Sphere   = let dir = rDirection r
-                           k = rOrigin r
+intervals r Sphere   = let dir = dropW $ rDirection r
+                           k = dropW $ rOrigin r
                            a = dir !.! dir
                            b = 2.0 * (k !.! dir)
                            c = (k !.! k) - 1.0
