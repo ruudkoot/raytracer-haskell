@@ -87,8 +87,7 @@ renderPixel x y ray object
     in if isHit info
        then let texturecoord    = textureCoord info
                 lalaShader      = getShader object
-                surfaceProperty = trace (show texturecoord) 
-                                        (runShader uvShader texturecoord)                                        
+                surfaceProperty = runShader uvShader texturecoord
              in toRGB $ localLightning info
                                        [PointLight (toVec3D (-4) 4 0) (toVec3D 1 1 1)]   -- visible lights
                                        surfaceProperty
@@ -125,7 +124,7 @@ mkRayMaker x y delta i j = Ray eye dir
   where eye = Vector4D (0, 0, -5, 0)
         dir = normalize $
               Vector4D (x - (fromIntegral j + 0.5) * delta,
-                        y - (fromIntegral i + 0.5) * delta, 1, 0)
+                        y - (fromIntegral i + 0.5) * delta, 1, 1)
 
 
 
