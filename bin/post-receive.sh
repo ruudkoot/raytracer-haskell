@@ -35,11 +35,12 @@ title "Copying generating Haddock docs" &&
 cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/ &&
 echo "  Browse haddock documentation at: http://projects.spockz.nl/projects/afp2009/doc/" && 
 
+# Run tests (configure with UserHooks)
+title "Running Tests." &&
+cd src &&
+find Tests -name "*.hs" | xargs ../bin/qCheck.py &&
+
 # Run Hlint on all haskell source files
 title "Linting" && 
 find -name "*.hs" | xargs hlint 
 
-# Run tests (configure with UserHooks)
-title "Running Tests." &&
-cd src &&
-find Tests -name "*.hs" | xargs ../bin/qCheck.py

@@ -6,6 +6,7 @@
 #
 # This will look for all the functions starting 
 # with prop_ and run them in ghci.
+#
 
 
 import sys
@@ -15,7 +16,7 @@ import subprocess
 def find_Props(s):
     """Finds functions starting with prop_ 
     in the Haskell source file."""
-    def get_Prop(s):
+    def get_Ident(s):
         res = ""
         for c in s:
             if c.isalnum() or c in ['_', "'"]:
@@ -24,25 +25,23 @@ def find_Props(s):
                 break
         return res
 
-    props = []
-    for line in s.splitlines():
-        if line.startswith("prop_"):
-            props.append(get_Prop(line))
+    props = (get_Ident(line) for line in s.splitlines() 
+             if line.startswith("prop_"))
     return list(set(props))
 
 
 def test_Props(srcFile, props):
     """Run the tests in ghci"""
+
+    test = "putStrLn \"Running test: %s.\"\nTest.QuickCheck.quickCheck %s"
     l = len(props)
-    print "*" * 40
-    print "Found %d props in %s." % (l, srcFile)
     if l == 0:
-        print "Skipping."
+        print "Skipping %s. No props found." % srcFile
     else:
         s = subprocess.Popen(["ghci"], stdin=subprocess.PIPE)
         s.stdin.write(":m +Test.QuickCheck\n")
         s.stdin.write(":l %s\n" % srcFile)
-        s.stdin.write("\n".join(("putStrLn \"Running test: %s.\"\nTest.QuickCheck.quickCheck %s" % (p,p) for p in props)))
+        s.stdin.write("\n".join((test % (p,p) for p in props)))
         s.stdin.write("\n:q\n")
         s.wait()
 
