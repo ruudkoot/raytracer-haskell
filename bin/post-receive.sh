@@ -42,4 +42,4 @@ find -name "*.hs" | xargs hlint
 # Run tests (configure with UserHooks)
 title "Running Tests." &&
 cd src &&
-find Tests -name "*.hs" | xargs ../bin/quickCheck
+find Tests -name "*.hs" | xargs ../bin/qCheck.py
