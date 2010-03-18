@@ -82,14 +82,14 @@ renderPixel x y raymaker object
   = let ray  = raymaker x y
         info = intersect (ray) object
     in if isHit info
-       then let texturecoord    = textureCoord info
-                lalaShader      = getShader object
-                surfaceProperty = runShader uvShader texturecoord
+       then let texturecoord = textureCoord info
+                lalaShader   = getShader object
+                surface      = runShader uvShader texturecoord
              in toRGB $ localLightning info
                                        [PointLight (toVec3D (0) (0) (-2)) (toVec3D 1 1 1)]   -- visible lights
-                                       surfaceProperty
+                                       (runShader lalaShader texturecoord)-- surface
                                        ray
-                                       -- (runShader lalaShader texturecoord)
+                                       
        else colour 0 0 0
        -- else if even (x+y)
        --      then colour   0   0   0

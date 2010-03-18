@@ -12,7 +12,6 @@ import Data.Vector
 import Renderer.Scene
 import Renderer.UV
 
-import Debug.Trace
 
 type Intersection      = (Double, Double) -- Enters at x, leaves at y
 

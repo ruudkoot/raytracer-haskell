@@ -18,7 +18,6 @@ import Data.Vector
 import Renderer.Intersections2
 import Renderer.Scene
 
-import Debug.Trace
   
 -- | Applies a list of color transformations using the int. info, the 
 --   available lights (TODO: Where do we do occlusion testing??? Should this

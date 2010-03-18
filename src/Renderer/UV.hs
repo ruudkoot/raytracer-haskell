@@ -4,7 +4,6 @@ import Base.Shader
 
 import Data.Vector
 
-import Debug.Trace
 ------------------------------------------------------------------------------
 
 uvSphere :: Pt3D -> SurfaceCoord
