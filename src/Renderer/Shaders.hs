@@ -2,9 +2,9 @@
 --   for testing purposes.
 module Renderer.Shaders where
 
-import Data.Colour
-
 import Base.Shader
+import Data.Colour
+import Data.Vector
 
 
 -- | Basic colors.
@@ -14,7 +14,7 @@ green = solid 0    1.0  0
 blue  = solid 0    0    1.0
 
 solid :: Double -> Double -> Double -> Shader
-solid r g b = Shader ( const SurfaceProperty { surfaceColour                 = Colour (r, g, b)
+solid r g b = Shader ( const SurfaceProperty { surfaceColour                 = colour r g b
                                              , diffuseReflectionCoefficient  = 1.0
                                              , specularReflectionCoefficient = 0.0
                                              , phongExponent                 = 1.0
@@ -44,12 +44,14 @@ gradient3D c1 c2 c3 = undefined
 {------------------------------------------------------------------------------}
 
 uvShader :: Shader
-uvShader = Shader { runShader = \(face, u, v) -> SurfaceProperty { surfaceColour                 = Colour ( u - (fromIntegral $ floor u)
-                                                                                                          , v - (fromIntegral $ floor v)
-                                                                                                          , 0)
-                                                                 , diffuseReflectionCoefficient  = 1.0
-                                                                 , specularReflectionCoefficient = 0.0
-                                                                 , phongExponent                 = 1.0
-                                                                 }
+uvShader = Shader { runShader = 
+  \(face, u, v) -> SurfaceProperty { 
+                     surfaceColour = colour (u - (fromIntegral $ floor u))
+                                            (v - (fromIntegral $ floor v))
+                                            0
+                     , diffuseReflectionCoefficient  = 1.0
+                     , specularReflectionCoefficient = 0.0
+                     , phongExponent                 = 1.0
+                     }
                   }
 

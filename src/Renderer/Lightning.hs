@@ -32,16 +32,14 @@ localLightning intersect lights surfaceproperty =
 
 diffuse :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> ColourD
 diffuse intersect lights surfaceproperty =
-  sum $ map diffuse' lights
+  toColour . sum $ map diffuse' lights
   where
     diffuse' (PointLight pos colour) = 
       let l       = normalize $ pos - location intersect
           ndotl   = normal intersect !.! l
           dRC     = diffuseReflectionCoefficient surfaceproperty
-          baseCol = toVector $ surfaceColour surfaceproperty 
-      in Data.Colour.fromVector $ 
-           fmap (ndotl * )  
-                (fmap (dRC*) colour * baseCol)
+          baseCol = fromColour $ surfaceColour surfaceproperty 
+      in fmap (ndotl * ) (fmap (dRC*) colour * baseCol)
     diffuse' l = error $ "No diffuse implementation yet for this light: "
                          ++ show l
 

@@ -4,44 +4,36 @@
 -- 
 module Data.Colour where 
 
-import Data.Vector (Vector3D(..))
+import Data.Vector (Vector3D(..), fromVector3D, fromVector)
+
+
+-- | Colour is a triple of three values 'r', 'g' and 'b'
+-- 
+newtype Colour a = Colour (Vector3D a) deriving (Eq, Ord, Show)
+type Colours a = [Colour a]
+ 
 
 -- * Synonyms
 type ColourD = Colour Double
 
--- | Colour is a triple of three values 'r', 'g' and 'b'
--- 
-newtype Colour a = Colour (a, a, a) deriving (Show, Eq, Ord)
-type Colours a = [Colour a]
 
-instance Num a => Num (Colour a) where
-  (+) a b = fromVector $ (+) (toVector a) (toVector b)
-  (*) a b = fromVector $ (*) (toVector a) (toVector b)
-  (-) a b = fromVector $ (-) (toVector a) (toVector b)
-  negate = fromVector . negate . toVector
-  abs    = fromVector . abs    . toVector
-  signum = fromVector . signum . toVector
-  fromInteger = fromVector . fromInteger
-  
-
-
--- | Get the (r, g, b) value from Colour.
+-- | Abstracted Colour constructor.
 --
-fromColour :: Colour a -> (a, a, a)
-fromColour (Colour (r, g, b)) = (r, g, b)
+colour :: a -> a -> a -> Colour a
+colour r g b = Colour (Vector3D (r, g, b)) 
 
 
 -- | The (r, g, b) values in Colour as [r, g, b].
 --
 colourToList :: Colour a -> [a]
-colourToList (Colour (r, g, b)) = [r, g, b]
+colourToList (Colour v) = fromVector v
 
 
 -- | Clamps the values in Colour, given a minimum and 
 -- maximum value.
 --
 clampColour :: Ord a => a -> a -> Colour a -> Colour a
-clampColour mi ma (Colour (r, g, b)) = Colour (c r, c g, c b)
+clampColour mi ma (Colour vec) = Colour (fmap c vec)
   where c v = max (min v ma) mi
 
 
@@ -50,11 +42,14 @@ clampColour mi ma (Colour (r, g, b)) = Colour (c r, c g, c b)
 clampedList :: Ord a => a -> a -> Colour a -> [a]
 clampedList mi ma = colourToList . clampColour mi ma
 
+
 toRGB :: ColourD -> Colour Int
-toRGB (Colour (r, g, b)) = Colour (round (255.0*r), round (255.0*g), round (255.0*b))
+toRGB (Colour v) = Colour (fmap (round . (255.0*)) v)
 
-fromVector :: Vector3D a -> Colour a
-fromVector (Vector3D (a, b, c)) = Colour (a, b, c)
 
-toVector :: Colour a -> Vector3D a
-toVector (Colour (a, b, c)) = Vector3D (a, b, c)
+toColour :: Vector3D a -> Colour a
+toColour v = Colour v
+
+
+fromColour :: Colour a -> Vector3D a 
+fromColour (Colour v) = v

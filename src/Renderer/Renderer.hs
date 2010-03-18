@@ -1,6 +1,6 @@
 module Renderer.Renderer (render) where
 
-import Data.Colour (Colour(..), Colours, toRGB)
+import Data.Colour (Colour(..), Colours, toRGB, colour)
 import Data.Vector (Vector4D(..), toVec3D, normalize)
 import Data.Radians
 
@@ -93,7 +93,7 @@ renderPixel x y ray object
                                        [PointLight (toVec3D (-4) 4 0) (toVec3D 1 1 1)]   -- visible lights
                                        surfaceProperty
                                        -- (runShader lalaShader texturecoord)
-       else Colour (255, 255, 255)   
+       else colour 255 255 255
        -- else if even (x+y)
        --      then Colour (  0,   0,   0)
        --      else Colour (255,   0, 255)

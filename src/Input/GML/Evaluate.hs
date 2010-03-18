@@ -38,7 +38,7 @@ shader :: Closure -> Shader
 shader (e, c) = Shader { runShader = \(face, u, v) -> let s                                                                       = [BaseValue (Int face), BaseValue (Real u), BaseValue (Real v)]
                                                           (e', s', c')                                                            = evaluate (e, s, c)
                                                           [Point p, BaseValue (Real kd), BaseValue (Real ks), BaseValue (Real n)] = s'
-                                                       in SurfaceProperty { surfaceColour                 = fromVector p
+                                                       in SurfaceProperty { surfaceColour                 = toColour p
                                                                           , diffuseReflectionCoefficient  = kd
                                                                           , specularReflectionCoefficient = ks
                                                                           , phongExponent                 = n

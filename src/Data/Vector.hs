@@ -42,15 +42,15 @@ instance Vector Vector4D where
 
 -- | A general two-dimensional vector.
 --
-newtype Vector2D a = Vector2D (a, a) deriving Eq
+newtype Vector2D a = Vector2D (a, a) deriving (Eq, Ord)
 
 -- | A general three-dimensional vector.
 --
-newtype Vector3D a = Vector3D (a, a, a) deriving Eq
+newtype Vector3D a = Vector3D (a, a, a) deriving (Eq, Ord)
 
 -- | A general four-dimensional vector.
 --
-newtype Vector4D a = Vector4D (a, a, a, a) deriving Eq
+newtype Vector4D a = Vector4D (a, a, a, a) deriving (Eq, Ord)
 
 
 
