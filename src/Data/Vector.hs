@@ -239,6 +239,7 @@ instance (Fractional a) => Fractional (Vector4D a) where
 -- corresponding entries and adding up those products. 
 --
 (!.!) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
+{-# INLINE (!.!) #-}
 v1 !.! v2 = foldVector sum (v1 * v2)
 
 -- | The cross product is a binary operation on two 3D vectors 
