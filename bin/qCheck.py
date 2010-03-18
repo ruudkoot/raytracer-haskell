@@ -34,24 +34,31 @@ def test_Props(srcFile, props):
     """Run the tests in ghci"""
 
     test = "putStrLn \"Running test: %s.\"\nTest.QuickCheck.quickCheck %s"
+    ghcInput = []
     l = len(props)
     if l == 0:
         print "Skipping %s. No props found." % srcFile
     else:
-        s = subprocess.Popen(["ghci"], stdin=subprocess.PIPE)
-        s.stdin.write(":m +Test.QuickCheck\n")
-        s.stdin.write(":l %s\n" % srcFile)
-        s.stdin.write("\n".join((test % (p,p) for p in props)))
-        s.stdin.write("\n:q\n")
-        s.wait()
+        ghcInput.append(":l %s" % srcFile)
+        ghcInput.append("\n".join((test % (p,p) for p in props)))
+    return ghcInput
+
 
 
 def main():
+    ghcInput = [":m +Test.QuickCheck", ":set +s", ":set +r"]
     for srcFile in sys.argv[1:]:
         f = open(srcFile, "r")
         props = find_Props(f.read())
         f.close()
-        test_Props(srcFile, props)
+        ghcInput.extend(test_Props(srcFile, props))
+
+    # Run ghci
+    ghcInput.append(":q")
+    s = subprocess.Popen(["ghci"], stdin=subprocess.PIPE)
+    for x in ghcInput:
+        s.stdin.write(x + "\n")
+    s.wait()
 
 
 if __name__ == "__main__":

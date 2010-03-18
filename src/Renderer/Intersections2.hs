@@ -66,8 +66,7 @@ intervals r Sphere   = let dir = dropW $ rDirection r
                            b = 2.0 * (k !.! dir)
                            c = (k !.! k) - 1.0
                            d = b*b - 4.0*a*c
-                       in trace (show r) $
-                          case compare d 0.0 of
+                       in case compare d 0.0 of
                              EQ -> [(-b/(2*a),-b/(2*a))]
                              LT -> []
                              _  -> let sqrd = sqrt d
