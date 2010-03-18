@@ -83,11 +83,7 @@ renderPixel x y ray object
     in if isHit info
        then let texturecoord    = textureCoord info
                 lalaShader      = getShader object
-<<<<<<< HEAD
                 surfaceProperty = runShader uvShader texturecoord
-=======
-                surfaceProperty = runShader uvShader texturecoord 
->>>>>>> 86a2d96898f1a34fa5a34559f9d769e206f578da
              in toRGB $ localLightning info
                                        [PointLight (toVec3D (-4) 4 0) (toVec3D 1 1 1)]   -- visible lights
                                        surfaceProperty
