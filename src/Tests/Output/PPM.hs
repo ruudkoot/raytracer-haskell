@@ -1,6 +1,7 @@
 module Tests.Output.PPM where
 
+import Output.Output
 import Output.PPM
 import Test.QuickCheck
 
---prop_Euuh = quickCheck (toPPM 10 10 [] == Nothing)
+prop_Euuh = toPPM (Size 10) (Size 10) [] == Nothing

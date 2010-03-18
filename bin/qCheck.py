@@ -52,7 +52,7 @@ def main():
         f = open(srcFile, "r")
         props = find_Props(f.read())
         f.close()
-        print_props(srcFile, props)
+        test_Props(srcFile, props)
 
 
 if __name__ == "__main__":
