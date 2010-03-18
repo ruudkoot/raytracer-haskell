@@ -23,10 +23,6 @@ import Data.List (sort)
 import System.IO.Unsafe
  
 
---- REMOVE@!!!! --- -
-import Debug.Trace
-
-
 -- | The number of threads to use in 
 -- the rendering process.
 --
@@ -87,8 +83,7 @@ renderPixel x y ray object
     in if isHit info
        then let texturecoord    = textureCoord info
                 lalaShader      = getShader object
-                surfaceProperty = trace (show texturecoord) 
-                                        (runShader uvShader texturecoord)                                        
+                surfaceProperty = runShader uvShader texturecoord 
              in toRGB $ localLightning info
                                        [PointLight (toVec3D (-4) 4 0) (toVec3D 1 1 1)]   -- visible lights
                                        surfaceProperty
