@@ -7,7 +7,6 @@ import Data.Vector
 import Data.Matrix
 import Base.Shape
 import Control.Monad
-import Debug.Trace
 
 -- test (Ray o d) = map (\(x,y) -> (x, magnitude $ Vector4D (1, 0, 1, 0) * (o + scaleF x d), y, magnitude $ Vector4D (1, 0, 1, 0) * (o + scaleF y d))) (intersection (Ray o d) Cylinder)
 
@@ -35,10 +34,10 @@ prop_sphereIntersect :: Ray -> Property
 prop_sphereIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnSphere (mkPoint x) && isOnSphere (mkPoint y)) intersections
   where isOnSphere v   = abs ((magnitudeSquared v) - 1.0) < margin
         mkPoint t      = dropW (o + scaleF t d)
-        intersections  = trace (show $ map (\(x,y) -> (magnitudeSquared $ mkPoint x, magnitudeSquared $ mkPoint y)) $ intervals (Ray o d) Sphere) intervals (Ray o d) Sphere
+        intersections  = intervals (Ray o d) Sphere
         
 prop_planeIntersect :: Ray -> Property
 prop_planeIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnPlane (mkPoint x) && isOnPlane (mkPoint y)) intersections
   where isOnPlane v    = (abs $ getY3D v) < margin
         mkPoint t      = dropW (o + scaleF t d)
-        intersections  = trace (show $ map (\(x,y) -> (getY3D $ mkPoint x, getY3D $ mkPoint y)) $ intervals (Ray o d) Plane) intervals (Ray o d) Plane
+        intersections  = intervals (Ray o d) Plane
