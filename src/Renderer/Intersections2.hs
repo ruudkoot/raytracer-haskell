@@ -44,6 +44,20 @@ intersect ray obj@(Simple (Sphere) m1 m2 shader) =
                $ instantiate ray (fst $ head its)
 
 -- ** Plane
+intersect ray obj@(Simple (Plane) m1 m2 shader) = 
+  IntersectionInfo
+    { isHit        = not $ null its
+    , location     = loc --error "Don't have locations yet"
+    , normal       = normalize loc -- error "Don' 'v' normals 't"
+    -- , distance     = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
+    , distance     = fst . head $ its
+    , textureCoord = textcoord
+    , tees         = its
+    }
+ where textcoord = uvmap its (uvPlane loc)
+       its = intervals ray Plane
+       loc = (\ v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) 
+               $ instantiate ray (fst $ head its)
 
 -- ** Cube
 

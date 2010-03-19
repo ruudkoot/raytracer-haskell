@@ -43,6 +43,12 @@ local intersect lights surface ray =
           dRC     = diffuseReflectionCoefficient surface
           baseCol = fromColour $ surfaceColour surface 
       in fmap (angle * ) (fmap (dRC*) colour * baseCol)
+    diffuse (DirectLight dir colour) = 
+      let n       = normal intersect
+          angle   = n !.! dir
+          dRC     = diffuseReflectionCoefficient surface
+          baseCol = fromColour $ surfaceColour surface 
+      in fmap (angle * ) (fmap (dRC*) colour * baseCol)
     diffuse _ = toVec3D 0 0 0
     -- diffuse l = error $ "No diffuse implementation yet for this light: "
     --                     ++ show l

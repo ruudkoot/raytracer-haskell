@@ -70,15 +70,15 @@ renderScene :: World -> IO ()
 renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
-        pixels = [renderPixel i j raymaker (wObject world) | 
+        pixels = [renderPixel i j raymaker (wObject world) (wLights world) | 
                   i <- [0..h-1],
                   j <- [0..w-1]]
 
 
 -- | Calculates the colour for a single pixel position.
 --
-renderPixel :: Int -> Int -> RayMaker -> Object -> Colour Int
-renderPixel x y raymaker object 
+renderPixel :: Int -> Int -> RayMaker -> Object -> [RenderLight] -> Colour Int
+renderPixel x y raymaker object lights
   = let ray  = raymaker x y
         info = intersect (ray) object
     in if isHit info
@@ -86,12 +86,12 @@ renderPixel x y raymaker object
                 lalaShader   = getShader object
                 surface      = runShader uvShader texturecoord
              in toRGB $ localLightning info
-                                       [PointLight (toVec3D (0) (0) (-2)) (toVec3D 1 1 1)]   -- visible lights
+                                       lights   -- visible lights
                                        (runShader lalaShader texturecoord)
                                        -- surface
                                        ray
                                        
-       else colour 255 255 255
+       else colour 255 255 0
        -- else if even (x+y)
        --      then colour   0   0   0
        --      else colour 255   0 255
@@ -161,22 +161,22 @@ runThreads n work world = runThreads' n work
 --
 newThread :: World -> [(Int, Int)] -> IO ()
 newThread world work = 
-  do let (raymaker, object) = (getRayMaker world, wObject world)
+  do let (raymaker, object, lights) = (getRayMaker world, wObject world, wLights world)
      mvar <- newEmptyMVar
      modifyMVar_ children (\cs -> return $ mvar:cs)
-     forkIO (renderThread raymaker object work `finally` putMVar mvar ())
+     forkIO (renderThread raymaker object lights work `finally` putMVar mvar ())
      return ()
         
 
 -- | This function takes a workload of pixel locations 
 -- and calculates their colour; pushing it to the result MVar.
 --
-renderThread :: RayMaker -> Object -> [(Int, Int)] -> IO ()
-renderThread _ _ [] = return ()
-renderThread raymaker obj ((i,j):work) = 
-  do let colour = renderPixel i j raymaker obj
+renderThread :: RayMaker -> Object -> [RenderLight] -> [(Int, Int)] -> IO ()
+renderThread _ _ [] _ = return ()
+renderThread raymaker obj lights ((i,j):work) = 
+  do let colour = renderPixel i j raymaker obj lights
      modifyMVar_ result (\cs -> return $ (i, j, colour) : cs)
-     renderThread raymaker obj work
+     renderThread raymaker obj lights work
 
 
 -- | Waits for the threads to finish, 
