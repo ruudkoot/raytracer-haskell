@@ -50,6 +50,6 @@ scene
 1
 90.0
 320 200
-"submarine.ppm"
+"target/submarine.ppm"
 render
 

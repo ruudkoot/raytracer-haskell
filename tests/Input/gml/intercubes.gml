@@ -44,6 +44,6 @@ scene                             % scene to render
 20                                % tracing depth
 90.0                              % field of view
 640 480                           % image wid and height
-"intercubes.ppm"                       % output file
+"target/intercubes.ppm"                       % output file
 render
 

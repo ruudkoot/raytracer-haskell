@@ -34,6 +34,6 @@ scene
 1
 90.0
 320 200
-"ellipsoid-2.ppm"
+"target/ellipsoid-2.ppm"
 render
 

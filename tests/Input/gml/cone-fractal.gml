@@ -77,6 +77,6 @@ scene				  % scene to render
 3				  % tracing depth
 90.0				  % field of view
 300 200				  % image wid and height
-"cone-fractal.ppm"		  % output file
+"target/cone-fractal.ppm"		  % output file
 render
 

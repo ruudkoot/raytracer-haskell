@@ -30,17 +30,17 @@
 box "cube0.ppm" doit apply
 
 % render bottom view
-box 90.0 rotatex "cube1.ppm" doit apply
+box 90.0 rotatex "target/cube1.ppm" doit apply
 
 % render top view
-box -90.0 rotatex "cube2.ppm" doit apply
+box -90.0 rotatex "target/cube2.ppm" doit apply
 
 % render right view
-box 90.0 rotatey "cube3.ppm" doit apply
+box 90.0 rotatey "target/cube3.ppm" doit apply
 
 % render left view
-box -90.0 rotatey "cube4.ppm" doit apply
+box -90.0 rotatey "target/cube4.ppm" doit apply
 
 % render back view
-box 180.0 rotatex "cube5.ppm" doit apply
+box 180.0 rotatex "target/cube5.ppm" doit apply
 

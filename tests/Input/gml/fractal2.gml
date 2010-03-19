@@ -88,5 +88,5 @@ scene				  % scene to render
 20				  % tracing depth
 80.0				  % field of view
 300 400				  % image wid and height
-"fractal+34.ppm"			  % output file
+"target/fractal+34.ppm"			  % output file
 render

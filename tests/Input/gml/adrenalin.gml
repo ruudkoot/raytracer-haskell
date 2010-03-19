@@ -193,6 +193,6 @@ scene                             % scene to render
 10                                % tracing depth
 90.0                              % field of view
 640 480                           % image wid and height
-"adrenalin.ppm"                   % output file
+"target/adrenalin.ppm"                   % output file
 render
 

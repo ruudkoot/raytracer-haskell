@@ -137,5 +137,5 @@ scene
 90.0		%% fov
 320		%% width (pixels)
 200		%% height (pixels)
-"golf.ppm"	%% filename
+"target/golf.ppm"	%% filename
 render

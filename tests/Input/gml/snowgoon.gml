@@ -413,5 +413,5 @@ scene
 75.0  %% fov
 300 %% width (pixels)
 300 %% height (pixels)
-"snowgoon.ppm" %% filename
+"target/snowgoon.ppm" %% filename
 render

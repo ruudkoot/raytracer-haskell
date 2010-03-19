@@ -44,6 +44,6 @@ scene                             % scene to render
 5                                 % tracing depth
 90.0                              % field of view
 640 480                           % image wid and height
-"intercyl.ppm"                    % output file
+"target/intercyl.ppm"                    % output file
 render
 

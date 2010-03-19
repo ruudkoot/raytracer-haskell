@@ -5613,6 +5613,6 @@ scene                             % scene to render
 10                                % tracing depth
 90.0                              % field of view
 640 480                           % image wid and height
-"protein.ppm"                     % output file
+"target/protein.ppm"                     % output file
 render
 

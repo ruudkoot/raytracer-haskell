@@ -50,5 +50,5 @@ scene				  % scene to render
 3				  % tracing depth
 60.0				  % field of view
 400 300				  % image wid and height
-"pipe.ppm"		  % output file
+"target/pipe.ppm"		  % output file
 render

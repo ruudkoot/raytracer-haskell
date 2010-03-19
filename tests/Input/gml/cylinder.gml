@@ -31,11 +31,11 @@
 box "cylinder0.ppm" doit apply
 
 % render bottom view
-box 90.0 rotatex "cylinder1.ppm" doit apply
+box 90.0 rotatex "target/cylinder1.ppm" doit apply
 
 % render top view
-box -90.0 rotatex "cylinder2.ppm" doit apply
+box -90.0 rotatex "target/cylinder2.ppm" doit apply
 
 % render back view
-box 180.0 rotatey "cylinder3.ppm" doit apply
+box 180.0 rotatey "target/cylinder3.ppm" doit apply
 

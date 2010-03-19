@@ -54,5 +54,5 @@ scene				  % scene to render
 3				  % tracing depth
 90.0				  % field of view
 400 240				  % image wid and height
-"house.ppm"			  % output file
+"target/house.ppm"			  % output file
 render

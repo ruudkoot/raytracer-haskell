@@ -24,6 +24,6 @@ scene
 1
 90.0
 320 200
-"rotate.ppm"
+"target/rotate.ppm"
 render
 

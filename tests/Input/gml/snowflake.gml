@@ -96,6 +96,6 @@ scene                             % scene to render
 20                                % tracing depth
 90.0                              % field of view
 1024 768                          % image wid and height
-"snowflake.ppm"                   % output file
+"target/snowflake.ppm"                   % output file
 render
 

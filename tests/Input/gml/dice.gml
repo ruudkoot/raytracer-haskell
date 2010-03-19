@@ -104,6 +104,6 @@ scene			% object
 3			% depth
 90.0			% fov
 640 400			% wid ht
-"dice.ppm"		% output file
+"target/dice.ppm"		% output file
 render
 

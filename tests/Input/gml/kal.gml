@@ -73,6 +73,6 @@ scene			% object
 1000			% depth
 90.0			% fov
 400 400 		% wid ht
-"kal.ppm"		% output file
+"target/kal.ppm"		% output file
 render
 

@@ -62,6 +62,6 @@ scene			% object
 4			% depth
 90.0			% fov
 320 240			% wid ht
-"reflect.ppm"		% output file
+"target/reflect.ppm"		% output file
 render
 

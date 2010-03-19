@@ -29,8 +29,8 @@ union union /scene
   render
 } /Render
 
-30.0 "fov-30.ppm" Render apply
-60.0 "fov-60.ppm" Render apply
-90.0 "fov-90.ppm" Render apply
-120.0 "fov-120.ppm" Render apply
+30.0 "target/fov-30.ppm" Render apply
+60.0 "target/fov-60.ppm" Render apply
+90.0 "target/fov-90.ppm" Render apply
+120.0 "target/fov-120.ppm" Render apply
 

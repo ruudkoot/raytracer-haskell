@@ -31,11 +31,11 @@
 box "cone0.ppm" doit apply
 
 % render bottom view
-box 90.0 rotatex "cone1.ppm" doit apply
+box 90.0 rotatex "target/cone1.ppm" doit apply
 
 % render top view
-box -90.0 rotatex "cone2.ppm" doit apply
+box -90.0 rotatex "target/cone2.ppm" doit apply
 
 % render back view
-box 180.0 rotatey "cone3.ppm" doit apply
+box 180.0 rotatey "target/cone3.ppm" doit apply
 

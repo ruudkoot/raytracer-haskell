@@ -71,6 +71,6 @@ scene
 1
 100.0
 320 200
-"large.ppm"
+"target/large.ppm"
 render
 

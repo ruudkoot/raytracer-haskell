@@ -98,14 +98,14 @@ filename		  % output file
 render
 } /rend
 
-260.0 "fractal+260" rend apply
-261.0 "fractal+261" rend apply
-262.0 "fractal+262" rend apply
-263.0 "fractal+263" rend apply
-264.0 "fractal+264" rend apply
-265.0 "fractal+265" rend apply
-266.0 "fractal+266" rend apply
-267.0 "fractal+267" rend apply
-268.0 "fractal+268" rend apply
-269.0 "fractal+269" rend apply
+260.0 "target/fractal+260" rend apply
+261.0 "target/fractal+261" rend apply
+262.0 "target/fractal+262" rend apply
+263.0 "target/fractal+263" rend apply
+264.0 "target/fractal+264" rend apply
+265.0 "target/fractal+265" rend apply
+266.0 "target/fractal+266" rend apply
+267.0 "target/fractal+267" rend apply
+268.0 "target/fractal+268" rend apply
+269.0 "target/fractal+269" rend apply
 

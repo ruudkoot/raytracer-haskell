@@ -34,6 +34,6 @@ scene				  % scene to render
 3				  % tracing depth
 90.0				  % field of view
 320 240				  % image wid and height
-"spheres.ppm"			  % output file
+"target/spheres.ppm"			  % output file
 render
 

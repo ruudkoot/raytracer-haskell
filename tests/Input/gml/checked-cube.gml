@@ -44,5 +44,5 @@ scene			% object
 1			% depth
 90.0			% fov
 320 200			% wid ht
-"checked-cube.ppm"	% output file
+"target/checked-cube.ppm"	% output file
 render
