@@ -80,7 +80,7 @@ renderScene world = saveRendering world pixels
 renderPixel :: Int -> Int -> RayMaker -> Object -> [RenderLight] -> Colour Int
 renderPixel x y raymaker object lights
   = let ray  = raymaker x y
-        info = intersect (ray) object
+        info = intersect ray object
     in if isHit info
        then let texturecoord = textureCoord info
                 lalaShader   = getShader object
@@ -111,7 +111,7 @@ saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
 getRayMaker :: World -> RayMaker 
 getRayMaker world = mkRayMaker x y delta 
   where (w,h) = getDimensions world
-        (x,y) = (tan(0.5 * (radians fov)), x * fromIntegral h / fromIntegral w)
+        (x,y) = (tan(0.5 * radians fov), x * fromIntegral h / fromIntegral w)
         delta = 2 * x / fromIntegral w
         fov = roFov (wOptions world)
 

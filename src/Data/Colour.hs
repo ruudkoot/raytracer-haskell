@@ -48,7 +48,7 @@ toRGB (Colour v) = Colour (fmap (round . (255.0*)) v)
 
 
 toColour :: Vector3D a -> Colour a
-toColour v = Colour v
+toColour = Colour 
 
 
 fromColour :: Colour a -> Vector3D a 
