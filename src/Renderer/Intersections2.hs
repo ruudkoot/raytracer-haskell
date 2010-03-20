@@ -201,6 +201,7 @@ intervals (Ray (Vector4D (px,py,_,_)) (Vector4D (vx,vy,_,_))) Cone =
       b = 2 * (px * vx + vy)
       c = 2 * py - 1
   in solveQuadratic a b c
+  -- missing: if 0 <= (py + vy * t) <= 1
 
 
 intervals r Cube     = undefined
@@ -210,7 +211,7 @@ intervals r Cube     = undefined
 
 
 normalSphere :: Ray -> Pt3D -> Vec3D
-normalSphere r = negate . normalize -- since we're dealing with unit sphere
+normalSphere _ = normalize -- since we're dealing with unit sphere
 
 
 
