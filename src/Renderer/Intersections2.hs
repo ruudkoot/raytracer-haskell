@@ -129,10 +129,7 @@ intervals (Ray o r) Plane =
 
 
 -- | Calculate intersection of a ray and an
--- infinite cylinder.
--- 
--- TODO: QUESTION: Should the height be 1? 
--- It can easily be added.
+-- cylinder of height one.
 --
 -- 
 -- Ray: p + vt
@@ -161,7 +158,7 @@ intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D(vx,vy,vz,_))) Cylinder =
   let a = vx ^ 2 + vz ^ 2
       b = 2 * (px * vx + pz * vz)
       c = px ^ 2 + pz ^ 2 - 1.0
-  in solveQuadratic a b c 
+  in filter (\t -> let y = py + vy * t in 0 <= y && y <= 1) $ solveQuadratic a b c 
 
 
 -- | Intersection of a ray with a cone of 
