@@ -33,7 +33,7 @@ data IntersectionInfo = IntersectionInfo {
 -- that solve the following equation:
 -- @intersection = eye + t*direction@
 --
-type Intersection = (Double, Double)
+type Intersections = [Double]
 
 
 
@@ -70,8 +70,8 @@ mkInfo ray shape uv = IntersectionInfo
 
 -- | Returns the nearest @t@.
 --
-nearest :: [Intersection] -> Double 
-nearest = minimum . map (uncurry min) 
+nearest :: Intersections -> Double 
+nearest = minimum 
 
 
 -- | Instead of heaving separate `hit` functions 
@@ -93,7 +93,7 @@ hit r o = isHit $ intersect r o
 -- that solve the following equation:
 -- @intersection = eye + t*direction@
 --
-intervals :: Ray -> Shape -> [Intersection]
+intervals :: Ray -> Shape -> Intersections
 
 
 -- Sphere
@@ -110,8 +110,7 @@ intervals (Ray o r) Plane =
   let (oy, ry) = (getY4D o, getY4D r)
   in if (oy == 0) || (oy * ry >= 0)
         then []
-        else [(- oy / ry, - oy / ry)]
-
+        else [- oy / ry]
 
 
 -- | Calculate intersection of a ray and an
@@ -156,9 +155,9 @@ intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D(vx,vy,vz,_))) Cylinder =
 -- Ray: p + vt
 -- Cone: x^2 + y^2 = (r^2/h^2) * (y - h)^2
 --
---    (px + vx * t) ^ 2 + (py + vy * t) ^ 2 = (r^2/h^2) * ((py + vy * t) - h)^2
+--    (px + vx * t) ^ 2 + (py + vy * t) ^ 2 = (r^2/h^2) * (py + vy * t - h)^2
 --  => (ratio and height is 1)
---    (px + vx * t) ^ 2 + (py + vy * t) ^ 2 = ((py + vy * t) - 1)^2
+--    (px + vx * t) ^ 2 + (py + vy * t) ^ 2 = (py + vy * t - 1)^2
 --  => (expand)
 --    (px^2 + (vx*t)^2 + 2*(px*vx*t)) + (py^2 + (vy*t)^2 + 2*(py*vy*t)) 
 --       = py^2 + (vy*t)^2 + 2*(py*vy*t) - 2*py - 2*(vy*t) + 1
@@ -171,9 +170,9 @@ intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D(vx,vy,vz,_))) Cylinder =
 --    (vx^2)*t^2 + 2*(px*vx+py*vy)*t + 2(-(py*vy*t) + (vy* t)) + 2*py - 1 = 0
 --  => (regroup)
 --    (vx^2)*t^2 + 2*(px*vx+py*vy)*t + 2*(-(py*vy) + vy)*t + 2*py - 1 = 0
---  => (cleanup)
---    (vx^2)*t^2 + 2*(px*vx+py*vy-(py*vy)+vy)*t + 2*py - 1 = 0
 --  => (regroup)
+--    (vx^2)*t^2 + 2*(px*vx+py*vy-(py*vy)+vy)*t + 2*py - 1 = 0
+--  => (cleanup)
 --    (vx^2)*t^2 + 2*(px*vx+vy)*t + 2*py - 1 = 0
 --
 --
@@ -202,14 +201,14 @@ intervals r Cube     = undefined
 -- | Solves an equation of the form:
 --     @ax^2 + bx + c = 0@
 --
-solveQuadratic :: Double -> Double -> Double -> [(Double, Double)]
+solveQuadratic :: Double -> Double -> Double -> Intersections
 solveQuadratic a b c = 
   case compare discr 0.0 of 
     LT -> [] 
-    EQ -> let r = -b / (2 * a) in [(r, r)]
-    GT -> let sqrd op = (-b `op` sqrt discr) / (2 * a)
-              in [(sqrd (-), sqrd (+))]
-  where discr = b ^ 2 - 4 * a * c
+    EQ -> [-b / (2 * a)]
+    GT -> [abc (-), abc (+)]
+  where discr  = b ^ 2 - 4 * a * c
+        abc op = (-b `op` sqrt discr) / (2 * a)
 
 
 -- | Instantiates a ray starting on some point 
@@ -222,7 +221,7 @@ instantiate (Ray origin direction) t = origin + fmap (t *) direction
 -- | Does something mysterious and arcane while mumbling
 -- profanities. No seriously, what's this for?
 --
-uvmap :: [Intersection] -> SurfaceCoord -> SurfaceCoord
+uvmap :: Intersections -> SurfaceCoord -> SurfaceCoord
 uvmap [] _ = (0, 0, 0)
 uvmap _  a = a
 
