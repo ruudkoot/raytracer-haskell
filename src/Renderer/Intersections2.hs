@@ -26,7 +26,6 @@ data IntersectionInfo = IntersectionInfo {
     , normal       :: Pt3D           -- ^ Real world normal.
     , distance     :: Double         -- ^ Distance between Intersection and eye.
     , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
-    , tees         :: [Intersection]
     } deriving (Eq, Show)
 
 
@@ -60,19 +59,19 @@ mkInfo ray shape uv = IntersectionInfo
   { isHit        = not $ null ints
   , location     = loc
   , normal       = toVec3D 0 0 0 -- TODO!
-  , distance     = nearest ints
+  , distance     = t
   , textureCoord = uvmap ints $ uv loc
-  , tees         = ints
   } 
   where ints = intervals ray shape
-        loc  = dropW $ instantiate ray (nearest ints)
+        loc  = dropW $ instantiate ray t
+        t    = nearest ints
 
 
 
 -- | Returns the nearest @t@.
 --
 nearest :: [Intersection] -> Double 
-nearest = fst . head -- minimum . map (uncurry min) 
+nearest = minimum . map (uncurry min) 
 
 
 -- | Instead of heaving separate `hit` functions 
