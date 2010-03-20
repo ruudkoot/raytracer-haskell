@@ -113,20 +113,28 @@ intervals (Ray o r) Plane =
         else [(- oy / ry, - oy / ry)]
 
 
+
 -- | Calculate intersection of a ray and an
 -- infinite cylinder.
--- TODO: Should the height be 1? 
+-- 
+-- TODO: QUESTION: Should the height be 1? 
+-- It can easily be added.
 --
--- Intersection with side surface:
 -- 
 -- Ray: p + vt
 -- Cylinder: x^2 + z^2 = r^2
 --
---   (px + vx * t)^2 + (pz + vz * t)^2 = r^2 
---   (px + vx * t)^2 + (pz + vz * t)^2 = 1 
---   (px^2 + (vx * t)^2 + 2 * (px * vx * t)) + (pz ^ 2 + (vz * t) ^ 2 + 2 * (pz * vz * t) - 1 = 0
---   px^2 + pz^2 + (vx * t)^2 + (vz*t)^2 + 2*(px*vx*t + pz*vz*t) - 1 = 0
---   (vx^2 + vz^2)*t^2 + 2*(px*vx + pz*vz)*t + px^2 + pz^2 - 1 = 0
+--
+--     (px + vx * t)^2 + (pz + vz * t)^2 = r^2 
+--   => (radius is 1)
+--     (px + vx * t)^2 + (pz + vz * t)^2 - 1 = 0
+--   => (expand)
+--     (px^2 + (vx*t)^2 + 2*(px*vx*t)) + (pz^2 + (vz*t)^2 + 2*(pz*vz*t) - 1 = 0
+--   => (regroup)
+--     (px^2 + pz^2 + (vx * t)^2 + (vz*t)^2 + 2*(px*vx*t + pz*vz*t) - 1 = 0
+--   => (regroup)
+--     (vx^2 + vz^2)*t^2 + 2*(px*vx + pz*vz)*t + px^2 + pz^2 - 1 = 0
+--
 --
 -- Solve with quadratic equation, where
 --   a = (vx^2 + vz^2) 
@@ -139,10 +147,49 @@ intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D(vx,vy,vz,_))) Cylinder =
   let a = vx ^ 2 + vz ^ 2
       b = 2 * (px * vx + pz * vz)
       c = px ^ 2 + pz ^ 2 - 1.0
+  in solveQuadratic a b c 
+
+
+-- | Intersection of a ray with a cone of 
+-- ratio 1 and height 1.
+--
+-- Ray: p + vt
+-- Cone: x^2 + y^2 = (r^2/h^2) * (y - h)^2
+--
+--    (px + vx * t) ^ 2 + (py + vy * t) ^ 2 = (r^2/h^2) * ((py + vy * t) - h)^2
+--  => (ratio and height is 1)
+--    (px + vx * t) ^ 2 + (py + vy * t) ^ 2 = ((py + vy * t) - 1)^2
+--  => (expand)
+--    (px^2 + (vx*t)^2 + 2*(px*vx*t)) + (py^2 + (vy*t)^2 + 2*(py*vy*t)) 
+--       = py^2 + (vy*t)^2 + 2*(py*vy*t) - 2*py - 2*(vy*t) + 1
+--  => (regroup)
+--    px^2 + (vx*t)^2 + 2*(px*vx+py*vy)*t + py^2 + (vy*t)^2 - 
+--       py^2 - (vy*t)^2 - 2*(py*vy*t) + 2*py + 2*(vy*t) - 1 = 0
+--  => (cleanup)
+--    px^2 + (vx*t)^2 + 2*(px*vx+py*vy)*t - 2*(py*vy*t) + 2*py + 2*(vy*t) - 1 = 0
+--  => (regroup)
+--    (vx^2)*t^2 + 2*(px*vx+py*vy)*t + 2(-(py*vy*t) + (vy* t)) + 2*py - 1 = 0
+--  => (regroup)
+--    (vx^2)*t^2 + 2*(px*vx+py*vy)*t + 2*(-(py*vy) + vy)*t + 2*py - 1 = 0
+--  => (cleanup)
+--    (vx^2)*t^2 + 2*(px*vx+py*vy-(py*vy)+vy)*t + 2*py - 1 = 0
+--  => (regroup)
+--    (vx^2)*t^2 + 2*(px*vx+vy)*t + 2*py - 1 = 0
+--
+--
+-- Solve with quadratic equation, where
+--   a = vx^2
+--   b = 2*(px*vx + vy)
+--   c = 2*py - 1
+--
+intervals (Ray (Vector4D (px,py,_,_)) (Vector4D (vx,vy,_,_))) Cone =
+  let a = vx ^ 2
+      b = 2 * (px * vx + vy)
+      c = 2 * py - 1
   in solveQuadratic a b c
 
+
 intervals r Cube     = undefined
-intervals r Cone     = undefined
 
 
 
