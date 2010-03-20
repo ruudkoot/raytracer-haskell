@@ -26,10 +26,10 @@ data IntersectionInfo = IntersectionInfo {
     , normal       :: Pt3D           -- ^ Real world normal.
     , distance     :: Double         -- ^ Distance between Intersection and eye.
     , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
-    , tees         :: Intersections  -- ^ Save intersections (for doing CSG)
     } deriving (Eq, Show)
 
 type IntersectionInfoM = Maybe IntersectionInfo
+type CSG = IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
 
 -- | The interval functions return the t's 
 -- that solve the following equation:
@@ -49,10 +49,15 @@ intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray Sphere uvSphere
 intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray Plane  uvPlane
 intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray Cube   uvCube
 intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray Cylinder uvCylinder
-intersect ray (Union      o1 o2) = unionI      (ray `intersect` o1) (ray `intersect` o2)
-intersect ray (Difference o1 o2) = differenceI (ray `intersect` o1) (ray `intersect` o2)
-intersect ray (Intersect  o1 o2) = intersectI  (ray `intersect` o1) (ray `intersect` o2)
+intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
+intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
+intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
 
+
+
+csg :: CSG -> Ray -> Object -> Object -> IntersectionInfoM
+csg f ray o1 o2 = f (iray o1) (iray o2)
+  where iray = intersect ray
 
 
 -- | Helper function used by @intersect@ to 
@@ -65,7 +70,6 @@ mkInfo ray shape uv = if null ints then Nothing
                            , normal       = toVec3D 0 0 0 -- TODO!
                            , distance     = t
                            , textureCoord = uvmap ints $ uv loc
-                           , tees         = ints
                            } 
   where ints = intervals ray shape
         loc  = dropW $ instantiate ray t
@@ -197,30 +201,27 @@ intervals r Cube     = undefined
 
 
 -- * CSG 
-
-mergeI :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
-mergeI i j = n { tees = tees i ++ tees j } 
-  where n = if distance i <= distance j then i else j
-
-
-unionI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
+unionI :: CSG
 unionI Nothing  Nothing  = Nothing 
 unionI (Just i) Nothing  = Just i
 unionI Nothing  (Just i) = Just i
 unionI (Just i) (Just j) = Just $ mergeI i j
 
-intersectI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM 
+
+intersectI :: CSG
 intersectI (Just i) (Just j) = Just $ mergeI i j
 intersectI _        _        = Nothing 
 
 
-differenceI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM 
+differenceI :: CSG
 differenceI (Just i) (Just j) = Nothing
 differenceI Nothing  Nothing  = Nothing 
 differenceI (Just i) Nothing  = Just i
 differenceI Nothing  (Just i) = Just i
 
 
+mergeI :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
+mergeI i j = if distance i <= distance j then i else j
 
 
 -- * Helper functions
