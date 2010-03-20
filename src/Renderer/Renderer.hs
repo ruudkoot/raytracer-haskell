@@ -1,7 +1,7 @@
 module Renderer.Renderer (render) where
 
 import Data.Colour (Colour(..), Colours, toRGB, colour)
-import Data.Vector (Vector4D(..), toVec3D, normalize)
+import Data.Vector (Vector4D(..), normalize)
 import Data.Radians
 
 import Output.Output (toSize)
@@ -172,10 +172,10 @@ newThread world work =
 -- and calculates their colour; pushing it to the result MVar.
 --
 renderThread :: RayMaker -> Object -> [RenderLight] -> [(Int, Int)] -> IO ()
-renderThread _ _ [] _ = return ()
+renderThread _ _ _ [] = return ()
 renderThread raymaker obj lights ((i,j):work) = 
-  do let colour = renderPixel i j raymaker obj lights
-     modifyMVar_ result (\cs -> return $ (i, j, colour) : cs)
+  do let col = renderPixel i j raymaker obj lights
+     modifyMVar_ result (\cs -> return $ (i, j, col) : cs)
      renderThread raymaker obj lights work
 
 

@@ -72,7 +72,7 @@ mkInfo ray shape uv = IntersectionInfo
 -- | Returns the nearest @t@.
 --
 nearest :: [Intersection] -> Double 
-nearest = minimum . map (uncurry min) 
+nearest = fst . head -- minimum . map (uncurry min) 
 
 
 -- | Instead of heaving separate `hit` functions 
@@ -112,16 +112,14 @@ intervals r Sphere   = let dir = dropW $ rDirection r
 
 
 -- Plane
-intervals r Plane    = let oy = getY4D $ rOrigin r
-                           dy = getY4D $ rDirection r
-                       in if (oy == 0) || (oy * dy >= 0)
-                           then []
-                           else [(- oy / dy, - oy / dy)]
+intervals (Ray o d) Plane = let (oy, dy) = (getY4D o, getY4D d)
+                            in if (oy == 0) || (oy * dy >= 0)
+                                 then []
+                                 else [(- oy / dy, - oy / dy)]
 
 
--- Cube
-
--- Cylinder
+intervals r Cube     = undefined
+intervals r Cylinder = undefined
 
 
 
