@@ -207,10 +207,10 @@ unionI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
 unionI Nothing  Nothing  = Nothing 
 unionI (Just i) Nothing  = Just i
 unionI Nothing  (Just i) = Just i
-unionI (Just i) (Just j) = Just $ merge i j
+unionI (Just i) (Just j) = Just $ mergeI i j
 
 intersectI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM 
-intersectI (Just i) (Just j) = Just $ merge i j
+intersectI (Just i) (Just j) = Just $ mergeI i j
 intersectI _        _        = Nothing 
 
 
