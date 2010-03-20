@@ -26,6 +26,7 @@ data IntersectionInfo = IntersectionInfo {
     , normal       :: Pt3D           -- ^ Real world normal.
     , distance     :: Double         -- ^ Distance between Intersection and eye.
     , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
+    , tees         :: Intersections  -- ^ Save intersections (for doing CSG)
     } deriving (Eq, Show)
 
 
@@ -61,6 +62,7 @@ mkInfo ray shape uv = IntersectionInfo
   , normal       = toVec3D 0 0 0 -- TODO!
   , distance     = t
   , textureCoord = uvmap ints $ uv loc
+  , tees         = ints
   } 
   where ints = intervals ray shape
         loc  = dropW $ instantiate ray t
