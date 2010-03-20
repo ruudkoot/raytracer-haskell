@@ -101,23 +101,47 @@ intervals (Ray o r) Sphere =
   let (k, dir) = (dropW o, dropW r)
       a = dot dir
       b = 2.0 * (k !.! dir)
-      d = b * b - 4.0 * a * (dot k - 1.0)
-  in case compare d 0.0 of
-      LT -> []
-      EQ -> let r = -b / (2*a) in [(r, r)]
-      GT -> let sqrd op = (-b `op` sqrt d) / (2 * a)
-            in [(sqrd (-), sqrd (+))]
+      c =  (dot k - 1.0)
+  in solveQuadratic a b c
 
 
 -- Plane
-intervals (Ray o d) Plane = let (oy, dy) = (getY4D o, getY4D d)
-                            in if (oy == 0) || (oy * dy >= 0)
-                                 then []
-                                 else [(- oy / dy, - oy / dy)]
+intervals (Ray o r) Plane = 
+  let (oy, ry) = (getY4D o, getY4D r)
+  in if (oy == 0) || (oy * ry >= 0)
+        then []
+        else [(- oy / ry, - oy / ry)]
 
+
+-- | Calculate intersection of a ray and an
+-- infinite cylinder.
+-- TODO: Should the height be 1? 
+--
+-- Intersection with side surface:
+-- 
+-- Ray: p + vt
+-- Cylinder: x^2 + z^2 = r^2
+--
+--   (px + vx * t)^2 + (pz + vz * t)^2 = r^2 
+--   (px + vx * t)^2 + (pz + vz * t)^2 = 1 
+--   (px^2 + (vx * t)^2 + 2 * (px * vx * t)) + (pz ^ 2 + (vz * t) ^ 2 + 2 * (pz * vz * t) - 1 = 0
+--   px^2 + pz^2 + (vx * t)^2 + (vz*t)^2 + 2*(px*vx*t + pz*vz*t) - 1 = 0
+--   (vx^2 + vz^2)*t^2 + 2*(px*vx + pz*vz)*t + px^2 + pz^2 - 1 = 0
+--
+-- Solve with quadratic equation, where
+--   a = (vx^2 + vz^2) 
+--   b = 2*(px*vx + pz*vz)
+--   c = px^2 + pz^2 - 1
+--
+-- Good source: http://mrl.nyu.edu/~dzorin/intro-graphics/lectures/lecture11/sld002.htm
+--
+intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D(vx,vy,vz,_))) Cylinder = 
+  let a = vx ^ 2 + vz ^ 2
+      b = 2 * (px * vx + pz * vz)
+      c = px ^ 2 + pz ^ 2 - 1.0
+  in solveQuadratic a b c
 
 intervals r Cube     = undefined
-intervals r Cylinder = undefined
 intervals r Cone     = undefined
 
 
@@ -126,6 +150,19 @@ intervals r Cone     = undefined
 
 
 -- * Helper functions
+
+
+-- | Solves an equation of the form:
+--     @ax^2 + bx + c = 0@
+--
+solveQuadratic :: Double -> Double -> Double -> [(Double, Double)]
+solveQuadratic a b c = 
+  case compare discr 0.0 of 
+    LT -> [] 
+    EQ -> let r = -b / (2 * a) in [(r, r)]
+    GT -> let sqrd op = (-b `op` sqrt discr) / (2 * a)
+              in [(sqrd (-), sqrd (+))]
+  where discr = b ^ 2 - 4 * a * c
 
 
 -- | Instantiates a ray starting on some point 
