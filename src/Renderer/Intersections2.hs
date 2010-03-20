@@ -1,6 +1,6 @@
 -- | Calculating the Ray-Object intersections.
 --
-module Renderer.Intersections2 (hit, intersect, IntersectionInfo(..)) where
+module Renderer.Intersections2 where
 
 
 import Base.Shader
@@ -37,52 +37,39 @@ data IntersectionInfo = IntersectionInfo {
 type Intersection = (Double, Double)
 
 
+
 -- * Intersections 
 
 
--- | Calculates the Intersections between a 
+-- | Calculates the intersections between a 
 -- ray and an object.
 --
 intersect :: Ray -> Object -> IntersectionInfo
-
-
--- Spheres
-intersect ray obj@(Simple (Sphere) m1 m2 shader) = 
-  IntersectionInfo
-    { isHit        = not $ null its
-    , location     = loc 
-    , normal       = normalize loc
-    , distance     = fst . head $ its
-    , textureCoord = textcoord
-    , tees         = its
-    }
-  where textcoord = uvmap its (uvSphere loc)
-        its = intervals ray Sphere
-        loc = dropW $ instantiate ray (fst $ head its)
-
-
--- Plane
-intersect ray obj@(Simple (Plane) m1 m2 shader) = 
-  IntersectionInfo
-    { isHit        = not $ null its
-    , location     = loc 
-    , normal       = normalize loc 
-    , distance     = fst . head $ its
-    , textureCoord = textcoord
-    , tees         = its
-    }
- where textcoord = uvmap its (uvPlane loc)
-       its = intervals ray Plane
-       loc = dropW $ instantiate ray (fst $ head its)
-
-
--- Cube
-
--- Cylinder
-
-intersect _ obj = error $ "Intersections of type \n" ++ show obj 
+intersect ray obj@(Simple Sphere m1 m2 shader) = mkInfo ray Sphere uvSphere
+intersect ray obj@(Simple Plane  m1 m2 shader) = mkInfo ray Plane  uvPlane
+intersect _   obj = error $ "Intersections of type \n" ++ show obj 
                           ++ " are not supported yet."
 
+
+-- | Helper function used by @intersect@ to 
+-- build the resulting IntersectionInfo.
+--
+mkInfo :: Ray -> Shape -> (Pt3D -> (Int, Double, Double)) -> IntersectionInfo 
+mkInfo ray shape uv = IntersectionInfo 
+  { isHit        = not $ null ints
+  , location     = dropW $ instantiate ray (nearest its)
+  , normal       = toVec3D 0 0 0 -- ^ TODO
+  , distance     = nearest its
+  , textureCoord = uvmap its $ uv loc
+  , tees         = its
+  } 
+  where ints = intervals ray shape
+
+
+-- | Returns the nearest @t@.
+--
+nearest :: [Intersection] -> Double 
+nearest = minimum . map (uncurry min) 
 
 
 -- | Instead of heaving separate `hit` functions 
@@ -93,6 +80,8 @@ intersect _ obj = error $ "Intersections of type \n" ++ show obj
 --
 hit :: Ray -> Object -> Bool
 hit r o = isHit $ intersect r o
+
+
 
 
 -- * Intervals 
