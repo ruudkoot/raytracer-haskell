@@ -59,7 +59,7 @@ mkInfo :: Ray -> Shape -> UVMapper -> IntersectionInfo
 mkInfo ray shape uv = IntersectionInfo 
   { isHit        = not $ null ints
   , location     = loc
-  , normal       = toVec3D 0 0 0 -- ^ TODO
+  , normal       = toVec3D 0 0 0 -- TODO!
   , distance     = nearest ints
   , textureCoord = uvmap ints $ uv loc
   , tees         = ints
