@@ -31,3 +31,6 @@ uvCube loc = case fromVector3D loc of
                _         -> error $ "Loc (" ++ show loc ++ ") is not a valid "
                                     ++ "cube coordinate... What where you "
                                     ++ "thinking?"
+
+uvCylinder :: UVMapper 
+uvCylinder loc = undefined

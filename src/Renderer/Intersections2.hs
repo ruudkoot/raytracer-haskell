@@ -45,10 +45,11 @@ type Intersection = (Double, Double)
 -- ray and an object.
 --
 intersect :: Ray -> Object -> IntersectionInfo
-intersect ray obj@(Simple Sphere m1 m2 shader) = mkInfo ray Sphere uvSphere
-intersect ray obj@(Simple Plane  m1 m2 shader) = mkInfo ray Plane  uvPlane
-intersect _   obj = error $ "Intersections of type \n" ++ show obj 
-                          ++ " are not supported yet."
+intersect ray obj@(Simple Sphere   m1 m2 shader) = mkInfo ray Sphere uvSphere
+intersect ray obj@(Simple Plane    m1 m2 shader) = mkInfo ray Plane  uvPlane
+intersect ray obj@(Simple Cube     m1 m2 shader) = mkInfo ray Cube   uvCube
+intersect ray obj@(Simple Cylinder m1 m2 shader) = mkInfo ray Cylinder uvCylinder
+intersect _   obj = error $ show obj ++ " are not supported yet."
 
 
 -- | Helper function used by @intersect@ to 
