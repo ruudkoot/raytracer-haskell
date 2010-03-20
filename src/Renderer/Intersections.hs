@@ -25,7 +25,7 @@ data IntersectionInfo = IntersectionInfo
     deriving Eq
 
 instance Ord IntersectionInfo where
-        compare i i2 = comparing distance i i2
+  compare = comparing distance 
         
 hit' :: Ray -> Object -> Bool
 hit' (Ray o d) (Simple s _ minv _) = hit (Ray (minv !*! o) (minv !*! d)) s
@@ -124,7 +124,7 @@ intersection r Cube    = let (ox,oy,oz,_) = fromVector4D $ rOrigin r
                              (tzl,tzh) = calcMinMax oz dz
                              tmin = max txl $ max tyl tzl
                              tmax = min txh $ min tyh tzh
-                         in if tmin<=tmax then [(tmin,tmax)] else []
+                         in [(tmin,tmax) | tmin <= tmax ]
 
 intersection r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
                               k = dropW $ Vector4D (1, 0, 1, 0) * rOrigin r
@@ -139,8 +139,8 @@ intersection r Cylinder = let dir = dropW $ Vector4D (1, 0, 1, 0) * rDirection r
                               dy = getY4D $ rDirection r
                               delta1 = min (-oy / dy) ((1 - oy) / dy)
                               delta2 = max (-oy / dy) ((1 - oy) / dy)
-                              tBottom = delta1 * (magnitudeSquared $ dropW $ rDirection r)
-                              tTop = delta2 * (magnitudeSquared $ dropW $ rDirection r)
+                              tBottom = delta1 * magnitudeSquared (dropW $ rDirection r)
+                              tTop = delta2 * magnitudeSquared (dropW $ rDirection r)
                               sideHit = (t1 <= tTop && t1 >= tBottom) || (t2 <= tTop && t2 >= tBottom)
                               bottomHit = magnitudeSquared (k + scaleF tBottom dir)
                               topHit = magnitudeSquared (k + scaleF tTop dir)
