@@ -34,3 +34,6 @@ uvCube loc = case fromVector3D loc of
 
 uvCylinder :: UVMapper 
 uvCylinder loc = undefined
+
+uvCone :: UVMapper 
+uvCone loc = undefined

@@ -50,6 +50,7 @@ intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray shader Sphere uvSphere
 intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray shader Plane  uvPlane
 intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray shader Cube   uvCube
 intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray shader Cylinder uvCylinder
+intersect ray (Simple Cone     m1 m2 shader) = mkInfo ray shader Cone   uvCone
 intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
 intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
 intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
