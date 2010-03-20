@@ -6,7 +6,9 @@ import Data.Vector
 
 ------------------------------------------------------------------------------
 
-uvSphere :: Pt3D -> SurfaceCoord
+type UVMapper = Pt3D -> SurfaceCoord
+
+uvSphere :: UVMapper
 uvSphere loc = let theta = acos  ( getY3D loc )
                    phi   = (atan2 ( getX3D loc ) (getZ3D loc))
                    pi2   = 2*pi
@@ -15,10 +17,10 @@ uvSphere loc = let theta = acos  ( getY3D loc )
                in ( 0, u, v )
 
 
-uvPlane :: Pt3D -> SurfaceCoord
+uvPlane :: UVMapper
 uvPlane loc = (0, getX3D loc, getZ3D loc)
               
-uvCube :: Pt3D -> SurfaceCoord
+uvCube :: UVMapper
 uvCube loc = case fromVector3D loc of
                (u, v, 0) -> (0, u, v) -- front
                (u, v, 1) -> (1, u, v) -- back

@@ -22,10 +22,10 @@ import Renderer.UV
 --
 data IntersectionInfo = IntersectionInfo { 
       isHit        :: Bool
-    , location     :: Pt3D                  -- ^ Real world location.
-    , normal       :: Pt3D                  -- ^ Real world normal.
-    , distance     :: Double                -- ^ Distance between Intersection and eye.
-    , textureCoord :: (Int, Double, Double) -- ^ Unit world coordinates
+    , location     :: Pt3D           -- ^ Real world location.
+    , normal       :: Pt3D           -- ^ Real world normal.
+    , distance     :: Double         -- ^ Distance between Intersection and eye.
+    , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
     , tees         :: [Intersection]
     } deriving (Eq, Show)
 
@@ -54,16 +54,18 @@ intersect _   obj = error $ "Intersections of type \n" ++ show obj
 -- | Helper function used by @intersect@ to 
 -- build the resulting IntersectionInfo.
 --
-mkInfo :: Ray -> Shape -> (Pt3D -> (Int, Double, Double)) -> IntersectionInfo 
+mkInfo :: Ray -> Shape -> UVMapper -> IntersectionInfo 
 mkInfo ray shape uv = IntersectionInfo 
   { isHit        = not $ null ints
-  , location     = dropW $ instantiate ray (nearest its)
+  , location     = loc
   , normal       = toVec3D 0 0 0 -- ^ TODO
-  , distance     = nearest its
-  , textureCoord = uvmap its $ uv loc
-  , tees         = its
+  , distance     = nearest ints
+  , textureCoord = uvmap ints $ uv loc
+  , tees         = ints
   } 
   where ints = intervals ray shape
+        loc  = dropW $ instantiate ray (nearest ints)
+
 
 
 -- | Returns the nearest @t@.
