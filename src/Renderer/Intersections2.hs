@@ -26,6 +26,7 @@ data IntersectionInfo = IntersectionInfo {
     , normal       :: Pt3D           -- ^ Real world normal.
     , distance     :: Double         -- ^ Distance between Intersection and eye.
     , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
+    , shader       :: Shader         -- ^ The shader to use to calculate the final color
     } deriving (Eq, Show)
 
 type IntersectionInfoM = Maybe IntersectionInfo
@@ -45,35 +46,39 @@ type Intersections = [Double]
 -- ray and an object.
 --
 intersect :: Ray -> Object -> IntersectionInfoM
-intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray Sphere uvSphere
-intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray Plane  uvPlane
-intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray Cube   uvCube
-intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray Cylinder uvCylinder
+intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray shader Sphere uvSphere 
+intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray shader Plane  uvPlane
+intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray shader Cube   uvCube
+intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray shader Cylinder uvCylinder
 intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
 intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
 intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
 
 
 
-csg :: CSG -> Ray -> Object -> Object -> IntersectionInfoM
-csg f ray o1 o2 = f (iray o1) (iray o2)
-  where iray = intersect ray
-
-
 -- | Helper function used by @intersect@ to 
 -- build the resulting IntersectionInfo.
 --
-mkInfo :: Ray -> Shape -> UVMapper -> Maybe IntersectionInfo 
-mkInfo ray shape uv = if null ints then Nothing
-                      else Just IntersectionInfo 
-                           { location     = loc
-                           , normal       = toVec3D 0 0 0 -- TODO!
-                           , distance     = t
-                           , textureCoord = uvmap ints $ uv loc
-                           } 
+mkInfo :: Ray -> Shader -> Shape -> UVMapper -> Maybe IntersectionInfo 
+mkInfo ray sh shape uv = 
+  if null ints then Nothing
+  else Just IntersectionInfo 
+       { location     = loc
+       , normal       = toVec3D 0 0 0 -- TODO!
+       , distance     = t
+       , textureCoord = uv loc
+       , shader       = sh
+       } 
   where ints = intervals ray shape
-        loc  = dropW $ instantiate ray t
+        loc  = dropW $ getPostition ray t
         t    = nearest ints
+
+
+-- | Helper combinator for doing CSG functions.
+--
+csg :: CSG -> Ray -> Object -> Object -> IntersectionInfoM
+csg f ray o1 o2 = f (iray o1) (iray o2)
+  where iray = intersect ray
 
 
 
@@ -201,23 +206,24 @@ intervals r Cube     = undefined
 
 
 -- * CSG 
+
+-- | OR
 unionI :: CSG
-unionI Nothing  Nothing  = Nothing 
+unionI (Just i) (Just j) = Just $ mergeI i j
 unionI (Just i) Nothing  = Just i
 unionI Nothing  (Just i) = Just i
-unionI (Just i) (Just j) = Just $ mergeI i j
+unionI Nothing  Nothing  = Nothing 
 
-
+-- | AND
 intersectI :: CSG
 intersectI (Just i) (Just j) = Just $ mergeI i j
 intersectI _        _        = Nothing 
 
-
+-- | XOR
 differenceI :: CSG
-differenceI (Just i) (Just j) = Nothing
-differenceI Nothing  Nothing  = Nothing 
 differenceI (Just i) Nothing  = Just i
 differenceI Nothing  (Just i) = Just i
+differenceI _        _        = Nothing 
 
 
 mergeI :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
@@ -243,15 +249,8 @@ solveQuadratic a b c =
 -- | Instantiates a ray starting on some point 
 -- and calculates the ending point given a certain t.
 --
-instantiate :: Ray -> Double -> Vec4D
-instantiate (Ray origin direction) t = origin + fmap (t *) direction
+getPostition :: Ray -> Double -> Vec4D
+getPostition (Ray origin direction) t = origin + fmap (t *) direction
 
-
--- | Does something mysterious and arcane while mumbling
--- profanities. No seriously, what's this for?
---
-uvmap :: Intersections -> SurfaceCoord -> SurfaceCoord
-uvmap [] _ = (0, 0, 0)
-uvmap _  a = a
 
 

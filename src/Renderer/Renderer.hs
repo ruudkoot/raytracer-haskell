@@ -84,7 +84,7 @@ renderPixel x y raymaker object lights
     in case i of 
        Nothing -> colour 255 255 0
        Just info ->  let texturecoord = textureCoord info
-                         lalaShader   = getShader object
+                         lalaShader   = shader info
                          surface      = runShader uvShader texturecoord
                      in toRGB $ localLightning info
                                 lights   -- visible lights
