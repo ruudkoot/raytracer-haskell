@@ -29,6 +29,7 @@ data IntersectionInfo = IntersectionInfo {
     , tees         :: Intersections  -- ^ Save intersections (for doing CSG)
     } deriving (Eq, Show)
 
+type IntersectionInfoM = Maybe IntersectionInfo
 
 -- | The interval functions return the t's 
 -- that solve the following equation:
@@ -43,13 +44,15 @@ type Intersections = [Double]
 -- | Calculates the intersections between a 
 -- ray and an object.
 --
-intersect :: Ray -> Object -> Maybe IntersectionInfo
+intersect :: Ray -> Object -> IntersectionInfoM
 intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray Sphere uvSphere
 intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray Plane  uvPlane
 intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray Cube   uvCube
 intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray Cylinder uvCylinder
---intersect ray (Union  o1 o2) = unionI (intersect ray o1) (intersect ray o2)
-intersect _   obj = error $ show obj ++ " are not supported yet."
+intersect ray (Union      o1 o2) = unionI      (intersect ray o1) (intersect ray o2)
+intersect ray (Difference o1 o2) = differenceI (intersect ray o1) (intersect ray o2)
+intersect ray (Intersect  o1 o2) = intersectI  (intersect ray o1) (intersect ray o2)
+
 
 
 -- | Helper function used by @intersect@ to 
@@ -193,6 +196,25 @@ intervals (Ray (Vector4D (px,py,_,_)) (Vector4D (vx,vy,_,_))) Cone =
 intervals r Cube     = undefined
 
 
+-- * CSG 
+
+
+unionI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
+unionI Nothing  Nothing  = Nothing 
+unionI (Just i) Nothing  = Just i
+unionI Nothing  (Just i) = Just i
+unionI (Just i) (Just j) = Just (n { tees = tees i ++ tees j } )
+  where n = if distance i <= distance j then i else j
+
+intersectI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM 
+intersectI (Just i) (Just j) = undefined 
+intersectI _        _        = Nothing 
+
+differenceI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM 
+differenceI (Just i) (Just j) = undefined
+differenceI Nothing  Nothing  = Nothing 
+differenceI (Just i) Nothing  = Just i
+differenceI Nothing  (Just i) = Just i
 
 
 
