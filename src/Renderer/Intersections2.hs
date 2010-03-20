@@ -198,20 +198,24 @@ intervals r Cube     = undefined
 
 -- * CSG 
 
+mergeI :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
+mergeI i j = n { tees = tees i ++ tees j } 
+  where n = if distance i <= distance j then i else j
+
 
 unionI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
 unionI Nothing  Nothing  = Nothing 
 unionI (Just i) Nothing  = Just i
 unionI Nothing  (Just i) = Just i
-unionI (Just i) (Just j) = Just (n { tees = tees i ++ tees j } )
-  where n = if distance i <= distance j then i else j
+unionI (Just i) (Just j) = Just $ merge i j
 
 intersectI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM 
-intersectI (Just i) (Just j) = undefined 
+intersectI (Just i) (Just j) = Just $ merge i j
 intersectI _        _        = Nothing 
 
+
 differenceI :: IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM 
-differenceI (Just i) (Just j) = undefined
+differenceI (Just i) (Just j) = Nothing
 differenceI Nothing  Nothing  = Nothing 
 differenceI (Just i) Nothing  = Just i
 differenceI Nothing  (Just i) = Just i
