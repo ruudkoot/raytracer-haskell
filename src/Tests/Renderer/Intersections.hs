@@ -22,7 +22,7 @@ instance Arbitrary Ray where
   arbitrary = liftM2 Ray arbitrary arbitrary
 
 prop_cylinderIntersect :: Ray -> Property
-prop_cylinderIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnCylinder (mkPoint x) && isOnCylinder (mkPoint y)) intersections
+prop_cylinderIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (isOnCylinder . mkPoint) intersections
    where isOnCylinder v = isOnTop v || isOnBottom v || isOnSide v
          isOnTop v      = abs (getY3D v) - 1.0 < margin
          isOnBottom v   = abs (getY3D v) < margin
@@ -31,13 +31,13 @@ prop_cylinderIntersect (Ray o d) = (not.null) intersections && magnitudeSquared 
          intersections  = intervals (Ray o d) Cylinder
          
 prop_sphereIntersect :: Ray -> Property
-prop_sphereIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnSphere (mkPoint x) && isOnSphere (mkPoint y)) intersections
+prop_sphereIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (isOnSphere . mkPoint) intersections
   where isOnSphere v   = abs (magnitudeSquared v - 1.0) < margin
         mkPoint t      = dropW (o + scaleF t d)
         intersections  = intervals (Ray o d) Sphere
         
 prop_planeIntersect :: Ray -> Property
-prop_planeIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnPlane (mkPoint x) && isOnPlane (mkPoint y)) intersections
+prop_planeIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (isOnPlane . mkPoint) intersections
   where isOnPlane v    = abs (getY3D v) < margin
         mkPoint t      = dropW (o + scaleF t d)
         intersections  = intervals (Ray o d) Plane
