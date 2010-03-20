@@ -26,18 +26,18 @@ prop_cylinderIntersect (Ray o d) = (not.null) intersections && magnitudeSquared 
    where isOnCylinder v = isOnTop v || isOnBottom v || isOnSide v
          isOnTop v      = abs (getY3D v) - 1.0 < margin
          isOnBottom v   = abs (getY3D v) < margin
-         isOnSide v     = abs (sqrt ((getX3D v)*(getX3D v) + (getZ3D v)*(getZ3D v)) - 1.0) < margin
+         isOnSide v     = abs (sqrt (getX3D v * getX3D v + getZ3D v * getZ3D v) - 1.0) < margin
          mkPoint t      = dropW (o + scaleF t d)
          intersections  = intervals (Ray o d) Cylinder
          
 prop_sphereIntersect :: Ray -> Property
 prop_sphereIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnSphere (mkPoint x) && isOnSphere (mkPoint y)) intersections
-  where isOnSphere v   = abs ((magnitudeSquared v) - 1.0) < margin
+  where isOnSphere v   = abs (magnitudeSquared v - 1.0) < margin
         mkPoint t      = dropW (o + scaleF t d)
         intersections  = intervals (Ray o d) Sphere
         
 prop_planeIntersect :: Ray -> Property
 prop_planeIntersect (Ray o d) = (not.null) intersections && magnitudeSquared d > 0 ==> all (\(x,y) -> isOnPlane (mkPoint x) && isOnPlane (mkPoint y)) intersections
-  where isOnPlane v    = (abs $ getY3D v) < margin
+  where isOnPlane v    = abs (getY3D v) < margin
         mkPoint t      = dropW (o + scaleF t d)
         intersections  = intervals (Ray o d) Plane

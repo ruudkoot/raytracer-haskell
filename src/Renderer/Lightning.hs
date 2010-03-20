@@ -32,36 +32,36 @@ localLightning = local
   
 
 local :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
-local intersect lights surface ray =
+local isect lights surface ray =
   toColour . sum $ map (\l -> diffuse l + specular l) lights
   where
     ----
-    diffuse (PointLight pos colour) = 
-      let n       = normal intersect
-          l       = normalize $ pos - location intersect
+    diffuse (PointLight pos col) = 
+      let n       = normal isect
+          l       = normalize $ pos - location isect
           angle   = n !.! l
           dRC     = diffuseReflectionCoefficient surface
           baseCol = fromColour $ surfaceColour surface 
-      in fmap (angle * ) (fmap (dRC*) colour * baseCol)
-    diffuse (DirectLight dir colour) = 
-      let n       = normal intersect
+      in fmap (angle * ) (fmap (dRC*) col * baseCol)
+    diffuse (DirectLight dir col) = 
+      let n       = normal isect
           angle   = n !.! dir
           dRC     = diffuseReflectionCoefficient surface
           baseCol = fromColour $ surfaceColour surface 
-      in fmap (angle * ) (fmap (dRC*) colour * baseCol)
+      in fmap (angle * ) (fmap (dRC*) col * baseCol)
     diffuse _ = toVec3D 0 0 0
     -- diffuse l = error $ "No diffuse implementation yet for this light: "
     --                     ++ show l
     ----
-    specular (PointLight pos colour) =
-      let n     = normal intersect
-          l     = normalize $ pos - location intersect
+    specular (PointLight pos col) =
+      let n     = normal isect
+          l     = normalize $ pos - location isect
           angle = n !.! l
           dir   = dropW $ rDirection ray
           r     = normalize $ fmap (2*angle*) n - l
           v     = normalize $ fmap negate dir
-          factor = (max (r !.! v) 0) ** phongExponent surface
-      in fmap (factor * specularReflectionCoefficient surface *) colour
+          factor = max (r !.! v) 0 ** phongExponent surface
+      in fmap (factor * specularReflectionCoefficient surface *) col
     specular _ = toVec3D 0 0 0
     -- specular l = error $ "No specular implementation yet for this light: "
     --                       ++ show l

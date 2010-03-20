@@ -14,13 +14,13 @@ tupleList [_]      = []
 tupleList (x:y:ls) = (x,y):tupleList ls
 
 instance Arbitrary TRanges where
-        arbitrary = liftM  (TRanges .tupleList.sort.nub) (listOf arbitrary)
+  arbitrary = liftM  (TRanges .tupleList.sort.nub) (listOf arbitrary)
 
 sort2::(Ord a)=>(a,a)->(a,a)
 sort2 (x,y) = if x < y then (x,y) else (y,x)
 
 instance Arbitrary TRange where
-        arbitrary = liftM2 (\x y -> TRange .sort2 $ (x,y)) arbitrary arbitrary
+  arbitrary = liftM2 (curry $ TRange . sort2) arbitrary arbitrary
 
 --Tests for the arbitrary instances
 prop_rangesOK::TRanges -> Bool
