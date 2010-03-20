@@ -1,5 +1,8 @@
-module Renderer.Intersections2 where
-------------------------------------------------------------------------------
+-- | Calculating the Ray-Object intersections.
+--
+module Renderer.Intersections2 (hit, intersect, IntersectionInfo(..)) where
+
+
 import Base.Shader
 import Base.Shape
 
@@ -7,72 +10,102 @@ import Data.Vector
 
 import Renderer.Scene
 import Renderer.UV
-------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------
+
+
 -- * Datastructures
-------------------------------------------------------------------------------
-data IntersectionInfo = IntersectionInfo
-    { isHit      :: Bool
-    , location :: Pt3D -- Real world location
-    , normal   :: Pt3D -- Real world normal
-    , distance :: Double -- ??
-    , textureCoord :: (Int, Double, Double) -- unit world coord
-    , tees     :: [Intersection]
-    }
-    deriving Eq
 
+
+-- | Intersection functions return this structure 
+-- so that the renderer has enough information
+-- to continue the calculation.
+--
+data IntersectionInfo = IntersectionInfo { 
+      isHit        :: Bool
+    , location     :: Pt3D                  -- ^ Real world location.
+    , normal       :: Pt3D                  -- ^ Real world normal.
+    , distance     :: Double                -- ^ Distance between Intersection and eye.
+    , textureCoord :: (Int, Double, Double) -- ^ Unit world coordinates
+    , tees         :: [Intersection]
+    } deriving (Eq, Show)
+
+
+-- | The interval functions return the t's 
+-- that solve the following equation:
+-- @intersection = eye + t*direction@
+--
 type Intersection = (Double, Double)
-------------------------------------------------------------------------------
--- * Intersection Wrapper functions
-------------------------------------------------------------------------------
+
+
+-- * Intersections 
+
+
+-- | Calculates the Intersections between a 
+-- ray and an object.
+--
 intersect :: Ray -> Object -> IntersectionInfo
--- ** Sphere
+
+
+-- Spheres
 intersect ray obj@(Simple (Sphere) m1 m2 shader) = 
   IntersectionInfo
     { isHit        = not $ null its
-    , location     = loc --error "Don't have locations yet"
-    , normal       = normalize loc -- error "Don' 'v' normals 't"
-    -- , distance     = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
+    , location     = loc 
+    , normal       = normalize loc
     , distance     = fst . head $ its
     , textureCoord = textcoord
     , tees         = its
     }
- where textcoord = uvmap its (uvSphere loc)
-       its = intervals ray Sphere
-       loc = (\ v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) 
-               $ instantiate ray (fst $ head its)
+  where textcoord = uvmap its (uvSphere loc)
+        its = intervals ray Sphere
+        loc = dropW $ instantiate ray (fst $ head its)
 
--- ** Plane
+
+-- Plane
 intersect ray obj@(Simple (Plane) m1 m2 shader) = 
   IntersectionInfo
     { isHit        = not $ null its
-    , location     = loc --error "Don't have locations yet"
-    , normal       = normalize loc -- error "Don' 'v' normals 't"
-    -- , distance     = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
+    , location     = loc 
+    , normal       = normalize loc 
     , distance     = fst . head $ its
     , textureCoord = textcoord
     , tees         = its
     }
  where textcoord = uvmap its (uvPlane loc)
        its = intervals ray Plane
-       loc = (\ v -> let (a, b, c, _) = fromVector4D v in toVec3D a b c) 
-               $ instantiate ray (fst $ head its)
+       loc = dropW $ instantiate ray (fst $ head its)
 
--- ** Cube
 
--- ** Cylinder
+-- Cube
+
+-- Cylinder
 
 intersect _ obj = error $ "Intersections of type \n" ++ show obj 
                           ++ " are not supported yet."
 
-------------------------------------------------------------------------------
--- * Intersection Inner functions
-------------------------------------------------------------------------------
+
+
+-- | Instead of heaving separate `hit` functions 
+-- that merely calculate whether or not an 
+-- object gets hit, we depend on laziness to 
+-- pick out that information efficiently from 
+-- the intersect functions.
+--
+hit :: Ray -> Object -> Bool
+hit r o = isHit $ intersect r o
+
+
+-- * Intervals 
+
+
+-- | The interval functions return the t's 
+-- that solve the following equation:
+-- @intersection = eye + t*direction@
+--
 intervals :: Ray -> Shape -> [Intersection]
 
 
--- ** Sphere
+-- Sphere
 intervals r Sphere   = let dir = dropW $ rDirection r
                            k = dropW $ rOrigin r
                            a = dir !.! dir
@@ -85,33 +118,39 @@ intervals r Sphere   = let dir = dropW $ rDirection r
                              _  -> let sqrd = sqrt d
                                    in [((-b-sqrd)/(2*a), (-b+sqrd)/(2*a))]
 
--- ** Plane
+
+-- Plane
 intervals r Plane    = let oy = getY4D $ rOrigin r
                            dy = getY4D $ rDirection r
                        in if (oy == 0) || (oy * dy >= 0)
                            then []
                            else [(- oy / dy, - oy / dy)]
--- ** Cube
-
--- ** Cylinder
-
-------------------------------------------------------------------------------
--- * Hit Wrapper functions
--- Let lazyness handle efficiency for now
-------------------------------------------------------------------------------
-hit :: Ray -> Object -> Bool
-hit r o = isHit $ intersect r o
 
 
-------------------------------------------------------------------------------
--- * Util functions
--- Let lazyness handle efficiency for now
-------------------------------------------------------------------------------
--- | Instantiates a ray starting on some point and calculates the ending point
---   given a certain t.
+-- Cube
+
+-- Cylinder
+
+
+
+
+
+
+-- * Helper functions
+
+
+-- | Instantiates a ray starting on some point 
+-- and calculates the ending point given a certain t.
+--
 instantiate :: Ray -> Double -> Vec4D
 instantiate (Ray origin direction) t = origin + fmap (t *) direction
 
+
+-- | Does something mysterious and arcane while mumbling
+-- profanities. No seriously, what's this for?
+--
 uvmap :: [Intersection] -> SurfaceCoord -> SurfaceCoord
 uvmap [] _ = (0, 0, 0)
 uvmap _  a = a
+
+

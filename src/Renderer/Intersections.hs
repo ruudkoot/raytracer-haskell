@@ -92,9 +92,10 @@ hit r Cone     = let dir = Vector4D (1, 0, 1, 0) * rDirection r
                      --bottomHit = magnitudeSquared (k + dir * (Vector4D (t, t, t, 1))) <= 1
                      --topHit = magnitudeSquared (k + dir * (Vector4D (t', t', t', 1))) < 1
                  in d >= 0 && sideHit && (t1 < 0 || t2 < 0)
-                 -- The 'unit' plane is the XZ plane, so we only have to consider the Y direction.
-                 -- If oy == 0, we're in the plane, otherwise we hit it if we move 'downwards' on Y
-                 -- when we start 'above' the plane, or vice versa.
+
+-- The 'unit' plane is the XZ plane, so we only have to consider the Y direction.
+-- If oy == 0, we're in the plane, otherwise we hit it if we move 'downwards' on Y
+-- when we start 'above' the plane, or vice versa.
 hit r Plane    = let oy = getY4D $ rOrigin r
                      dy = getY4D $ rDirection r
                  in (oy == 0) || (oy * dy < 0)
@@ -155,8 +156,7 @@ intersection r Sphere   = let dir = rDirection r
                               b = 2.0 * (k !.! dir)
                               c = (k !.! k) - 1.0
                               d = b*b - 4.0*a*c
-                          in trace (show r) $
-                             case compare d 0.0 of
+                          in case compare d 0.0 of
                                 EQ -> [(-b/(2*a),-b/(2*a))]
                                 LT -> []
                                 _  -> let sqrd = sqrt d
@@ -176,8 +176,7 @@ intersectionInfo ray object = IntersectionInfo
                                 , distance     = error "Don' 'v' distance 't"--undefined --fst . head $ intersection r Sphere
                                 , textureCoord = textcoord
                                 }
-  where textcoord = trace (show its ++ "hit: " ++ (show (hit' ray object))) $
-                    case its of
+  where textcoord = case its of
                       []        -> (0, 0, 0)
                       ((a,_):_) -> uvSphere loc
         its = intersection ray Sphere
