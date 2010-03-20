@@ -34,63 +34,55 @@ complementIn (lbound,hbound) ls = (lbound,fst.head $ ls):complement ls ++ [(snd.
 --Requires valid range/ranges
 insertRange::(Ord a) => Range a -> Ranges a -> Ranges a
 insertRange ele []     = [ele]
-insertRange ele@(el,eh) (x@(xl,xh):xs) | xh >= el --Ele entering domain?
-                                                  = if el < xl --Ele before x?
-                                                    then if eh < xl --Overlap?
-                                                         then ele:x:xs -- no overlap, insert
-                                                         else if eh < xh --eh inside?
-                                                              then (el,xh):xs --partial overlap
-                                                              else insertRange (el,eh) xs --x completely inside e
-                                                    else --el inside x
-                                                         if eh < xh
-                                                         then x:xs--e completely inside x
-                                                         else insertRange (xl,eh) xs --partial overlap
-                                       | otherwise = x:insertRange ele xs
+insertRange ele@(el,eh) (x@(xl,xh):xs) 
+  | xh >= el  = f                                 -- ele entering domain?
+  | otherwise = x:insertRange ele xs
+  where f | el < xl   = g                         -- ele entering domain?
+          | eh < xh   = x:xs                      -- e completely inside x 
+          | otherwise = insertRange (xl, eh) xs   -- partial overlap
+        g | eh < xl   = ele:x:xs                  -- no overlap; insert
+          | eh < xh   = (el,xh):xs                -- partial overlap
+          | otherwise = insertRange (el, eh) xs   -- x completely inside e
+
 
 unionRanges::(Ord a) => Ranges a -> Ranges a -> Ranges a
 unionRanges r              []             = r
 unionRanges []             r              = r  
-unionRanges (x@(xl,xh):xs) (y@(yl,yh):ys) = if xl < yl --x lowest ?
-                                            then if xh < yl --overlap?
-                                                 then x:unionRanges xs (y:ys) --no overlap
-                                                 else if xh > yh --y fully in x?
-                                                      then unionRanges (x:xs) ys
-                                                      else unionRanges xs ((xl,yh):ys)
-                                            else if yh < xl --overlap?
-                                                 then y:unionRanges (x:xs) ys --no overlap
-                                                 else if yh > xh --x fully in y?
-                                                      then unionRanges xs (y:ys)
-                                                      else unionRanges ((yl,xh):xs) ys
+unionRanges (x@(xl,xh):xs) (y@(yl,yh):ys) 
+  | xl < yl = f                                   -- overlap?
+  | yh < xl = y:unionRanges (x:xs) ys             -- no overlap
+  | yh > xh = unionRanges xs (y:ys)               -- x fully in y?
+  | otherwise = unionRanges ((yl,xh):xs) ys
+  where f | xh < yl = x : unionRanges xs (y:ys)   -- no overlap 
+          | xh > yh = unionRanges (x:xs) ys 
+          | otherwise = unionRanges xs ((xl, yh):ys)
+
 
 intersectRanges::(Ord a) => Ranges a -> Ranges a -> Ranges a
 intersectRanges []             _              = []
 intersectRanges _              []             = []
-intersectRanges (x@(xl,xh):xs) (y@(yl,yh):ys) = if xl < yl --x lowest ?
-                                                then if xh < yl --overlap?
-                                                     then intersectRanges xs (y:ys) --no overlap
-                                                     else if xh > yh --y fully in x?
-                                                          then y:intersectRanges (x:xs) ys 
-                                                          else (yl,xh):intersectRanges xs (y:ys)
-                                                else if yh < xl --overlap?
-                                                     then intersectRanges (x:xs) ys --no overlap
-                                                     else if yh > xh --x fully in y?
-                                                          then x:intersectRanges xs (y:ys) 
-                                                          else (xl,yh):intersectRanges (x:xs) ys
+intersectRanges (x@(xl,xh):xs) (y@(yl,yh):ys) 
+  | xl < yl   = f                                   --overlap?
+  | yh < xl   = intersectRanges (x:xs) ys           --no overlap
+  | yh > xh   = x:intersectRanges xs (y:ys)         -- x fully in y
+  | otherwise = (xl,yh):intersectRanges (x:xs) ys
+  where f | xh < yl   = intersectRanges xs (y:ys)   -- no overlap 
+          | xh > yh   = y:intersectRanges (x:xs) ys 
+          | otherwise = (yl,xh):intersectRanges xs (y:ys)
+
 
 diffRanges::(Ord a) => Ranges a -> Ranges a -> Ranges a
 diffRanges []             _              = []
 diffRanges r              []             = r
-diffRanges (x@(xl,xh):xs) (y@(yl,yh):ys) = if xl <= yl --x lowest ?
-                                           then if xh < yl --overlap?
-                                                then x:diffRanges xs (y:ys) --no overlap
-                                                else if xh >= yh --y fully in x?
-                                                     then (xl,yl):diffRanges ((yh,xh):xs) ys 
-                                                     else (xl,yl):diffRanges xs (y:ys)
-                                                else if yh < xl --overlap?
-                                                     then diffRanges (x:xs) ys --no overlap
-                                                     else if yh >= xh --x fully in y?
-                                                          then diffRanges xs (y:ys) 
-                                                          else diffRanges ((yh,xh):xs) ys
+diffRanges (x@(xl,xh):xs) (y@(yl,yh):ys) 
+  | xl <= yl  = f                                          -- x lowest ?
+  | yh <  xl  = diffRanges (x:xs) ys                       -- no overlap
+  | yh >= xh  = diffRanges xs (y:ys)                       -- x fully in y
+  | otherwise = diffRanges ((yh,xh):xs) ys
+  where f | xh < yl   = x:diffRanges xs (y:ys)             -- no overlap
+          | xh >= yh  = (xl,yl):diffRanges ((yh,xh):xs) ys -- y fully in x
+          | otherwise = (xl,yl):diffRanges xs (y:ys)
+
 
 {-
 --Aanname: i1l < i2l
