@@ -8,7 +8,8 @@ import Control.Monad (liftM2, liftM3, liftM4)
 import Test.QuickCheck
 
 -- * Synonyms
-type Pt3D  = Vector3D Double
+type Pt3D  = Vec3D
+type Vec3D = Vector3D Double
 type Vec4D = Vector4D Double
 
 

@@ -23,7 +23,7 @@ import Data.Maybe (isJust)
 --
 data IntersectionInfo = IntersectionInfo { 
       location     :: Pt3D           -- ^ Real world location.
-    , normal       :: Pt3D           -- ^ Real world normal.
+    , normal       :: Vec3D          -- ^ Real world normal. 
     , distance     :: Double         -- ^ Distance between Intersection and eye.
     , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
     , shader       :: Shader         -- ^ The shader to use to calculate the final color
@@ -206,6 +206,15 @@ intervals (Ray (Vector4D (px,py,_,_)) (Vector4D (vx,vy,_,_))) Cone =
 intervals r Cube     = undefined
 
 
+-- * Normals 
+
+
+normalSphere :: Ray -> Pt3D -> Vec3D
+normalSphere r = negate . normalize -- since we're dealing with unit sphere
+
+
+
+
 -- * CSG 
 
 -- | OR
@@ -229,6 +238,10 @@ differenceI _        _        = Nothing
 
 mergeI :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
 mergeI i j = if distance i <= distance j then i else j
+
+
+
+
 
 
 -- * Helper functions
