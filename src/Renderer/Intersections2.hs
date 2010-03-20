@@ -49,9 +49,9 @@ intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray Sphere uvSphere
 intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray Plane  uvPlane
 intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray Cube   uvCube
 intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray Cylinder uvCylinder
-intersect ray (Union      o1 o2) = unionI      (intersect ray o1) (intersect ray o2)
-intersect ray (Difference o1 o2) = differenceI (intersect ray o1) (intersect ray o2)
-intersect ray (Intersect  o1 o2) = intersectI  (intersect ray o1) (intersect ray o2)
+intersect ray (Union      o1 o2) = unionI      (ray `intersect` o1) (ray `intersect` o2)
+intersect ray (Difference o1 o2) = differenceI (ray `intersect` o1) (ray `intersect` o2)
+intersect ray (Intersect  o1 o2) = intersectI  (ray `intersect` o1) (ray `intersect` o2)
 
 
 
@@ -60,7 +60,7 @@ intersect ray (Intersect  o1 o2) = intersectI  (intersect ray o1) (intersect ray
 --
 mkInfo :: Ray -> Shape -> UVMapper -> Maybe IntersectionInfo 
 mkInfo ray shape uv = if null ints then Nothing
-                      else Just $ IntersectionInfo 
+                      else Just IntersectionInfo 
                            { location     = loc
                            , normal       = toVec3D 0 0 0 -- TODO!
                            , distance     = t
