@@ -80,21 +80,17 @@ renderScene world = saveRendering world pixels
 renderPixel :: Int -> Int -> RayMaker -> Object -> [RenderLight] -> Colour Int
 renderPixel x y raymaker object lights
   = let ray  = raymaker x y
-        info = intersect ray object
-    in if isHit info
-       then let texturecoord = textureCoord info
-                lalaShader   = getShader object
-                surface      = runShader uvShader texturecoord
-             in toRGB $ localLightning info
-                                       lights   -- visible lights
-                                       (runShader lalaShader texturecoord)
-                                       -- surface
-                                       ray
-                                       
-       else colour 255 255 0
-       -- else if even (x+y)
-       --      then colour   0   0   0
-       --      else colour 255   0 255
+        i    = intersect ray object
+    in case i of 
+       Nothing -> colour 255 255 0
+       Just info ->  let texturecoord = textureCoord info
+                         lalaShader   = getShader object
+                         surface      = runShader uvShader texturecoord
+                     in toRGB $ localLightning info
+                                lights   -- visible lights
+                                (runShader lalaShader texturecoord)
+                                -- surface
+                                ray
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)

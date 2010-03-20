@@ -12,6 +12,7 @@ import Renderer.Scene
 import Renderer.UV
 
 
+import Data.Maybe (isJust)
 
 -- * Datastructures
 
@@ -21,8 +22,7 @@ import Renderer.UV
 -- to continue the calculation.
 --
 data IntersectionInfo = IntersectionInfo { 
-      isHit        :: Bool
-    , location     :: Pt3D           -- ^ Real world location.
+      location     :: Pt3D           -- ^ Real world location.
     , normal       :: Pt3D           -- ^ Real world normal.
     , distance     :: Double         -- ^ Distance between Intersection and eye.
     , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
@@ -37,33 +37,33 @@ data IntersectionInfo = IntersectionInfo {
 type Intersections = [Double]
 
 
-
 -- * Intersections 
 
 
 -- | Calculates the intersections between a 
 -- ray and an object.
 --
-intersect :: Ray -> Object -> IntersectionInfo
-intersect ray obj@(Simple Sphere   m1 m2 shader) = mkInfo ray Sphere uvSphere
-intersect ray obj@(Simple Plane    m1 m2 shader) = mkInfo ray Plane  uvPlane
-intersect ray obj@(Simple Cube     m1 m2 shader) = mkInfo ray Cube   uvCube
-intersect ray obj@(Simple Cylinder m1 m2 shader) = mkInfo ray Cylinder uvCylinder
+intersect :: Ray -> Object -> Maybe IntersectionInfo
+intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray Sphere uvSphere
+intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray Plane  uvPlane
+intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray Cube   uvCube
+intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray Cylinder uvCylinder
+--intersect ray (Union  o1 o2) = unionI (intersect ray o1) (intersect ray o2)
 intersect _   obj = error $ show obj ++ " are not supported yet."
 
 
 -- | Helper function used by @intersect@ to 
 -- build the resulting IntersectionInfo.
 --
-mkInfo :: Ray -> Shape -> UVMapper -> IntersectionInfo 
-mkInfo ray shape uv = IntersectionInfo 
-  { isHit        = not $ null ints
-  , location     = loc
-  , normal       = toVec3D 0 0 0 -- TODO!
-  , distance     = t
-  , textureCoord = uvmap ints $ uv loc
-  , tees         = ints
-  } 
+mkInfo :: Ray -> Shape -> UVMapper -> Maybe IntersectionInfo 
+mkInfo ray shape uv = if null ints then Nothing
+                      else Just $ IntersectionInfo 
+                           { location     = loc
+                           , normal       = toVec3D 0 0 0 -- TODO!
+                           , distance     = t
+                           , textureCoord = uvmap ints $ uv loc
+                           , tees         = ints
+                           } 
   where ints = intervals ray shape
         loc  = dropW $ instantiate ray t
         t    = nearest ints
@@ -83,7 +83,7 @@ nearest = minimum
 -- the intersect functions.
 --
 hit :: Ray -> Object -> Bool
-hit r o = isHit $ intersect r o
+hit r = isJust . intersect r 
 
 
 
