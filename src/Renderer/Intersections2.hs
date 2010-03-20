@@ -97,17 +97,16 @@ intervals :: Ray -> Shape -> [Intersection]
 
 
 -- Sphere
-intervals r Sphere   = let dir = dropW $ rDirection r
-                           k = dropW $ rOrigin r
-                           a = dir !.! dir
-                           b = 2.0 * (k !.! dir)
-                           c = (k !.! k) - 1.0
-                           d = b*b - 4.0*a*c
-                       in case compare d 0.0 of
-                             EQ -> [(-b/(2*a),-b/(2*a))]
-                             LT -> []
-                             _  -> let sqrd = sqrt d
-                                   in [((-b-sqrd)/(2*a), (-b+sqrd)/(2*a))]
+intervals (Ray o r) Sphere =
+  let (k, dir) = (dropW o, dropW r)
+      a = dot dir
+      b = 2.0 * (k !.! dir)
+      d = b * b - 4.0 * a * (dot k - 1.0)
+  in case compare d 0.0 of
+      LT -> []
+      EQ -> let r = -b / (2*a) in [(r, r)]
+      GT -> let sqrd op = (-b `op` sqrt d) / (2 * a)
+            in [(sqrd (-), sqrd (+))]
 
 
 -- Plane
@@ -119,6 +118,7 @@ intervals (Ray o d) Plane = let (oy, dy) = (getY4D o, getY4D d)
 
 intervals r Cube     = undefined
 intervals r Cylinder = undefined
+intervals r Cone     = undefined
 
 
 

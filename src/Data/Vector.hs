@@ -242,6 +242,14 @@ instance (Fractional a) => Fractional (Vector4D a) where
 {-# INLINE (!.!) #-}
 v1 !.! v2 = foldVector sum (v1 * v2)
 
+
+-- | @dot v@ is equivalent to @v !.! v@.
+--
+dot :: (Vector v, Num a, Num (v a)) => v a -> a
+{-# INLINE dot #-}
+dot v = v !.! v
+
+
 -- | The cross product is a binary operation on two 3D vectors 
 -- that results in another vector which is perpendicular to 
 -- the plane containing the two input vectors.
@@ -277,7 +285,7 @@ normalize v1 = pure (1 / magnitude v1) * v1
 
 -- | Sum values of a vector.
 --
-sumVector :: (Vector v, Floating a, Num (v a)) => v a -> a
+sumVector :: (Vector v, Num a, Num (v a)) => v a -> a
 sumVector = foldVector sum
 
 -- | Downgrade 4D vector to 3D.
