@@ -40,3 +40,8 @@ data RenderLight
   --  light's direction vector (i.e., the vector from pos to at) and the vector
   --  from pos to Q. If the angle is greater than the cutoff angle, then intensity
   --  is zero; otherwise the intensity is given by the equation
+
+getColor :: RenderLight -> Pt3D
+getColor (DirectLight _ c) = c
+getColor (PointLight  _ c) = c
+getColor (SpotLight   _ _ c _ _) = c 

@@ -91,8 +91,7 @@ renderPixel x y raymaker world
        Just info ->  let texturecoord = textureCoord info
                          lalaShader   = shader info
                          surface      = runShader uvShader texturecoord
-                     in 
-                        toRGB $ localLightning ambient
+                     in toRGB $ localLightning ambient
                                                info
                                                lights
                                                --[PointLight (toVec3D 0 0 (-2)) (toVec3D 1 1 1)]--lights   -- visible lights
@@ -107,7 +106,7 @@ renderPixel x y raymaker world
 saveRendering :: World -> Colours Int -> IO ()
 saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
   where bad = error "Error: didn't produce a valid PPM image."
-        save = writeFile $ roFile (wOptions world)
+        save = trace ("writing result to " ++ roFile (wOptions world)) writeFile $ roFile (wOptions world)
         (w,h) = getDimensions world
 
 
@@ -125,7 +124,7 @@ getRayMaker world = mkRayMaker x y delta
 --
 mkRayMaker :: Double -> Double -> Double -> RayMaker 
 mkRayMaker x y delta i j = Ray eye dir
-  where eye = Vector4D (0, 0, -1, 0)
+  where eye = Vector4D (0, 0, -1, 1)
         dir = normalize $
               Vector4D (x - (fromIntegral j + 0.5) * delta,
                         y - (fromIntegral i + 0.5) * delta, 1, 1)

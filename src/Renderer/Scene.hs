@@ -2,7 +2,7 @@ module Renderer.Scene where
 
 import Data.Colour
 import Data.Vector
-import Data.Matrix (Matrix4D)
+import Data.Matrix (Matrix4D, (!*!))
 
 import Base.Light
 import Base.Shape
@@ -42,6 +42,8 @@ data Ray = Ray
   }
   deriving Show
 
+transformRay :: Ray -> Matrix4D Double -> Ray
+transformRay (Ray o d) m = Ray (m !*! o) (m !*! d)
   
 data Object   = Simple Shape (Matrix4D Double) (Matrix4D Double) Shader -- Shape, transformation and inverse of transformation matrix
               | Union      Object Object

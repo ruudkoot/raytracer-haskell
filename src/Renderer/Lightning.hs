@@ -31,7 +31,6 @@ localLightning ambient its lights surface r =
   add (times (surfaceColour surface) ambient)
       (local its lights surface r)
 
-  
 
 local :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
 local isect lights surface ray =
@@ -68,4 +67,19 @@ local isect lights surface ray =
     -- specular l = error $ "No specular implementation yet for this light: "
     --                       ++ show l
 
-
+-- | Transformed version of the formula in the assignment on page 11.
+-- local' :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
+-- local' ambient its lights surface r =
+--   surfaceColor * $   diffRC * ambient 
+--                    + totalIntensity * (diffRC * diffuse + specRC * specular)
+--                    -- + specRC * toVec3D 0 0 0 -- TODO: Reflection, add the 
+--                                                --       colour of the resulting
+--                                                --       ray to the parameters
+--   where totalIntensity         = (sum . map getIntensity) lights                
+--         diffRC                 = diffuseReflectionCoefficient surface
+--         specRC                 = specularReflectionCoefficient surface
+--         diffuse                = (sum . map (\l -> n !.! getIntensity l )) lights
+--         specular               = (sum . map (\l -> n !.! ))
+--         n                      = normal isect
+--         l (PointLight pos col) = normalize $ pos - location isect
+--         l (Dir)
