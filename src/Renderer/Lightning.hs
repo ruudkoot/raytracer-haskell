@@ -23,12 +23,14 @@ import Renderer.Scene
 --   available lights (TODO: Where do we do occlusion testing??? Should this
 --   also contain soft shadows???) for the moment this assumes that the
 --   provided lights are the visible lights. :)
---   TODO: Ambient color
 --   TODO: Shadows, maybe [(Factor, RenderLight)]  to indicate how heavy a
 --         light weighs.
-localLightning :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
-localLightning = local
-  -- in surfaceColour surfaceproperty
+--         Filter out invisible lights.
+localLightning :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
+localLightning ambient its lights surface r = 
+  add (times (surfaceColour surface) ambient)
+      (local its lights surface r)
+
   
 
 local :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD

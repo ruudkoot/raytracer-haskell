@@ -53,3 +53,13 @@ toColour = Colour
 
 fromColour :: Colour a -> Vector3D a 
 fromColour (Colour v) = v
+
+-- | Colour arithmetic
+add :: (Ord a, Num a) => Colour a -> Colour a -> Colour a
+add = op (+)
+
+times :: (Ord a, Num a) => Colour a -> Colour a -> Colour a
+times = op (*)
+
+op :: (Ord a, Num a) => (Vector3D a -> Vector3D a -> Vector3D a) -> Colour a -> Colour a -> Colour a
+op f a b = (clampColour 0 1 . toColour) $ (fromColour a) `f` (fromColour b)

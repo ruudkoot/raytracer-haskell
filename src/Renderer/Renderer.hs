@@ -1,7 +1,7 @@
 module Renderer.Renderer (render) where
 
 import Data.Colour (Colour(..), Colours, toRGB, colour)
-import Data.Vector (Vector4D(..), normalize)
+import Data.Vector (Vector4D(..), normalize, toVec3D)
 import Data.Radians
 
 import Output.Output (toSize)
@@ -21,6 +21,8 @@ import Control.Concurrent.MVar
 import Control.Exception (finally)
 import Data.List (sort)
 import System.IO.Unsafe
+
+import Debug.Trace
  
 
 -- | The number of threads to use in 
@@ -70,27 +72,34 @@ renderScene :: World -> IO ()
 renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
-        pixels = [renderPixel i j raymaker (wObject world) (wLights world) | 
+        pixels = [renderPixel i j raymaker world | 
                   i <- [0..h-1],
                   j <- [0..w-1]]
 
 
 -- | Calculates the colour for a single pixel position.
 --
-renderPixel :: Int -> Int -> RayMaker -> Object -> [RenderLight] -> Colour Int
-renderPixel x y raymaker object lights
-  = let ray  = raymaker x y
+renderPixel :: Int -> Int -> RayMaker -> World -> Colour Int
+renderPixel x y raymaker world
+  = let object = wObject world
+        lights = wLights world
+        ambient = (roAmbience.wOptions) world
+        ray  = raymaker x y
         i    = intersect ray object
     in case i of 
        Nothing -> colour 255 255 0
        Just info ->  let texturecoord = textureCoord info
                          lalaShader   = shader info
                          surface      = runShader uvShader texturecoord
-                     in toRGB $ localLightning info
-                                lights   -- visible lights
-                                (runShader lalaShader texturecoord)
-                                -- surface
-                                ray
+                     in 
+                        toRGB $ localLightning ambient
+                                               info
+                                               lights
+                                               --[PointLight (toVec3D 0 0 (-2)) (toVec3D 1 1 1)]--lights   -- visible lights
+                                               (runShader lalaShader texturecoord)
+                                               -- surface
+                                               ray
+                                    
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
@@ -116,7 +125,7 @@ getRayMaker world = mkRayMaker x y delta
 --
 mkRayMaker :: Double -> Double -> Double -> RayMaker 
 mkRayMaker x y delta i j = Ray eye dir
-  where eye = Vector4D (0, 0, -1, 0)
+  where eye = Vector4D (0, 0, -5, 0)
         dir = normalize $
               Vector4D (x - (fromIntegral j + 0.5) * delta,
                         y - (fromIntegral i + 0.5) * delta, 1, 1)
@@ -160,19 +169,19 @@ newThread world work =
   do let (raymaker, object, lights) = (getRayMaker world, wObject world, wLights world)
      mvar <- newEmptyMVar
      modifyMVar_ children (\cs -> return $ mvar:cs)
-     forkIO (renderThread raymaker object lights work `finally` putMVar mvar ())
+     forkIO (renderThread raymaker world work `finally` putMVar mvar ())
      return ()
         
 
 -- | This function takes a workload of pixel locations 
 -- and calculates their colour; pushing it to the result MVar.
 --
-renderThread :: RayMaker -> Object -> [RenderLight] -> [(Int, Int)] -> IO ()
-renderThread _ _ _ [] = return ()
-renderThread raymaker obj lights ((i,j):work) = 
-  do let col = renderPixel i j raymaker obj lights
+renderThread :: RayMaker -> World -> [(Int, Int)] -> IO ()
+renderThread _ _  [] = return ()
+renderThread raymaker world ((i,j):work) = 
+  do let col = renderPixel i j raymaker world
      modifyMVar_ result (\cs -> return $ (i, j, col) : cs)
-     renderThread raymaker obj lights work
+     renderThread raymaker world work
 
 
 -- | Waits for the threads to finish, 
