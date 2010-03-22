@@ -72,15 +72,16 @@ renderScene :: World -> IO ()
 renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
-        pixels = [renderPixel i j raymaker world | 
+        depth = (roDepth.wOptions) world
+        pixels = [renderPixel depth i j raymaker world | 
                   i <- [0..h-1],
                   j <- [0..w-1]]
 
 
 -- | Calculates the colour for a single pixel position.
 --
-renderPixel :: Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel x y raymaker world
+renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
+renderPixel depth x y raymaker world
   = let object = wObject world
         lights = wLights world
         ambient = (roAmbience.wOptions) world
@@ -175,7 +176,7 @@ newThread world work =
 renderThread :: RayMaker -> World -> [(Int, Int)] -> IO ()
 renderThread _ _  [] = return ()
 renderThread raymaker world ((i,j):work) = 
-  do let col = renderPixel i j raymaker world
+  do let col = renderPixel ((roDepth.wOptions) world) i j raymaker world
      modifyMVar_ result (\cs -> return $ (i, j, col) : cs)
      renderThread raymaker world work
 
