@@ -47,16 +47,14 @@ type Intersections = [Double]
 -- ray and an object.
 --
 intersect :: Ray -> Object -> IntersectionInfoM
-intersect ray (Simple Sphere   m1 m2 shader) = mkInfo ray shader Sphere uvSphere 
-intersect ray (Simple Plane    m1 m2 shader) = mkInfo ray shader Plane  uvPlane
-intersect ray (Simple Cube     m1 m2 shader) = mkInfo ray shader Cube   uvCube
-intersect ray (Simple Cylinder m1 m2 shader) = mkInfo ray shader Cylinder uvCylinder
-intersect ray (Simple Cone     m1 m2 shader) = mkInfo ray shader Cone   uvCone
+intersect ray (Simple Sphere   m1 m2 shader) = mkInfo (transformRay ray m2) shader Sphere uvSphere 
+intersect ray (Simple Plane    m1 m2 shader) = mkInfo (transformRay ray m2) shader Plane  uvPlane
+intersect ray (Simple Cube     m1 m2 shader) = mkInfo (transformRay ray m2) shader Cube   uvCube
+intersect ray (Simple Cylinder m1 m2 shader) = mkInfo (transformRay ray m2) shader Cylinder uvCylinder
+intersect ray (Simple Cone     m1 m2 shader) = mkInfo (transformRay ray m2) shader Cone   uvCone
 intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
 intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
 intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
-
-
 
 -- | Helper function used by @intersect@ to 
 -- build the resulting IntersectionInfo.
