@@ -125,7 +125,7 @@ getRayMaker world = mkRayMaker x y delta
 --
 mkRayMaker :: Double -> Double -> Double -> RayMaker 
 mkRayMaker x y delta i j = Ray eye dir
-  where eye = Vector4D (0, 0, -5, 0)
+  where eye = Vector4D (0, 0, -1, 0)
         dir = normalize $
               Vector4D (x - (fromIntegral j + 0.5) * delta,
                         y - (fromIntegral i + 0.5) * delta, 1, 1)
