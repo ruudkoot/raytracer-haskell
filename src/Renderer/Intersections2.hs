@@ -8,6 +8,7 @@ import Base.Shape
 
 import Data.Vector
 
+import Renderer.Normals
 import Renderer.Scene
 import Renderer.UV
 
@@ -65,7 +66,7 @@ mkInfo ray sh shape uv =
   if null ints then Nothing
   else Just IntersectionInfo 
        { location     = loc
-       , normal       = toVec3D 0 0 0 -- TODO!
+       , normal       = getNormal shape ray loc 
        , distance     = t
        , textureCoord = uv loc
        , shader       = sh
@@ -203,12 +204,6 @@ intervals (Ray (Vector4D (px,py,_,_)) (Vector4D (vx,vy,_,_))) Cone =
 
 intervals r Cube     = undefined
 
-
--- * Normals 
-
-
-normalSphere :: Ray -> Pt3D -> Vec3D
-normalSphere _ = normalize -- since we're dealing with unit sphere
 
 
 
