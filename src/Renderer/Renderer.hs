@@ -90,13 +90,11 @@ renderPixel x y raymaker world
        Nothing -> colour 255 255 0
        Just info ->  let texturecoord = textureCoord info
                          lalaShader   = shader info
-                         surface      = runShader uvShader texturecoord
+                         surface      = runShader (shader info) texturecoord
                      in toRGB $ localLightning ambient
                                                info
                                                lights
-                                               --[PointLight (toVec3D 0 0 (-2)) (toVec3D 1 1 1)]--lights   -- visible lights
-                                               (runShader lalaShader texturecoord)
-                                               -- surface
+                                               surface
                                                ray
                                     
 
