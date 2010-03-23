@@ -298,4 +298,3 @@ dropW (Vector4D (x, y, z, _)) = Vector3D (x, y, z)
 --
 addW :: Vector3D a -> a -> Vector4D a 
 addW (Vector3D (x, y, z)) w = Vector4D (x, y, z, w)
-
