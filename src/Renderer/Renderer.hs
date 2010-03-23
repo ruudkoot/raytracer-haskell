@@ -95,7 +95,7 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
               reflDir      = fmap (2 * n !.! dropW (rDirection ray) *) n
               reflected    = Ray { rOrigin = addW (location info) 0, 
                                    rDirection = negate (rDirection ray) + 
-                                                addW (reflDir) 0 } -- should this ray be transformed?
+                                                addW reflDir 0 } -- should this ray be transformed?
           in if depth == 0 
                then f $ toVec3D 0 0 0 -- or should that be 1 1 1?
                else renderPixel' (depth - 1) reflected 
