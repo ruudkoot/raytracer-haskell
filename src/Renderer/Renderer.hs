@@ -20,6 +20,7 @@ import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
 import Control.Exception (finally)
 import Data.List (sort)
+import System.IO (hPutStr, stderr)
 import System.IO.Unsafe
 
 import Debug.Trace
@@ -66,6 +67,16 @@ render 1 = renderScene
 render n = renderSceneConc n
 
 
+-- | Render a progress bar on the screen. Only redraw if necessary.
+--
+dot i j w h expr = if numberOfDots > previousNumberOfDots
+                   then unsafePerformIO $ do putDotsLine; return expr
+                   else expr
+  where numberOfDots = ((100 * (i * h + j)) `div` (w * h))
+        previousNumberOfDots = ((100 * (i * h + j - 1)) `div` (w * h))
+        putDotsLine = hPutStr stderr ("\r" ++ (replicate numberOfDots '.') ++
+                                                " " ++ show numberOfDots ++ "%")
+
 -- | Renders the World without using threads.
 --
 renderScene :: World -> IO ()
@@ -73,7 +84,7 @@ renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = [renderPixel depth i j raymaker world | 
+        pixels = [(dot i j h w) $ renderPixel depth i j raymaker world | 
                   i <- [0..h-1],
                   j <- [0..w-1]]
 
