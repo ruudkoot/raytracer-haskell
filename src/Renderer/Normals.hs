@@ -29,16 +29,18 @@ getNormal' Cone     loc = case fromVector3D loc of
     (_, 1, _) -> Vector3D (0.0,1.0,0.0)
     (x, y, z) -> normalize $ Vector3D (2*x,-2*y,2*z)
 
-getNormal' Cube     loc = case fromVector3D loc of
-    (_, _, 0) -> Vector3D ( 0.0, 0.0,-1.0) -- front
-    (_, _, 1) -> Vector3D ( 0.0, 0.0, 1.0) -- back
-    (0, _, _) -> Vector3D (-1.0, 0.0, 0.0) -- left
-    (1, _, _) -> Vector3D ( 1.0, 0.0, 0.0) -- right
-    (_, 0, _) -> Vector3D ( 0.0,-1.0, 0.0) -- top
-    (_, 1, _) -> Vector3D ( 0.0, 1.0, 0.0) -- bottom 
-    _         -> error $ "Loc (" ++ show loc ++ ") is not a valid "
-                        ++ "cube coordinate for normal... What where you "
-                        ++ "thinking?"
+getNormal' Cube     (Vector3D (x,y,z)) | 0.0 `dEq` z = Vector3D ( 0.0, 0.0,-1.0) -- front
+                                       | 1.0 `dEq` z = Vector3D ( 0.0, 0.0, 1.0) -- back
+                                       | 0.0 `dEq` x = Vector3D (-1.0, 0.0, 0.0) -- left
+                                       | 1.0 `dEq` x = Vector3D ( 1.0, 0.0, 0.0) -- right
+                                       | 0.0 `dEq` y = Vector3D ( 0.0,-1.0, 0.0) -- top
+                                       | 1.0 `dEq` y = Vector3D ( 0.0, 1.0, 0.0) -- bottom 
+                                       | otherwise = error $ "Loc (" ++ show (Vector3D (x,y,z)) ++ ") is not a valid "
+                                                          ++ "cube coordinate for normal... What where you "
+                                                          ++ "thinking?"
+
+dEq::Double -> Double -> Bool
+dEq d1 d2 = abs (d1-d2) < 0.001
 
 inside::Shape -> Pt3D -> Bool
 
