@@ -18,6 +18,7 @@ title "Updating Instance" &&
 
 title "Updating RedMine Clone" &&
 ./update_redmine_mirror.sh >/dev/null && 
+echo "Done." &&
 
 # Build programme
 title "Building Program" &&
@@ -31,9 +32,10 @@ cabal --executable haddock &&
 # Copy website
 title "Copying www/ Folder to Website" &&
 cp -r www/* /var/www/projects/afp2009/ &&
+echo "Done." &&
 
 # Copy generated docs
-title "Copying generating Haddock docs" &&
+title "Copying Generated Haddock Docs" &&
 cp -r dist/doc/html/RayTracer/raytrace/* /var/www/projects/afp2009/doc/ &&
 echo "  Browse haddock documentation at: http://projects.spockz.nl/projects/afp2009/doc/" && 
 
