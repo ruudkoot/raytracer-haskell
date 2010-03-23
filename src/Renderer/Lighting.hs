@@ -83,7 +83,8 @@ local' (Colour amb) its lights surface r = Colour (kdiac + kdsum + kssum + ksisc
         direction (PointLight pos _) = normalize $ pos - location its
         direction (DirectLight dir _) = normalize $ negate dir
         direction (SpotLight pos _ _ _ _) = normalize $ pos - location its
-        dirhalf _ = toVec3D 0 0 0 -- No.
+        dirhalf l = normalize $ (dropW (rDirection r) `cross` direction l) 
+        eye = toVec3D 0 0 (-1)
         intensityS = 1.0 -- No.
                 
 
