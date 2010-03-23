@@ -19,6 +19,8 @@ import Renderer.Intersections2
 import Renderer.Scene
 
   
+import Control.Applicative ((<$>))
+
 -- | Applies a list of color transformations using the int. info, the 
 --   available lights (TODO: Where do we do occlusion testing??? Should this
 --   also contain soft shadows???) for the moment this assumes that the
@@ -62,8 +64,28 @@ specular isect light surface ray = case light of
         v     = normalize $ negate dir
         factor angle = max angle 0 ** phongExponent surface
         sRC = specularReflectionCoefficient surface
-        doLight angle col = fmap (factor angle * sRC *) col
+        doLight angle = fmap (factor angle * sRC *) 
 
+
+local' :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
+local' (Colour amb) its lights surface r = Colour (kdiac + kdsum + kssum + ksisc)
+  where kdiac = (kd *) <$> amb * c
+        kdsum = (kd *) <$> (sum $ map (\l -> ((n !.! direction l) *) <$> getIntensity l * c) lights)
+        ksisc = (ks *) <$> intensityS * c
+        kssum = (ks *) <$> (sum $ map (\l -> ((n !.! dirhalf l) ** phongExponent surface *) <$> getIntensity l * c) lights)
+        kd = diffuseReflectionCoefficient surface
+        ks = specularReflectionCoefficient surface
+        n = normal its
+        (Colour c) = surfaceColour surface
+        getIntensity (DirectLight _ i) = i 
+        getIntensity (PointLight  _ i) = i
+        getIntensity (SpotLight _ _ i _ _) = i
+        direction (PointLight pos _) = normalize $ pos - location its
+        direction (DirectLight dir _) = normalize $ negate dir
+        direction (SpotLight pos _ _ _ _) = normalize $ pos - location its
+        dirhalf _ = toVec3D 0 0 0 -- No.
+        intensityS = 1.0 -- No.
+                
 
 -- | Transformed version of the formula in the assignment on page 11.
 -- local' :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
