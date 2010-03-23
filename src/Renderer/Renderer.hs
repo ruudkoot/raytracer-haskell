@@ -81,22 +81,21 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel depth x y raymaker world
-  = let object = wObject world
-        lights = wLights world
-        ambient = (roAmbience.wOptions) world
-        ray  = raymaker x y
-        i    = intersect ray object
-    in case i of 
-       Nothing -> colour 255 255 0
-       Just info ->  let texturecoord = textureCoord info
-                         lalaShader   = shader info
-                         surface      = runShader (shader info) texturecoord
-                     in toRGB $ localLighting ambient
-                                               info
-                                               lights
-                                               surface
-                                               ray
+renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth x y raymaker
+  where renderPixel' depth x y raymaker = 
+         let object = wObject world
+             lights = wLights world
+             ambient = (roAmbience.wOptions) world
+             ray  = raymaker x y
+             i    = intersect ray object
+         in case i of 
+            Nothing -> toVec3D 0 0 0
+            Just info ->  let texturecoord = textureCoord info
+                              lalaShader   = shader info
+                              surface      = runShader (shader info) texturecoord
+                              reflected    = if depth == 0 then toVec3D 1 1 1
+                                                           else renderPixel' (depth - 1) x y raymaker
+                 in localLighting ambient info lights surface ray reflected
                                     
 
 -- | Saves the calculated colours to a PPM file (the 
@@ -192,6 +191,7 @@ waitForChildren world = do
     m:ms -> do putMVar children ms 
                takeMVar m 
                waitForChildren world
+
 -- | Takes the result and saves it.
 -- The result MVar is not emptied here, 
 -- and instead gets reset when a new image gets 
