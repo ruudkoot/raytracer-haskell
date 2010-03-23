@@ -33,39 +33,37 @@ localLightning ambient its lights surface r =
 
 
 local :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
-local isect lights surface ray =
-  toColour . sum $ map (\l -> diffuse l + specular l) lights
+local isect lights surface ray = toColour . sum $ map (\l -> d l + s l) lights
+  where d l = diffuse isect l surface
+        s l = specular isect l surface ray
+
+diffuse :: IntersectionInfo -> RenderLight -> SurfaceProperty -> Vec3D
+diffuse isect light surface = case light of 
+  (PointLight  pos col) -> let l = lVector isect pos in doLight (n !.! l) col
+  (DirectLight dir col) -> doLight (n !.! dir) col 
+  _                     -> toVec3D 0 0 0
   where
-    ----
-    diffuse (PointLight pos col) = 
-      let n       = normal isect
-          l       = normalize $ pos - location isect
-          angle   = n !.! l
-          dRC     = diffuseReflectionCoefficient surface
-          baseCol = fromColour $ surfaceColour surface 
-      in fmap (angle * ) (fmap (dRC*) col * baseCol)
-    diffuse (DirectLight dir col) = 
-      let n       = normal isect
-          angle   = n !.! dir
-          dRC     = diffuseReflectionCoefficient surface
-          baseCol = fromColour $ surfaceColour surface 
-      in fmap (angle * ) (fmap (dRC*) col * baseCol)
-    diffuse _ = toVec3D 0 0 0
-    -- diffuse l = error $ "No diffuse implementation yet for this light: "
-    --                     ++ show l
-    ----
-    specular (PointLight pos col) =
-      let n     = normal isect
-          l     = normalize $ pos - location isect
-          angle = n !.! l
-          dir   = dropW $ rDirection ray
-          r     = normalize $ fmap (2*angle*) n - l
-          v     = normalize $ fmap negate dir
-          factor = max (r !.! v) 0 ** phongExponent surface
-      in fmap (factor * specularReflectionCoefficient surface *) col
-    specular _ = toVec3D 0 0 0
-    -- specular l = error $ "No specular implementation yet for this light: "
-    --                       ++ show l
+    n = normal isect
+    baseCol = fromColour $ surfaceColour surface 
+    dRC     = diffuseReflectionCoefficient surface
+    doLight angle col = fmap (angle * dRC *) col * baseCol
+
+lVector isect pos = normalize $ pos - location isect
+
+specular :: IntersectionInfo -> RenderLight -> SurfaceProperty -> Ray -> Vec3D 
+specular isect light surface ray = case light of 
+  (PointLight pos col) -> let l = lVector isect pos 
+                          in doLight (r l !.! v) col
+  _                    -> toVec3D 0 0 0 
+  where n = normal isect
+        angle l = n !.! l
+        dir   = dropW $ rDirection ray
+        r l    = normalize $ fmap (2 * angle l *) n - l
+        v     = normalize $ negate dir
+        factor angle = max angle 0 ** phongExponent surface
+        sRC = specularReflectionCoefficient surface
+        doLight angle col = fmap (factor angle * sRC *) col
+
 
 -- | Transformed version of the formula in the assignment on page 11.
 -- local' :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
