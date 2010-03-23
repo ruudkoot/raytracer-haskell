@@ -29,6 +29,6 @@ uv Cube loc = case fromVector3D loc of
                                      ++ "cube coordinate... What where you "
                                      ++ "thinking?"
 
-uv Cylinder loc = undefined
+uv Cylinder loc = (0,0.0,0.0)
 
-uv Cone loc = undefined
+uv Cone loc = (0,0.0,0.0)
