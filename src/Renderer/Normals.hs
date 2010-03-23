@@ -46,9 +46,11 @@ inside Sphere   loc = magnitude loc < 1.0
 
 inside Plane    loc = getY3D loc < 0.0
 
-inside Cylinder loc = undefined
+inside Cone     loc = let (x,y,z) = fromVector3D loc
+                      in y < 1.0 && x*x+z*z-y*y < 0.0
 
-inside Cone     loc = undefined
+inside Cylinder loc = let (x,y,z) = fromVector3D loc
+                      in y < 1.0 && y > 0.0 && x*x+z*z < 0.0
 
 inside Cube     loc = let (ox,oy,oz) = fromVector3D loc
                       in ox > 0.0 && ox < 1.0 && oy > 0.0 && oy < 1.0 && oz > 0.0 && oz < 1.0
