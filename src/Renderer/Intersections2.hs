@@ -261,7 +261,7 @@ solveQuadratic a b c =
   case compare discr 0.0 of 
     LT -> [] 
     EQ -> [-b / (2 * a)]
-    GT -> [abc (-) `min` abc (-), abc (-) `max` abc (-)]
+    GT -> [abc (-) `min` abc (+), abc (-) `max` abc (+)]
   where discr  = b ^ 2 - 4 * a * c
         abc op = (-b `op` sqrt discr) / (2 * a)
 
