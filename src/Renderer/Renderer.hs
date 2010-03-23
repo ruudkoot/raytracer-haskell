@@ -105,7 +105,7 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
           let surface      = runShader (shader info) $ textureCoord info
               n            = normal info
               reflDir      = fmap (2 * n !.! dropW (rDirection ray) *) n
-              reflected    = let origin    = addW (location info) 0
+              reflected    = let origin    = addW (location info) 1
                                  direction = negate (rDirection ray) + addW reflDir 0
                                  clearasil = origin + 0.01 * direction -- cures acne
                               in Ray { rOrigin    = clearasil
