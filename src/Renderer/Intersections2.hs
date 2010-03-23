@@ -208,27 +208,35 @@ intervals r Cube     = undefined
 
 -- * CSG 
 
--- | OR
+-- | A + B 
+-- If A OR B is hit. If both are hit 
+-- the nearest intersection is choosen.
+--
 unionI :: CSG
-unionI (Just i) (Just j) = Just $ mergeI i j
+unionI (Just i) (Just j) = Just $ pickNearest i j
 unionI (Just i) Nothing  = Just i
 unionI Nothing  (Just i) = Just i
 unionI Nothing  Nothing  = Nothing 
 
--- | AND
+-- | A & B 
+-- If A and B are both hit.
+--
 intersectI :: CSG
-intersectI (Just i) (Just j) = Just $ mergeI i j
+intersectI (Just i) (Just j) = Just $ pickNearest i j
 intersectI _        _        = Nothing 
 
--- | XOR
+-- | A - B   
+-- Only if A is hit. 
+--
 differenceI :: CSG
 differenceI (Just i) Nothing  = Just i
-differenceI Nothing  (Just i) = Just i
 differenceI _        _        = Nothing 
 
 
-mergeI :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
-mergeI i j = if distance i <= distance j then i else j
+-- | Pick the nearest intersection.
+--
+pickNearest :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
+pickNearest i j = if distance i <= distance j then i else j
 
 
 
