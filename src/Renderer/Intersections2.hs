@@ -185,11 +185,11 @@ intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D (vx,vy,vz,_))) Cone =
   let a = vx ^ 2 + vz ^ 2 - vy ^ 2
       b = 2 * (px * vx + pz * vz - (py) * vy)
       c = px ^ 2 + pz ^ 2 - py ^ 2
-      bla s = case (filter (\t -> py + vy * t >= 0 && py + vy * t <= 1)) $ s of
+      solveTop s = case (filter (\t -> (py + vy * t) >= 0 && (py + vy * t) <= 1)) $ s of
                         [x] -> [(1 - py)/vy, x]
                         [] -> []
                         _ -> s
-  in bla $ solveQuadratic a b c
+  in solveTop $ solveQuadratic a b c
   -- missing: if 0 <= (py + vy * t) <= 1
 
 
