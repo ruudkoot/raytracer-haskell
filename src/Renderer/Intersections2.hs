@@ -3,17 +3,17 @@
 module Renderer.Intersections2 where
 
 
-import Base.Shader
-import Base.Shape
+import Base.Shader (SurfaceCoord, Shader)
+import Base.Shape  (Shape(..))
 
-import Data.Vector
+import Data.Maybe  (isJust)
+import Data.Vector 
 
-import Renderer.Normals
-import Renderer.Scene
-import Renderer.UV
+import Renderer.Normals (getNormal)
+import Renderer.Scene   (Ray(..), Object(..), transformRay)
+import Renderer.UV      (uv)
 
 
-import Data.Maybe (isJust)
 
 -- * Datastructures
 
@@ -33,7 +33,7 @@ data IntersectionInfo = IntersectionInfo {
 type IntersectionInfoM = Maybe IntersectionInfo
 type CSG = IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
 
--- | The interval functions return the t's 
+-- | The @interval@ functions return the t's 
 -- that solve the following equation:
 -- @intersection = eye + t*direction@
 --
@@ -47,26 +47,23 @@ type Intersections = [Double]
 -- ray and an object.
 --
 intersect :: Ray -> Object -> IntersectionInfoM
-intersect ray (Simple Sphere   m1 m2 shader) = mkInfo (transformRay ray m2) shader Sphere uvSphere 
-intersect ray (Simple Plane    m1 m2 shader) = mkInfo (transformRay ray m2) shader Plane  uvPlane
-intersect ray (Simple Cube     m1 m2 shader) = mkInfo (transformRay ray m2) shader Cube   uvCube
-intersect ray (Simple Cylinder m1 m2 shader) = mkInfo (transformRay ray m2) shader Cylinder uvCylinder
-intersect ray (Simple Cone     m1 m2 shader) = mkInfo (transformRay ray m2) shader Cone   uvCone
+intersect ray (Simple s m1 m2 shader) = mkInfo (transformRay ray m2) shader s
 intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
 intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
 intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
 
+
 -- | Helper function used by @intersect@ to 
 -- build the resulting IntersectionInfo.
 --
-mkInfo :: Ray -> Shader -> Shape -> UVMapper -> Maybe IntersectionInfo 
-mkInfo ray sh shape uv = 
+mkInfo :: Ray -> Shader -> Shape -> Maybe IntersectionInfo 
+mkInfo ray sh shape = 
   if null ints then Nothing
   else Just IntersectionInfo 
        { location     = loc
        , normal       = getNormal shape ray loc 
        , distance     = t
-       , textureCoord = uv loc
+       , textureCoord = uv shape loc
        , shader       = sh
        } 
   where ints = intervals ray shape
