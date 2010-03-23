@@ -1,6 +1,6 @@
 module Renderer.Renderer (render) where
 
-import Data.Colour (Colour(..), Colours, toRGB, colour)
+import Data.Colour (Colour(..), Colours, toRGB, fromColour)
 import Data.Vector (Vector4D(..), normalize, toVec3D, dropW, addW, (!.!))
 import Data.Radians
 
@@ -85,7 +85,7 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
   where renderPixel' depth ray = 
          let object = wObject world
              lights = wLights world
-             ambient = (roAmbience.wOptions) world
+             ambient = fromColour $ (roAmbience.wOptions) world
              i    = intersect ray object
          in case i of 
             Nothing -> toVec3D 0 0 0
