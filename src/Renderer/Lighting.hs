@@ -1,12 +1,5 @@
 -- | Contains the code for applying local lighting. It supports `dynamically'
 --   adding of more lighting methods provided the information provided
-
--- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
--- ERRR: Er is hier nu een  hoop gekut met het heen en weer vertalen tussen
---       Point3D en ColourD omdat we gebruik maken van de gesharede lights
---       datastructuur. Als we dit hier mooier willen hebben moeten we
---       misschien toch de structuren scheiden?
--- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 module Renderer.Lighting (localLighting) where
 
 import Base.Light  
