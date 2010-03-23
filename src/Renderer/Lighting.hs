@@ -70,9 +70,9 @@ specular isect light surface ray = case light of
 local' :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
 local' (Colour amb) its lights surface r = Colour (kdiac + kdsum + kssum + ksisc)
   where kdiac = (kd *) <$> amb * c
-        kdsum = (kd *) <$> (sum $ map (\l -> ((n !.! direction l) *) <$> getIntensity l * c) lights)
+        kdsum = (kd *) <$> sum (map (\l -> ((n !.! direction l) *) <$> getIntensity l * c) lights)
         ksisc = (ks *) <$> intensityS * c
-        kssum = (ks *) <$> (sum $ map (\l -> ((n !.! dirhalf l) ** phongExponent surface *) <$> getIntensity l * c) lights)
+        kssum = (ks *) <$> sum (map (\l -> ((n !.! dirhalf l) ** phongExponent surface *) <$> getIntensity l * c) lights)
         kd = diffuseReflectionCoefficient surface
         ks = specularReflectionCoefficient surface
         n = normal its
@@ -83,24 +83,7 @@ local' (Colour amb) its lights surface r = Colour (kdiac + kdsum + kssum + ksisc
         direction (PointLight pos _) = normalize $ pos - location its
         direction (DirectLight dir _) = normalize $ negate dir
         direction (SpotLight pos _ _ _ _) = normalize $ pos - location its
-        dirhalf l = normalize $ (dropW (rDirection r) `cross` direction l) 
+        dirhalf l = normalize (dropW (rDirection r) `cross` direction l) -- not sure about this
         eye = toVec3D 0 0 (-1)
         intensityS = 1.0 -- No.
                 
-
--- | Transformed version of the formula in the assignment on page 11.
--- local' :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
--- local' ambient its lights surface r =
---   surfaceColor * $   diffRC * ambient 
---                    + totalIntensity * (diffRC * diffuse + specRC * specular)
---                    -- + specRC * toVec3D 0 0 0 -- TODO: Reflection, add the 
---                                                --       colour of the resulting
---                                                --       ray to the parameters
---   where totalIntensity         = (sum . map getIntensity) lights                
---         diffRC                 = diffuseReflectionCoefficient surface
---         specRC                 = specularReflectionCoefficient surface
---         diffuse                = (sum . map (\l -> n !.! getIntensity l )) lights
---         specular               = (sum . map (\l -> n !.! ))
---         n                      = normal isect
---         l (PointLight pos col) = normalize $ pos - location isect
---         l (Dir)
