@@ -5,14 +5,14 @@ module Renderer.Lighting (localLighting) where
 import Base.Light (RenderLight(..))
 import Base.Shader (SurfaceProperty(..))
   
-import Data.Colour (ColourD, Colour(..), fromColour)
+import Data.Colour (ColourD, fromColour)
 import Data.Vector 
   
 import Renderer.Intersections2 (IntersectionInfo(..))
 import Renderer.Scene (Ray(..))
 
-  
 import Control.Applicative ((<$>))
+
 
 -- Calculate the local lighting.
 --

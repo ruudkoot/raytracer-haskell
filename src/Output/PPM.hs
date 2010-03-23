@@ -1,5 +1,6 @@
 module Output.PPM (toPPM) where 
 
+import Data.Char (chr)
 import Output.Output 
 
 -- | Converts the colours to a String in PPM format.
@@ -9,5 +10,5 @@ import Output.Output
 toPPM :: ImageWriter
 toPPM w h cs = if fromSize w * fromSize h /= toInteger (length cs)
                  then Nothing
-                 else Just $ concat ["P3 ", show w, " ", show h, " 255\n",
-                             unlines (map (unwords . map show . clampedList 0 255) cs)]
+                 else Just $ concat ["P6\n#Team the ray team.\n", show w, " ", show h, "\n255\n",
+                             concatMap (map chr . clampedList 0 255) cs]
