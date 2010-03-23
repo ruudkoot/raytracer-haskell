@@ -226,7 +226,7 @@ intersectI (Just i) (Just j) = Just $ pickNearest i j
 intersectI _        _        = Nothing 
 
 -- | A - B   
--- Only if A is hit. 
+-- Only if A is hit and B is not hit.
 --
 differenceI :: CSG
 differenceI (Just i) Nothing  = Just i
