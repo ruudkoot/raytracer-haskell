@@ -94,9 +94,11 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
           let surface      = runShader (shader info) $ textureCoord info
               n            = normal info
               reflDir      = fmap (2 * n !.! dropW (rDirection ray) *) n
-              reflected    = Ray { rOrigin = addW (location info) 0, 
-                                   rDirection = negate (rDirection ray) + 
-                                                addW reflDir 0 } -- should this ray be transformed?
+              reflected    = let origin    = addW (location info) 0
+                                 direction = negate (rDirection ray) + addW reflDir 0
+                                 clearasil = origin + 0.01 * direction -- cures acne
+                              in Ray { rOrigin    = clearasil
+                                     , rDirection = direction } -- should this ray be transformed?
           in if depth == 0 -- Are we at the bottom of the recursion?
                then f $ toVec3D 0 0 0 -- Yes, return intensity 0 ; or should that be 1???
                else renderPixel' (depth - 1) reflected -- No, shoot another ray..
