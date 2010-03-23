@@ -1,7 +1,7 @@
 module Renderer.Renderer (render) where
 
 import Data.Colour (Colour(..), Colours, toRGB, colour)
-import Data.Vector (Vector4D(..), normalize, toVec3D)
+import Data.Vector (Vector4D(..), normalize, toVec3D, dropW, addW, (!.!))
 import Data.Radians
 
 import Output.Output (toSize)
@@ -81,21 +81,23 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth x y raymaker
-  where renderPixel' depth x y raymaker = 
+renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raymaker x y)
+  where renderPixel' depth ray = 
          let object = wObject world
              lights = wLights world
              ambient = (roAmbience.wOptions) world
-             ray  = raymaker x y
              i    = intersect ray object
          in case i of 
             Nothing -> toVec3D 0 0 0
             Just info ->  let texturecoord = textureCoord info
-                              lalaShader   = shader info
                               surface      = runShader (shader info) texturecoord
-                              reflected    = if depth == 0 then toVec3D 1 1 1
-                                                           else renderPixel' (depth - 1) x y raymaker
-                 in localLighting ambient info lights surface ray reflected
+                              n            = normal info
+                              reflected    = Ray { rOrigin = addW (location info) 0, 
+                                                   rDirection = negate (rDirection ray) + 
+                                                                addW (fmap (2 * n !.! (dropW $ rDirection ray) *) n) 0 }
+                              reflectedI   = if depth == 0 then toVec3D 1 1 1
+                                                           else renderPixel' (depth - 1) reflected
+                 in localLighting ambient info lights surface ray reflectedI
                                     
 
 -- | Saves the calculated colours to a PPM file (the 
