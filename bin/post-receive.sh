@@ -23,7 +23,7 @@ echo "Done." &&
 # Build programme
 title "Building Program" &&
 cd .. && 
-cabal install --enable-executable-profiling && 
+cabal install --enable-executable-profiling 2>&1 && 
 
 # Generate Haddock documentation
 title "Generating Haddock Documentation" &&
