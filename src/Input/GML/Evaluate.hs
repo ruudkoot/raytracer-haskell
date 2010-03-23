@@ -27,10 +27,10 @@ evaluate = until (null . \(_, _ , x) -> x) evaluate'
           evaluate' st                                                = error ("Error in evaluation, state dump:\n"++show st)
                                                              
 operator :: String -> Operator
-operator o = Map.findWithDefault (error ("unknown operator "++o)) o operators
+operator o = Map.findWithDefault (error ("unknown operator: " ++ o)) o operators
 
 set = Map.insert
-get = Map.findWithDefault (error "unknown identifier")
+get x = Map.findWithDefault (error ("unknown identifier: " ++ x)) x
 
 
 
