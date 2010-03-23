@@ -89,17 +89,17 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
     renderPixel' depth ray f = 
       case intersect ray object of 
         Nothing -> f $ toVec3D 0 0 0
-        Just info ->  let texturecoord = textureCoord info
-                          surface      = runShader (shader info) texturecoord
-                          n            = normal info
-                          reflDir      = fmap (2 * n !.! dropW (rDirection ray) *) n
-                          reflected    = Ray { rOrigin = addW (location info) 0, 
-                                               rDirection = negate (rDirection ray) + 
-                                                            addW (reflDir) 0 }
-                          in if depth == 0 
-                               then f $ toVec3D 0 0 0 -- or should that be 1 1 1?
-                               else renderPixel' (depth - 1) reflected 
-                                     (f . localLighting ambient info lights surface ray)
+        Just info ->  
+          let surface      = runShader (shader info) $ textureCoord info
+              n            = normal info
+              reflDir      = fmap (2 * n !.! dropW (rDirection ray) *) n
+              reflected    = Ray { rOrigin = addW (location info) 0, 
+                                   rDirection = negate (rDirection ray) + 
+                                                addW (reflDir) 0 } -- should this ray be transformed?
+          in if depth == 0 
+               then f $ toVec3D 0 0 0 -- or should that be 1 1 1?
+               else renderPixel' (depth - 1) reflected 
+                      (f . localLighting ambient info lights surface ray)
                                     
 
 -- | Saves the calculated colours to a PPM file (the 
