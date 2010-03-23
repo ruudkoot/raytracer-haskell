@@ -1,34 +1,36 @@
 -- | Contains the code for applying local lighting. It supports `dynamically'
---   adding of more lighting methods provided the information provided
+--   adding of more lighting methods provided the information provided <-- what?
 module Renderer.Lighting (localLighting) where
 
-import Base.Light  
-import Base.Shader
+import Base.Light (RenderLight(..))
+import Base.Shader (SurfaceProperty(..))
   
 import Data.Colour (ColourD, Colour(..), fromColour)
-import Data.Vector
+import Data.Vector 
   
-import Renderer.Intersections2
-import Renderer.Scene
+import Renderer.Intersections2 (IntersectionInfo(..))
+import Renderer.Scene (Ray(..))
 
   
 import Control.Applicative ((<$>))
 
-
+-- Calculate the local lighting.
+--
 localLighting :: Vec3D -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
-localLighting amb its lights surface r reflected = diffuse + specular
-  where diffuse     = (kd *) <$> amb * c + sum (map dirLight lights)
-        specular    = (ks *) <$> reflected * c + sum (map phong lights)
-        kd          = diffuseReflectionCoefficient surface
-        ks          = specularReflectionCoefficient surface
-        dirLight l  = ((n !.! dir l) *) <$> intensity l * c
-        phong l     = ((n !.! dirhalf l) ** phongExponent surface *) <$> intensity l * c
-        dirhalf l   = normalize (dropW (rDirection r) `cross` dir l) -- ?
-        c           = fromColour $ surfaceColour surface
-        n           = normal its
-        loc         = location its
-        intensity l = getIntensity l loc
-        dir         = direction loc
+localLighting ambient its lights surface r reflected = diffuse + specular
+  where diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight
+        specular   = col (specularReflectionCoefficient surface) reflected phong
+        col k i f  = (k*) <$> i * surfC + sum (map f lights)
+
+        dirLight l = light (n !.! dir l) l 
+        phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
+        light  f l = (f*) <$> getIntensity l (location its) * surfC
+
+        dirhalf  l = normalize (dropW (rDirection r) `cross` dir l) -- ?
+        dir        = direction (location its)
+        
+        surfC      = fromColour $ surfaceColour surface
+        n          = normal its
  
 
 -- | Get the unit vector from a location 
