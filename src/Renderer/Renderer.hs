@@ -78,7 +78,8 @@ renderScene world = saveRendering world pixels
                   j <- [0..w-1]]
 
 
--- | Calculates the colour for a single pixel position.
+-- | Calculates the colour for a single pixel position 
+-- by recursively shooting a ray into the World.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
 renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raymaker x y) id
@@ -88,18 +89,19 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
     ambient = fromColour $ (roAmbience.wOptions) world
     renderPixel' depth ray f = 
       case intersect ray object of 
-        Nothing -> f $ toVec3D 0 0 0
-        Just info ->  
+        Nothing -> f $ toVec3D 0 0 0 -- No intersections. Intensity=0
+        Just info ->                 -- An intersection. Find out intensity:
           let surface      = runShader (shader info) $ textureCoord info
               n            = normal info
               reflDir      = fmap (2 * n !.! dropW (rDirection ray) *) n
               reflected    = Ray { rOrigin = addW (location info) 0, 
                                    rDirection = negate (rDirection ray) + 
                                                 addW reflDir 0 } -- should this ray be transformed?
-          in if depth == 0 
-               then f $ toVec3D 0 0 0 -- or should that be 1 1 1?
-               else renderPixel' (depth - 1) reflected 
-                      (f . localLighting ambient info lights surface ray)
+          in if depth == 0 -- Are we at the bottom of the recursion?
+               then f $ toVec3D 0 0 0 -- Yes, return intensity 0 ; or should that be 1???
+               else renderPixel' (depth - 1) reflected -- No, shoot another ray..
+                      (f . localLighting ambient info lights surface ray) -- ..and build 
+                      -- up the result in continuation passing style (lighter on memory)
                                     
 
 -- | Saves the calculated colours to a PPM file (the 

@@ -15,6 +15,8 @@ import Control.Applicative ((<$>))
 
 
 -- Calculate the local lighting.
+-- This basically implements the lighting model 
+-- from page 11 of the assigment.
 --
 localLighting :: Vec3D -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
 localLighting ambient its lights surface r reflected = diffuse + specular
