@@ -27,13 +27,13 @@ import Renderer.Scene
 --         light weighs.
 --         Filter out invisible lights.
 localLightning :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
-localLightning ambient its lights surface r = 
-  add (times (surfaceColour surface) ambient)
-      (local its lights surface r)
+localLightning (Colour amb) its lights surface r = Colour $ amb * surfC + localC
+  where localC = local its surface r lights
+        (Colour surfC) = surfaceColour surface
 
 
-local :: IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
-local isect lights surface ray = toColour . sum $ map (\l -> d l + s l) lights
+local :: IntersectionInfo -> SurfaceProperty -> Ray -> [RenderLight] -> Vec3D
+local isect surface ray = sum . map (\l -> d l + s l) 
   where d l = diffuse isect l surface
         s l = specular isect l surface ray
 

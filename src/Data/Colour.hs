@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- | Colours are represented as a triple (r, g, b) which has been 
 -- made polymorphic. This enables us to use Colour Int for 
 -- displaying purposes and Colour Double for calculations.
@@ -9,9 +10,9 @@ import Data.Vector (Vector3D(..), fromVector3D, fromVector)
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 
-newtype Colour a = Colour (Vector3D a) deriving (Eq, Ord, Show)
+newtype Colour a = Colour (Vector3D a) deriving (Eq, Ord, Show, Functor)
 type Colours a = [Colour a]
- 
+
 
 -- * Synonyms
 type ColourD = Colour Double
@@ -50,16 +51,5 @@ toRGB (Colour v) = Colour (fmap (round . (255.0*)) v)
 toColour :: Vector3D a -> Colour a
 toColour = Colour 
 
-
 fromColour :: Colour a -> Vector3D a 
 fromColour (Colour v) = v
-
--- | Colour arithmetic
-add :: (Ord a, Num a) => Colour a -> Colour a -> Colour a
-add = op (+)
-
-times :: (Ord a, Num a) => Colour a -> Colour a -> Colour a
-times = op (*)
-
-op :: (Ord a, Num a) => (Vector3D a -> Vector3D a -> Vector3D a) -> Colour a -> Colour a -> Colour a
-op f a b = (clampColour 0 1 . toColour) $ fromColour a `f` fromColour b
