@@ -94,7 +94,7 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
                               n            = normal info
                               reflected    = Ray { rOrigin = addW (location info) 0, 
                                                    rDirection = negate (rDirection ray) + 
-                                                                addW (fmap (2 * n !.! (dropW $ rDirection ray) *) n) 0 }
+                                                                addW (fmap (2 * n !.! dropW (rDirection ray) *) n) 0 }
                               reflectedI   = if depth == 0 then toVec3D 1 1 1
                                                            else renderPixel' (depth - 1) reflected
                  in localLighting ambient info lights surface ray reflectedI
