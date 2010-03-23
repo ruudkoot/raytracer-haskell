@@ -31,7 +31,11 @@ main :: IO()
 main = do args <- getArgs           
           scenes <- runGML $ head args
           let threads = 1 -- TODO: specify number of threads via command line arguments
-          render threads . toWorld $ head scenes
+          mapM_ (doRender threads) scenes
+
+doRender:: Int -> Scene -> IO ()
+doRender thds  = render thds . toWorld
+
 {-           
 main :: IO()
 main = do args <- getArgs 
