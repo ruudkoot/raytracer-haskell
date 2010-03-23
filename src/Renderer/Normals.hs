@@ -11,23 +11,21 @@ getNormal :: Shape -> Ray -> Pt3D -> Vec3D
 
 getNormal s ray loc = let normal = getNormal' s loc
                       in if inside s (dropW $ rOrigin ray) 
-                         then negate normal
-                         else normal
+                         then normal
+                         else negate normal
 
 getNormal' :: Shape -> Pt3D -> Vec3D 
 
 getNormal' Sphere   loc = normalize loc
 
-getNormal' Plane    loc = Vector3D (0.0,1.0,0.0)
+getNormal' Plane    _   = Vector3D (0.0,1.0,0.0)
 
-getNormal' Cylinder loc = case fromVector3D loc of
-    (_, 0, _) -> Vector3D (0.0,-1.0,0.0)
-    (_, 1, _) -> Vector3D (0.0, 1.0,0.0)
-    (x, y, z) -> normalize $ Vector3D (2*x,0.0,2*z)
+getNormal' Cylinder (Vector3D (x,y,z)) | 0.0 `dEq` y = Vector3D (0.0,-1.0,0.0)
+                                       | 1.0 `dEq` y = Vector3D (0.0, 1.0,0.0)
+                                       | otherwise   = normalize $ Vector3D (2*x,0.0,2*z)
 
-getNormal' Cone     loc = case fromVector3D loc of
-    (_, 1, _) -> Vector3D (0.0,1.0,0.0)
-    (x, y, z) -> normalize $ Vector3D (2*x,-2*y,2*z)
+getNormal' Cone     (Vector3D (x,y,z)) | 1.0 `dEq` y = Vector3D (0.0,1.0,0.0)
+                                       | otherwise   = normalize $ Vector3D (2*x,-2*y,2*z)
 
 getNormal' Cube     (Vector3D (x,y,z)) | 0.0 `dEq` z = Vector3D ( 0.0, 0.0,-1.0) -- front
                                        | 1.0 `dEq` z = Vector3D ( 0.0, 0.0, 1.0) -- back
