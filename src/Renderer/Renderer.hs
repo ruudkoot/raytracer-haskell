@@ -13,7 +13,7 @@ import Base.Shader
 import Renderer.Intersections2
 import Renderer.Scene 
 import Renderer.Shaders
-import Renderer.Lightning
+import Renderer.Lighting
 
 
 import Control.Concurrent (forkIO)
@@ -92,7 +92,7 @@ renderPixel depth x y raymaker world
        Just info ->  let texturecoord = textureCoord info
                          lalaShader   = shader info
                          surface      = runShader (shader info) texturecoord
-                     in toRGB $ localLightning ambient
+                     in toRGB $ localLighting ambient
                                                info
                                                lights
                                                surface

@@ -1,5 +1,5 @@
--- | Contains the code for applying local lightning. It supports `dynamically'
---   adding of more lightning methods provided the information provided
+-- | Contains the code for applying local lighting. It supports `dynamically'
+--   adding of more lighting methods provided the information provided
 
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 -- ERRR: Er is hier nu een  hoop gekut met het heen en weer vertalen tussen
@@ -7,7 +7,7 @@
 --       datastructuur. Als we dit hier mooier willen hebben moeten we
 --       misschien toch de structuren scheiden?
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-module Renderer.Lightning (localLightning) where
+module Renderer.Lighting (localLighting) where
 
 import Base.Light  
 import Base.Shader
@@ -28,8 +28,8 @@ import Control.Applicative ((<$>))
 --   TODO: Shadows, maybe [(Factor, RenderLight)]  to indicate how heavy a
 --         light weighs.
 --         Filter out invisible lights.
-localLightning :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
-localLightning (Colour amb) its lights surface r = Colour $ amb * surfC + localC
+localLighting :: ColourD -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> ColourD
+localLighting (Colour amb) its lights surface r = Colour $ amb * surfC + localC
   where localC = local its surface r lights
         (Colour surfC) = surfaceColour surface
 
