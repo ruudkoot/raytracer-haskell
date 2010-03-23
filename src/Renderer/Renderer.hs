@@ -81,23 +81,25 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raymaker x y)
-  where renderPixel' depth ray = 
-         let object = wObject world
-             lights = wLights world
-             ambient = fromColour $ (roAmbience.wOptions) world
-             i    = intersect ray object
-         in case i of 
-            Nothing -> toVec3D 0 0 0
-            Just info ->  let texturecoord = textureCoord info
-                              surface      = runShader (shader info) texturecoord
-                              n            = normal info
-                              reflected    = Ray { rOrigin = addW (location info) 0, 
-                                                   rDirection = negate (rDirection ray) + 
-                                                                addW (fmap (2 * n !.! dropW (rDirection ray) *) n) 0 }
-                              reflectedI   = if depth == 0 then toVec3D 1 1 1
-                                                           else renderPixel' (depth - 1) reflected
-                 in localLighting ambient info lights surface ray reflectedI
+renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raymaker x y) id
+  where 
+    object = wObject world
+    lights = wLights world
+    ambient = fromColour $ (roAmbience.wOptions) world
+    renderPixel' depth ray f = 
+      case intersect ray object of 
+        Nothing -> f $ toVec3D 0 0 0
+        Just info ->  let texturecoord = textureCoord info
+                          surface      = runShader (shader info) texturecoord
+                          n            = normal info
+                          reflDir      = fmap (2 * n !.! dropW (rDirection ray) *) n
+                          reflected    = Ray { rOrigin = addW (location info) 0, 
+                                               rDirection = negate (rDirection ray) + 
+                                                            addW (reflDir) 0 }
+                          in if depth == 0 
+                               then f $ toVec3D 0 0 0 -- or should that be 1 1 1?
+                               else renderPixel' (depth - 1) reflected 
+                                     (f . localLighting ambient info lights surface ray)
                                     
 
 -- | Saves the calculated colours to a PPM file (the 
