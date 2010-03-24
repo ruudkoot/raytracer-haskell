@@ -5,9 +5,13 @@
 % Fractal thingie with spheres.
 %
 
-#include "surface.ins"
+%include "surface.ins"
 
-
+{ /n /ks /kd /color
+  { /v /u /face
+    color kd ks n
+  }
+} /const-surface
 0.4 0.5 0.6 point 1.0 0.1 1.0 const-surface apply plane /p
 
 { /col
@@ -84,7 +88,7 @@ p 0.0 -1.0 0.0 translate union
 scene				  % scene to render
 3				  % tracing depth
 100.0				  % field of view
-300 200				  % image wid and height
+1280 700				  % image wid and height
 "target/fractal.ppm"			  % output file
 render
 
