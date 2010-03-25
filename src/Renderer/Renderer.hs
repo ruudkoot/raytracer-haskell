@@ -15,7 +15,8 @@ import Renderer.Scene
 import Renderer.Shaders
 import Renderer.Lighting
 
-import Control.Parallel.Strategies (parMap, rwhnf)
+import Control.Parallel            --(par)
+import Control.Parallel.Strategies --(rnf, using, parListChunk, rdeepseq)
 import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
 import Control.Exception (finally)
@@ -84,12 +85,9 @@ renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = parMap rwhnf
-                        (\(i,j) -> dot i j h w $ renderPixel depth i j raymaker world)
-                        [(i,j) | i <- [0..h-1], j <- [0..w-1]]
-        -- pixels = [(dot i j h w) $ renderPixel depth i j raymaker world | 
-        --           i <- [0..h-1],
-        --           j <- [0..w-1]]
+        pixels = map  (\(i,j) -> dot i j h w $ renderPixel depth i j raymaker world)
+                      [(i,j) | i <- [0..h-1], j <- [0..w-1]]
+                      `using` parListChunk (w*h `div` 4) rdeepseq
 
 
 -- | Calculates the colour for a single pixel position 

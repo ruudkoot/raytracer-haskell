@@ -87,6 +87,6 @@ p 0.0 -1.0 0.0 translate union
 scene				  % scene to render
 20				  % tracing depth
 80.0				  % field of view
-300 400				  % image wid and height
+150 200				  % image wid and height
 "target/fractal+34.ppm"			  % output file
 render

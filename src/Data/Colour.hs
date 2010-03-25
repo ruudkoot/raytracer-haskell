@@ -5,15 +5,17 @@
 -- 
 module Data.Colour where 
 
-import Data.Vector (Vector3D(..), fromVector3D, fromVector)
-
+import Control.DeepSeq             (NFData)
+import Control.Parallel.Strategies
+import Data.Vector                 (Vector3D(..), fromVector3D, fromVector)
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 
 newtype Colour a = Colour (Vector3D a) deriving (Eq, Ord, Show, Functor)
 type Colours a = [Colour a]
 
-
+instance NFData (Colour a) where
+  rnf a = a `seq` ()
 -- * Synonyms
 type ColourD = Colour Double
 
