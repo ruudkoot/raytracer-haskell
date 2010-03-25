@@ -12,8 +12,6 @@ import Renderer.Renderer (render)
 import System
 import System.IO
 
-import qualified Data.Map as M
-
 {-
 doParseGML :: Handle -> IO GML
 doParseGML h = do parseResult <- parseGML <$> hGetContents h

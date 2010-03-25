@@ -1,6 +1,7 @@
 -- | Provides general (perhaps too general) data structures 
 -- and functions for 2D, 3D and 4D vectors. 
 --
+{-# LANGUAGE UnboxedTuples #-}
 module Data.Vector where
   
 import Control.Applicative 
@@ -43,15 +44,15 @@ instance Vector Vector4D where
 
 -- | A general two-dimensional vector.
 --
-newtype Vector2D a = Vector2D (a, a) deriving (Eq, Ord)
-
+-- newtype Vector2D a = Vector2D (a, a) deriving (Eq, Ord)
+data Vector2D a = Vector2D !(a,a) deriving (Eq, Ord)
 -- | A general three-dimensional vector.
 --
-newtype Vector3D a = Vector3D (a, a, a) deriving (Eq, Ord)
+data Vector3D a = Vector3D !(a, a, a) deriving (Eq, Ord)
 
 -- | A general four-dimensional vector.
 --
-newtype Vector4D a = Vector4D (a, a, a, a) deriving (Eq, Ord)
+data Vector4D a = Vector4D !(a, a, a, a) deriving (Eq, Ord)
 
 
 
@@ -240,8 +241,19 @@ instance (Fractional a) => Fractional (Vector4D a) where
 -- corresponding entries and adding up those products. 
 --
 (!.!) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
-{-# INLINE (!.!) #-}
+{-# RULES "(!.!)/Vector3D" (!.!) = dotProduct3DD #-}
+{-# RULES "(!.!)/Vector4D" (!.!) = dotProduct4DD #-}
+{-# NOINLINE !.! #-}
 v1 !.! v2 = foldVector sum (v1 * v2)
+
+dotProduct3DD :: Vector3D Double -> Vector3D Double -> Double
+dotProduct3DD (Vector3D (x1, y1, z1)) (Vector3D (x2, y2, z2)) =
+  x1*x2 + y1*y2 + z1*z2
+  
+dotProduct4DD :: Vector4D Double -> Vector4D Double -> Double
+
+dotProduct4DD (Vector4D (x1, y1, z1, w1)) (Vector4D (x2, y2, z2, w2)) = undefined
+  -- x1*x2 + y1*y2 + z1*z2 + w1*w2
 
 
 -- | @dot v@ is equivalent to @v !.! v@.
