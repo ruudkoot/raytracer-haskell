@@ -243,7 +243,7 @@ instance (Fractional a) => Fractional (Vector4D a) where
 (!.!) :: (Vector v, Num a, Num (v a)) => v a -> v a -> a
 {-# RULES "(!.!)/Vector3D" (!.!) = dotProduct3DD #-}
 {-# RULES "(!.!)/Vector4D" (!.!) = dotProduct4DD #-}
-{-# NOINLINE !.! #-}
+{-# NOINLINE (!.!) #-}
 v1 !.! v2 = foldVector sum (v1 * v2)
 
 dotProduct3DD :: Vector3D Double -> Vector3D Double -> Double
