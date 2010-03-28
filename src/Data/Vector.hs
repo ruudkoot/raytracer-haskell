@@ -8,7 +8,7 @@ import Control.Applicative
 import Control.Monad (liftM2, liftM3, liftM4)
 import Test.QuickCheck
 
-import Data.Glome.Vec hiding (x, y, z, vmap, Ray(..), abs)
+import Data.Glome.Vec hiding (x, y, z, vmap, Ray(..), abs, invxfm_ray)
 import qualified Data.Glome.Vec as G (x, y, z, vmap, Ray(..), abs)
 
 -- * Synonyms
@@ -27,7 +27,12 @@ mkRay !o !d = G.Ray o d
 rOrigin = G.origin
 rDirection = G.dir
 
-transformRay r m = xfm_ray m r
+invxfm_ray :: Xfm -> Ray -> Ray
+invxfm_ray !xfm !(G.Ray orig dir) =
+ G.Ray (invxfm_point xfm orig) (invxfm_vec xfm dir)
+
+
+transformRay r m = invxfm_ray m r
 
 -- * Classes Vec needs to adhere to but doesn't.
 
