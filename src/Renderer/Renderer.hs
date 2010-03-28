@@ -1,7 +1,8 @@
 module Renderer.Renderer (render) where
+import Data.Maybe
 
 import Data.Colour (Colour(..), Colours, toRGB, fromColour)
-import Data.Vector (Vector4D(..), normalize, toVec3D, dropW, addW, (!.!))
+import Data.Vector (Vector4D(..), normalize, toVec3D, dropW, addW, (!.!),Pt3D)
 import Data.Radians
 
 import Output.Output (toSize)
@@ -112,12 +113,20 @@ renderPixel depth x y raymaker world = toRGB . Colour $ renderPixel' depth (raym
                                  clearasil = origin + 0.01 * direction -- cures acne
                               in Ray { rOrigin    = clearasil
                                      , rDirection = direction } -- should this ray be transformed?
+              lightsv = filter (not.shadowed (location info) object) lights
           in if depth == 0 -- Are we at the bottom of the recursion?
                then f $ toVec3D 0 0 0 -- Yes, return intensity 0 ; or should that be 1???
                else renderPixel' (depth - 1) reflected -- No, shoot another ray..
-                      (f . localLighting ambient info lights surface ray) -- ..and build 
+                      (f . localLighting ambient info lightsv surface ray) -- ..and build 
                       -- up the result in continuation passing style (lighter on memory)
                                     
+shadowed::Pt3D -> Object -> RenderLight -> Bool
+shadowed p o (DirectLight l _)     = let p4 = addW p 1.0 
+                                     in not.isJust.intersect (Ray p4 (addW (l-p) 0.0)) $ o
+shadowed p o (PointLight l _)      = let p4 = addW p 1.0 
+                                     in hit (Ray p4 (addW (l-p) 0.0)) $ o
+shadowed p o (SpotLight l _ _ _ _) = let p4 = addW p 1.0 
+                                     in hit (Ray p4 (addW (l-p) 0.0)) $ o
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
