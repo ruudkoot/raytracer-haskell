@@ -15,19 +15,10 @@ import Data.Vector
 import Data.Glome.Vec hiding (translate, scale)
 import qualified Data.Glome.Vec as G (translate, scale)
 
-type Matrix4D = Matrix
+-- type Matrix4D = Matrix
 type Transformation = Xfm
 
-
--- Note: changed compared to the original Multiplicable.
-class Multiplicable a where 
-  (!*!) :: a -> a -> a
-  
-instance Multiplicable (Transformation) where
-  (!*!) = xfm_mult
-
-instance Multiplicable (Matrix4D) where
-  (!*!) = mat_mult
+(!*!) = xfm_mult
 
 -- * Renaming
 

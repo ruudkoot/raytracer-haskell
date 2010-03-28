@@ -1,6 +1,6 @@
 module Renderer.Renderer (render) where
 
-import Data.Colour (Colour(..), Colours, fromColour)
+import Data.Colour (Colour(..), Colours, fromColour, toRGB, toColour)
 import Data.Vector (Vector3D(..), normalize, toVec3D, (!.!), Ray(..), rDirection, rOrigin, vector3D, mkRay, vmap)
 import Data.Radians
 
@@ -37,27 +37,6 @@ type Threads = Int
 --
 type RayMaker = Int -> Int -> Ray
 
-
--- | The RenderResult is a list of triples: 
--- [(pixelY, pixelX, colour)]
--- 
-type RenderResult = MVar [(Int, Int, Colour)]
-
--- | Used to wait for worker threads. 
--- See the Control.Concurrent documentation
--- for more details. 
---
-type Children = MVar [MVar ()]
-
-{-# NOINLINE result #-}
-result :: RenderResult 
-result = unsafePerformIO $ newMVar []
-
-{-# NOINLINE children #-}
-children :: Children 
-children = unsafePerformIO $ newMVar []
-
-
 -- | High level render function that uses renderScene 
 -- when Thread is zero or one; and renderSceneConc otherwise.  
 -- This is useful because renderSceneConc has a greater overhead.
@@ -85,7 +64,7 @@ renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = map  (\(i,j) -> dot i j h w $ renderPixel depth i j raymaker world)
+        pixels = map  (\(i,j) -> renderPixel depth i j raymaker world)
                       [(i,j) | i <- [0..h-1], j <- [0..w-1]]
                       `using` parListChunk (w*h `div` 4) rdeepseq
 
@@ -93,12 +72,13 @@ renderScene world = saveRendering world pixels
 -- | Calculates the colour for a single pixel position 
 -- by recursively shooting a ray into the World.
 --
-renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour
-renderPixel depth x y raymaker world = Colour $ renderPixel' depth (raymaker x y) id
+renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
+renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (raymaker x y) id
   where 
     object = wObject world
     lights = wLights world
     ambient = fromColour $ (roAmbience.wOptions) world
+    renderPixel' :: Int -> Ray -> (Vector3D -> Vector3D) -> Vector3D
     renderPixel' depth ray f = 
       case intersect ray object of 
         Nothing -> f $ toVec3D 0 0 0 -- No intersections. Intensity=0
@@ -120,7 +100,7 @@ renderPixel depth x y raymaker world = Colour $ renderPixel' depth (raymaker x y
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
 --
-saveRendering :: World -> Colours -> IO ()
+saveRendering :: World -> Colours Int -> IO ()
 saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
   where bad = error "Error: didn't produce a valid PPM image."
         save = trace ("writing result to " ++ roFile (wOptions world)) writeFile $ roFile (wOptions world)

@@ -2,7 +2,7 @@ module Renderer.Scene where
 
 import Data.Colour
 import Data.Vector
-import Data.Matrix (Matrix4D, (!*!), Transformation(..))
+import Data.Matrix (Transformation(..))
 
 import Base.Light
 import Base.Shape
@@ -26,7 +26,7 @@ data World = World
 
 data RenderOptions = RenderOptions
   {
-    roAmbience :: Colour -- amb
+    roAmbience :: ColourD -- amb
   , roDepth    :: Int
   , roFov      :: Double -- fov
   , roWidth    :: Int -- wid
