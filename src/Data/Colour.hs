@@ -7,51 +7,55 @@ module Data.Colour where
 
 import Control.DeepSeq             (NFData)
 import Control.Parallel.Strategies
-import Data.Vector                 (Vec3D, fromVector3D, fromVector, vector3D, vmap)
+import Data.Vector                 (Vector3D(..), fromVector3D, fromVector, vector3D)
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 
-newtype Colour = Colour Vec3D deriving (Eq, Show)
-type Colours = [Colour]
+newtype Colour a = Colour (a, a, a) deriving (Eq, Ord, Show)
+type Colours a = [Colour a]
 
-instance NFData (Colour) where
+instance NFData (Colour a) where
   rnf a = a `seq` ()
 
+instance Functor Colour where
+  fmap f (Colour (a, b, c)) = Colour (f a, f b, f c)
+
 -- * Synonyms
+type ColourD = Colour Double
 
 
 -- | Abstracted Colour constructor.
 --
-colour :: Double -> Double -> Double -> Colour
-colour r g b = Colour (vector3D (r, g, b)) 
+colour :: a -> a -> a -> Colour a
+colour r g b = Colour (r, g, b)
 
 
 -- | The (r, g, b) values in Colour as [r, g, b].
 --
-colourToList :: Colour -> [Double]
-colourToList (Colour v) = fromVector v
+colourToList :: Colour a -> [a]
+colourToList (Colour (a, b, c)) = [a, b, c]
 
 
 -- | Clamps the values in Colour, given a minimum and 
 -- maximum value.
 --
-clampColour :: Int -> Int -> [Double] -> [Int]
-clampColour mi ma cs = map c cs
-  where c v = max (min (round v) ma) mi
+clampColour :: Ord a => a -> a -> Colour a -> Colour a
+clampColour mi ma col = (fmap c col)
+  where c v = max (min v ma) mi
 
 
 -- | Same as 'colourToList . clampColour min max'.
 --
-clampedList :: Int -> Int -> Colour -> [Int]
-clampedList mi ma = (clampColour mi ma) . colourToList
+clampedList :: Ord a => a -> a -> Colour a -> [a]
+clampedList mi ma = colourToList . clampColour mi ma
 
 
---toRGB :: Colour -> Colour
---toRGB (Colour v) = Colour (vmap (round . (255.0*)) v)
+toRGB :: ColourD -> Colour Int
+toRGB col = fmap (round . (255.0*)) col
 
 
-toColour :: Vec3D -> Colour
-toColour = Colour 
+toColour :: Vector3D -> Colour Double
+toColour v = Colour $ fromVector3D v
 
-fromColour :: Colour -> Vec3D
-fromColour (Colour v) = v
+fromColour :: Colour Double -> Vector3D 
+fromColour (Colour c) = vector3D c

@@ -25,5 +25,5 @@ toRenderObject = flip (GML.foldObject algebra) identityTransformation
 
 toWorld::GML.Scene->Renderer.World
 toWorld (GML.Scene amb l obj dp fov w h fil) = 
-       Renderer.World (Renderer.RenderOptions (Colour amb) dp fov w h fil) (toRenderObject obj) l
+       Renderer.World (Renderer.RenderOptions (toColour amb) dp fov w h fil) (toRenderObject obj) l
    

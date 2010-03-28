@@ -77,4 +77,4 @@ cross = vcross
 -- and calculates the ending point given a certain t.
 --
 getPostition :: Ray -> Double -> Vec3D
-getPostition r t = (rOrigin r) + vscale (rDirection r) t
+getPostition r t = vscaleadd (rOrigin r) (rDirection r) t

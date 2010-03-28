@@ -25,11 +25,11 @@ solid r g b = Shader ( const SurfaceProperty { surfaceColour                 = c
 -- * 2D shaders
 
 -- | Gradient function
-gradient :: Colour -> Colour -> Shader
+gradient :: ColourD -> ColourD -> Shader
 gradient c1 c2 = undefined
 
 -- | Noise shaders
-perlin :: Colour -> Colour -> Shader
+perlin :: ColourD -> ColourD -> Shader
 perlin c1 c2 = undefined 
 
 -- * 3D shaders:
@@ -37,7 +37,7 @@ perlin c1 c2 = undefined
 
 -- | Generates a shader that produces a colour that's linearly dependent on
 --   the 3 coordinates of the system.
-gradient3D :: Colour -> Colour -> Colour -> Shader
+gradient3D :: ColourD -> ColourD -> ColourD -> Shader
 gradient3D c1 c2 c3 = undefined
 
 
