@@ -14,6 +14,7 @@ import Renderer.Intersections2
 import Renderer.Scene 
 import Renderer.Shaders
 import Renderer.Lighting
+import Renderer.IntersectionInfo
 
 import Control.Parallel            --(par)
 import Control.Parallel.Strategies --(rnf, using, parListChunk, rdeepseq)
