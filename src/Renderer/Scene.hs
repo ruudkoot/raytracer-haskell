@@ -2,7 +2,7 @@ module Renderer.Scene where
 
 import Data.Colour
 import Data.Vector
-import Data.Matrix (Matrix4D, (!*!))
+import Data.Matrix (Matrix4D, (!*!), Transformation(..))
 
 import Base.Light
 import Base.Shape
@@ -26,7 +26,7 @@ data World = World
 
 data RenderOptions = RenderOptions
   {
-    roAmbience :: ColourD -- amb
+    roAmbience :: Colour -- amb
   , roDepth    :: Int
   , roFov      :: Double -- fov
   , roWidth    :: Int -- wid
@@ -34,18 +34,7 @@ data RenderOptions = RenderOptions
   , roFile     :: FilePath
   }
   
-
-data Ray = Ray 
-  {
-    rOrigin    :: Vec4D
-  , rDirection :: Vec4D
-  }
-  deriving Show
-
-transformRay :: Ray -> Matrix4D Double -> Ray
-transformRay (Ray o d) m = Ray (m !*! o) (m !*! d)
-  
-data Object   = Simple Shape (Matrix4D Double) (Matrix4D Double) Shader -- Shape, transformation and inverse of transformation matrix
+data Object   = Simple Shape Transformation Shader
               | Union      Object Object
               | Intersect  Object Object
               | Difference Object Object

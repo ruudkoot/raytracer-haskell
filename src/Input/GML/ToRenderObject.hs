@@ -10,17 +10,17 @@ import qualified Input.GML.Evaluate as Evil
 import qualified Renderer.Scene     as Renderer
 
 toRenderObject :: GML.Object -> Renderer.Object
-toRenderObject = flip (GML.foldObject algebra) identity4D
-    where algebra = ( \shape closure matrix -> Renderer.Simple shape matrix (inverse matrix) (Evil.shader closure)
-                    , \o d1 d2 d3    matrix -> o (matrix !*! translate d1 d2 d3)
-                    , \o d1 d2 d3    matrix -> o (matrix !*! diagonal4D (Vector4D (d1, d2, d3, 1)))
-                    , \o d           matrix -> o (matrix !*! diagonal4D (Vector4D (d, d, d, 1)))
-                    , \o d           matrix -> o (matrix !*! rotateX (radians d))
-                    , \o d           matrix -> o (matrix !*! rotateY (radians d))
-                    , \o d           matrix -> o (matrix !*! rotateZ (radians d))
-                    , \o1 o2         matrix -> Renderer.Union      (o1 matrix) (o2 matrix)
-                    , \o1 o2         matrix -> Renderer.Intersect  (o1 matrix) (o2 matrix)
-                    , \o1 o2         matrix -> Renderer.Difference (o1 matrix) (o2 matrix)
+toRenderObject = flip (GML.foldObject algebra) identityTransformation
+    where algebra = ( \shape closure transformation -> Renderer.Simple shape transformation (Evil.shader closure)
+                    , \o d1 d2 d3    transformation -> o (transformation !*! translate d1 d2 d3)
+                    , \o d1 d2 d3    transformation -> o (transformation !*! scale d1 d2 d3)
+                    , \o d           transformation -> o (transformation !*! scale d d d)
+                    , \o d           transformation -> o (transformation !*! rotateX (radians d))
+                    , \o d           transformation -> o (transformation !*! rotateY (radians d))
+                    , \o d           transformation -> o (transformation !*! rotateZ (radians d))
+                    , \o1 o2         transformation -> Renderer.Union      (o1 transformation) (o2 transformation)
+                    , \o1 o2         transformation -> Renderer.Intersect  (o1 transformation) (o2 transformation)
+                    , \o1 o2         transformation -> Renderer.Difference (o1 transformation) (o2 transformation)
                     )
 
 toWorld::GML.Scene->Renderer.World

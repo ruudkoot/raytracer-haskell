@@ -167,7 +167,7 @@ operators = fromList [ ( "addi"      ,       iii (+)                    ) -- num
                      , ( "getx"      ,        pr getX3D                 ) -- points
                      , ( "gety"      ,        pr getY3D                 )
                      , ( "getz"      ,        pr getZ3D                 )
-                     , ( "point"     ,      rrrp (\x y z -> Vector3D (x, y, z)))
+                     , ( "point"     ,      rrrp (\x y z -> vector3D (x, y, z)))
                      , ( "get"       ,       aiv (!!)                   ) -- arrays
                      , ( "length"    ,        ai length                 )
                      , ( "sphere"    ,        co (Simple Shape.Sphere  )) -- Primitive Objects

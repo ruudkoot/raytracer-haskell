@@ -5,11 +5,10 @@ module Renderer.Lighting (localLighting) where
 import Base.Light (RenderLight(..))
 import Base.Shader (SurfaceProperty(..))
   
-import Data.Colour (ColourD, fromColour)
+import Data.Colour (Colour, fromColour)
 import Data.Vector 
   
 import Renderer.Intersections2 (IntersectionInfo(..))
-import Renderer.Scene (Ray(..))
 
 import Control.Applicative ((<$>))
 
@@ -22,13 +21,13 @@ localLighting :: Vec3D -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -
 localLighting ambient its lights surface r reflected = diffuse + specular
   where diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight
         specular   = col (specularReflectionCoefficient surface) reflected phong
-        col k i f  = (k*) <$> i * surfC + sum (map f lights)
+        col k i f  = (k*) `vmap` i * surfC + sum (map f lights)
 
         dirLight l = light (n !.! dir l) l 
         phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
-        light  f l = (f*) <$> getIntensity l (location its) * surfC
+        light  f l = (f*) `vmap` getIntensity l (location its) * surfC
 
-        dirhalf  l = normalize (dropW (rDirection r) `cross` dir l) -- ?
+        dirhalf  l = normalize ((rDirection r) `cross` dir l) -- ?
         dir        = direction (location its)
         
         surfC      = fromColour $ surfaceColour surface
@@ -52,7 +51,7 @@ getIntensity (DirectLight _  i) _ = i
 getIntensity (PointLight pos i) loc = attenuate (magnitude $ abs (loc - pos)) i
 getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude $ abs (loc - pos)) i'
   where i' = if angle > cutoff then toVec3D 0 0 0 else spot 
-        spot = (((dir / abs dir) !.! (posDir / abs posDir)) ** exp *) <$> i
+        spot = (((dir / abs dir) !.! (posDir / abs posDir)) ** exp *) `vmap` i
         dir = at - pos 
         posDir = loc - pos
         angle = acos(dir !.! posDir)
@@ -63,6 +62,6 @@ getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude $ abs (l
 -- the surface.
 -- 
 attenuate :: Double -> Vec3D -> Vec3D
-attenuate d = fmap ((/ dis) . (100*))
+attenuate d = vmap ((/ dis) . (100*))
   where dis = 99 + d ** 2
 

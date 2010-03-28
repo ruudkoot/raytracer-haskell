@@ -5,7 +5,7 @@ import Data.Colour
 type Face            = Int
 type SurfaceCoord    = (Face, Double, Double)
 data SurfaceProperty = SurfaceProperty
-    { surfaceColour                 :: Colour Double
+    { surfaceColour                 :: Colour
     , diffuseReflectionCoefficient  :: Double
     , specularReflectionCoefficient :: Double
     , phongExponent                 :: Double

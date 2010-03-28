@@ -10,7 +10,7 @@ import Data.Maybe  (isJust)
 import Data.Vector 
 
 import Renderer.Normals (getNormal)
-import Renderer.Scene   (Ray(..), Object(..), transformRay)
+import Renderer.Scene   (Object(..))
 import Renderer.UV      (uv)
 
 
@@ -47,7 +47,7 @@ type Intersections = [Double]
 -- ray and an object.
 --
 intersect :: Ray -> Object -> IntersectionInfoM
-intersect ray (Simple s m1 m2 shader) = mkInfo (transformRay ray m2) shader s
+intersect ray (Simple s tr shader) = mkInfo (transformRay ray tr) shader s
 intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
 intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
 intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
@@ -67,7 +67,7 @@ mkInfo ray sh shape =
        , shader       = sh
        } 
   where ints = intervals ray shape
-        loc  = dropW $ getPostition ray t
+        loc  = getPostition ray t
         t    = nearest ints
 
 
@@ -108,8 +108,8 @@ intervals :: Ray -> Shape -> Intersections
 
 
 -- Sphere
-intervals (Ray o r) Sphere =
-  let (k, dir) = (dropW o, dropW r)
+intervals r Sphere =
+  let (k, dir) = (rOrigin r, rDirection r)
       a = dot dir
       b = 2.0 * (k !.! dir)
       c =  (dot k - 1.0)
@@ -117,8 +117,8 @@ intervals (Ray o r) Sphere =
 
 
 -- Plane
-intervals (Ray o r) Plane = 
-  let (oy, ry) = (getY4D o, getY4D r)
+intervals r Plane = 
+  let (oy, ry) = (getY3D $ rOrigin r, getY3D $ rDirection r)
   in if (oy == 0) || (oy * ry >= 0)
         then []
         else [- oy / ry]
@@ -150,8 +150,10 @@ intervals (Ray o r) Plane =
 --
 -- Good source: http://mrl.nyu.edu/~dzorin/intro-graphics/lectures/lecture11/sld002.htm
 --
-intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D(vx,vy,vz,_))) Cylinder = 
-  let a = vx ^ 2 + vz ^ 2
+intervals r Cylinder = 
+  let (px, py, pz) = fromVector3D $ rOrigin r
+      (vx, vy, vz) = fromVector3D $ rDirection r
+      a = vx ^ 2 + vz ^ 2
       b = 2 * (px * vx + pz * vz)
       c = px ^ 2 + pz ^ 2 - 1.0
   in filter (\t -> let y = py + vy * t in 0 <= y && y <= 1) $ solveQuadratic a b c 
@@ -181,8 +183,10 @@ intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D(vx,vy,vz,_))) Cylinder =
 --   b = 2*(px*vx + pz*vz - (py + 1) * vy)
 --   c = px^2 + pz^2 - py^2 + 2*py - 1
 --
-intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D (vx,vy,vz,_))) Cone =
-  let a = vx ^ 2 + vz ^ 2 - vy ^ 2
+intervals r Cone =
+  let (px, py, pz) = fromVector3D $ rOrigin r
+      (vx, vy, vz) = fromVector3D $ rDirection r
+      a = vx ^ 2 + vz ^ 2 - vy ^ 2
       b = 2 * (px * vx + pz * vz - (py) * vy)
       c = px ^ 2 + pz ^ 2 - py ^ 2
       solveTop s = case (filter (\t -> (py + vy * t) >= 0 && (py + vy * t) <= 1)) $ s of
@@ -194,8 +198,8 @@ intervals (Ray (Vector4D (px,py,pz,_)) (Vector4D (vx,vy,vz,_))) Cone =
 
 
 intervals r Cube     = 
- let (ox,oy,oz,_) = fromVector4D $ rOrigin r
-     (dx,dy,dz,_) = fromVector4D $ rDirection r
+ let (ox,oy,oz) = fromVector3D $ rOrigin r
+     (dx,dy,dz) = fromVector3D $ rDirection r
      calcMinMax o d = let div = 1.0/d
                           t1 = -o*div
                           t2 = (1.0-o)*div
@@ -265,12 +269,6 @@ solveQuadratic a b c =
   where discr  = b ^ 2 - 4 * a * c
         abc op = (-b `op` sqrt discr) / (2 * a)
 
-
--- | Instantiates a ray starting on some point 
--- and calculates the ending point given a certain t.
---
-getPostition :: Ray -> Double -> Vec4D
-getPostition (Ray origin direction) t = origin + fmap (t *) direction
 
 
 

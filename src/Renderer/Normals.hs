@@ -2,7 +2,6 @@ module Renderer.Normals where
 
 import Base.Shape
 import Data.Vector
-import Renderer.Scene (Ray(..))
 
 -- TODO: Incorporate the ray
 
@@ -10,7 +9,7 @@ import Renderer.Scene (Ray(..))
 getNormal :: Shape -> Ray -> Pt3D -> Vec3D 
 
 getNormal s ray loc = let normal = getNormal' s loc
-                      in if inside s (dropW $ rOrigin ray) 
+                      in if inside s (rOrigin ray) 
                          then normal
                          else negate normal
 
@@ -18,24 +17,33 @@ getNormal' :: Shape -> Pt3D -> Vec3D
 
 getNormal' Sphere   loc = normalize loc
 
-getNormal' Plane    _   = Vector3D (0.0,1.0,0.0)
+getNormal' Plane    _   = vector3D (0.0,1.0,0.0)
 
-getNormal' Cylinder (Vector3D (x,y,z)) | 0.0 `dEq` y = Vector3D (0.0,-1.0,0.0)
-                                       | 1.0 `dEq` y = Vector3D (0.0, 1.0,0.0)
-                                       | otherwise   = normalize $ Vector3D (2*x,0.0,2*z)
+getNormal' Cylinder v | 0.0 `dEq` y = vector3D (0.0,-1.0,0.0)
+                      | 1.0 `dEq` y = vector3D (0.0, 1.0,0.0)
+                      | otherwise   = normalize $ vector3D (2*x,0.0,2*z)
+                      where x = getX3D v
+                            y = getY3D v
+                            z = getY3D v
 
-getNormal' Cone     (Vector3D (x,y,z)) | 1.0 `dEq` y = Vector3D (0.0,1.0,0.0)
-                                       | otherwise   = normalize $ Vector3D (2*x,-2*y,2*z)
+getNormal' Cone     v | 1.0 `dEq` y = vector3D (0.0,1.0,0.0)
+                      | otherwise   = normalize $ vector3D (2*x,-2*y,2*z)
+                      where x = getX3D v
+                            y = getY3D v
+                            z = getY3D v
 
-getNormal' Cube     (Vector3D (x,y,z)) | 0.0 `dEq` z = Vector3D ( 0.0, 0.0,-1.0) -- front
-                                       | 1.0 `dEq` z = Vector3D ( 0.0, 0.0, 1.0) -- back
-                                       | 0.0 `dEq` x = Vector3D (-1.0, 0.0, 0.0) -- left
-                                       | 1.0 `dEq` x = Vector3D ( 1.0, 0.0, 0.0) -- right
-                                       | 0.0 `dEq` y = Vector3D ( 0.0,-1.0, 0.0) -- top
-                                       | 1.0 `dEq` y = Vector3D ( 0.0, 1.0, 0.0) -- bottom 
-                                       | otherwise = error $ "Loc (" ++ show (Vector3D (x,y,z)) ++ ") is not a valid "
-                                                          ++ "cube coordinate for normal... What where you "
-                                                          ++ "thinking?"
+getNormal' Cube     v | 0.0 `dEq` z = vector3D ( 0.0, 0.0,-1.0) -- front
+                      | 1.0 `dEq` z = vector3D ( 0.0, 0.0, 1.0) -- back
+                      | 0.0 `dEq` x = vector3D (-1.0, 0.0, 0.0) -- left
+                      | 1.0 `dEq` x = vector3D ( 1.0, 0.0, 0.0) -- right
+                      | 0.0 `dEq` y = vector3D ( 0.0,-1.0, 0.0) -- top
+                      | 1.0 `dEq` y = vector3D ( 0.0, 1.0, 0.0) -- bottom 
+                      | otherwise = error $ "Loc (" ++ show v ++ ") is not a valid "
+                                              ++ "cube coordinate for normal... What where you "
+                                              ++ "thinking?"
+                      where x = getX3D v
+                            y = getY3D v
+                            z = getY3D v
 
 dEq::Double -> Double -> Bool
 dEq d1 d2 = abs (d1-d2) < 0.001

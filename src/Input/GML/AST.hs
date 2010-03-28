@@ -93,7 +93,7 @@ type Env       = Map.Map Id Value
 type Code      = [Token]
 type Closure   = (Env, Code)
 
-type Point     = Vector3D Double
+type Point     = Vector3D
 type Light     = Light.RenderLight
 
 data Value     = BaseValue BaseValue
