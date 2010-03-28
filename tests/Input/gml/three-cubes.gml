@@ -13,9 +13,9 @@
 0.0 1.0 0.0 point mkCube apply /greenCube
 0.0 0.0 1.0 point mkCube apply /blueCube
 
-redCube     -0.5 0.5  8.5 translate
+redCube     -2.5 0.5  8.5 translate
 greenCube    0.0 0.0  9.0 translate
-blueCube     0.5 -0.5 9.5 translate
+blueCube     2.5 -0.5 9.5 translate
 union union /scene
 
         % directional light

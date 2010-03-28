@@ -21,6 +21,9 @@ type Transformation = Xfm
 (!*!) = xfm_mult
 multiplyTransformations t1 t2 = xfm_mult t2 t1
 
+transformPoint = xfm_point
+transformVector = xfm_vec
+
 -- * Renaming
 
 identityTransformation = ident_xfm
