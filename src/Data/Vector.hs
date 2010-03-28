@@ -43,7 +43,7 @@ instance Num Vec where
   (*) = vmul
   (-) = vsub
   negate = vmap negate 
-  abs    = G.abs 
+  abs    = vmap abs 
   signum = vmap signum 
   fromInteger i = vec (fromInteger i) (fromInteger i) (fromInteger i)
   
