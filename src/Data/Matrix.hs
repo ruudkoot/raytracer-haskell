@@ -19,6 +19,7 @@ import qualified Data.Glome.Vec as G (translate, scale)
 type Transformation = Xfm
 
 (!*!) = xfm_mult
+multiplyTransformations t1 t2 = xfm_mult t2 t1
 
 -- * Renaming
 
