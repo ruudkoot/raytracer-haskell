@@ -35,7 +35,7 @@ get x = Map.findWithDefault (error ("unknown identifier: " ++ x)) x
 
 
 shader :: Closure -> Shader
-shader (e, c) = Shader { runShader = \(face, u, v) -> let s                                                                       = [BaseValue (Int face), BaseValue (Real u), BaseValue (Real v)]
+shader (e, c) = Shader { runShader = \(face, u, v) -> let s                                                                       = [BaseValue (Real v),BaseValue (Real u),BaseValue (Int face)]
                                                           (e', s', c')                                                            = evaluate (e, s, c)
                                                           [BaseValue (Real n), BaseValue (Real ks), BaseValue (Real kd), Point p] = s'
                                                        in SurfaceProperty { surfaceColour                 = toColour p

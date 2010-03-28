@@ -8,12 +8,11 @@ import Base.Shape  (Shape(..))
 
 import Data.Maybe  (isJust)
 import Data.Vector 
+import Data.Matrix
 
 import Renderer.Normals (getNormal)
 import Renderer.Scene   (Ray(..), Object(..), transformRay)
 import Renderer.UV      (uv)
-
-
 
 -- * Datastructures
 
@@ -47,7 +46,7 @@ type Intersections = [Double]
 -- ray and an object.
 --
 intersect :: Ray -> Object -> IntersectionInfoM
-intersect ray (Simple s m1 m2 shader) = mkInfo (transformRay ray m2) shader s
+intersect ray o@(Simple s m1 m2 shader) = mkInfo (transformRay ray m2) o
 intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
 intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
 intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
@@ -56,18 +55,18 @@ intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
 -- | Helper function used by @intersect@ to 
 -- build the resulting IntersectionInfo.
 --
-mkInfo :: Ray -> Shader -> Shape -> Maybe IntersectionInfo 
-mkInfo ray sh shape = 
+mkInfo :: Ray -> Object -> Maybe IntersectionInfo 
+mkInfo ray (Simple shape m1 m2 sh) = 
   if null ints then Nothing
   else Just IntersectionInfo 
-       { location     = loc
-       , normal       = getNormal shape ray loc 
-       , distance     = t
-       , textureCoord = uv shape loc
+       { location     = dropW (m1 !*! loc)
+       , normal       = dropW $ m1 !*! (addW (getNormal shape ray (dropW loc)) 0.0) --normal in world
+       , distance     = t --not real distance
+       , textureCoord = uv shape (dropW loc)
        , shader       = sh
        } 
   where ints = intervals ray shape
-        loc  = dropW $ getPostition ray t
+        loc  = getPostition ray t --local intersection point
         t    = nearest ints
 
 
