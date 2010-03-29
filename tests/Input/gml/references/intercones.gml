@@ -51,6 +51,6 @@ scene                             % scene to render
 20                                % tracing depth
 90.0                              % field of view
 640 480                           % image wid and height
-"target/intercones.ppm"                       % output file
+"intercones.ppm"                       % output file
 render
 

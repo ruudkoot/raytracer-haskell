@@ -64,6 +64,6 @@ scene				% object
 1				% depth
 90.0				% fov
 480 480				% wid ht
-"target/test-spotlight.ppm"		% output file
+"test-spotlight.ppm"		% output file
 render
 

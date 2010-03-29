@@ -11,7 +11,6 @@ import Renderer.UV      (uv)
 import Renderer.Intervals
 -- * Datastructures
 
-
 -- | Intersection functions return this structure 
 -- so that the renderer has enough information
 -- to continue the calculation.
@@ -31,7 +30,7 @@ type IntersectionInfoM = Maybe IntersectionInfo
 --
 buildIntersection :: Ray -> Object -> Maybe IntersectionInfo 
 buildIntersection ray (Simple shape tr1 sh) = 
-  if null ints then Nothing
+  if null ints || not (any (>0.0) ints) then Nothing
   else Just IntersectionInfo 
        { location     = (transformPoint tr1 loc) --location in world
        , normal       = transformVector tr1 (getNormal shape rayt (loc)) --normal in world
@@ -43,7 +42,8 @@ buildIntersection ray (Simple shape tr1 sh) =
         ints = intervals rayt shape
         loc  = getPostition rayt t --local intersection point
         t    = nearest ints
+
 -- | Returns the nearest @t@.
 --
 nearest :: Intersections -> Double 
-nearest = minimum 
+nearest = minimum.filter (>0.0)
