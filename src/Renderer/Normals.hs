@@ -24,13 +24,13 @@ getNormal' Cylinder v | 0.0 `dEq` y = vector3D (0.0,-1.0,0.0)
                       | otherwise   = normalize $ vector3D (2*x,0.0,2*z)
                       where x = getX3D v
                             y = getY3D v
-                            z = getY3D v
+                            z = getZ3D v
 
 getNormal' Cone     v | 1.0 `dEq` y = vector3D (0.0,1.0,0.0)
                       | otherwise   = normalize $ vector3D (2*x,-2*y,2*z)
                       where x = getX3D v
                             y = getY3D v
-                            z = getY3D v
+                            z = getZ3D v
 
 getNormal' Cube     v | 0.0 `dEq` z = vector3D ( 0.0, 0.0,-1.0) -- front
                       | 1.0 `dEq` z = vector3D ( 0.0, 0.0, 1.0) -- back
@@ -43,7 +43,7 @@ getNormal' Cube     v | 0.0 `dEq` z = vector3D ( 0.0, 0.0,-1.0) -- front
                                               ++ "thinking?"
                       where x = getX3D v
                             y = getY3D v
-                            z = getY3D v
+                            z = getZ3D v
 
 dEq::Double -> Double -> Bool
 dEq d1 d2 = abs (d1-d2) < 0.001
