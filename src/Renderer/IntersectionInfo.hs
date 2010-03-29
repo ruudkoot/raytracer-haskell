@@ -28,13 +28,13 @@ type IntersectionInfoM = Maybe IntersectionInfo
 -- | Helper function used by @intersect@ to 
 -- build the resulting IntersectionInfo.
 --
-buildIntersection :: Ray -> Object -> Maybe IntersectionInfo 
+buildIntersection :: Ray -> Object -> IntersectionInfoM
 buildIntersection ray (Simple shape tr1 sh) = 
   if null ints || not (any (>0.0) ints) then Nothing
   else Just IntersectionInfo 
        { location     = transformPoint tr1 loc --location in world
        , normal       = transformVector tr1 (getNormal shape rayt loc) --normal in world
-       , distance     = t --not real distance
+       , distance     = t -- magnitude $ (transformPoint tr1 loc) - (rOrigin rayt) 
        , textureCoord = uv shape loc
        , shader       = sh
        } 
