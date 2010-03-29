@@ -1,8 +1,9 @@
-module Input.GML.RunGML where
+module Input.GML.RunGML (runGML, module Input.GML.ToRenderObject) where
 
 import Input.GML.Parser
 import Input.GML.AST
 import Input.GML.Evaluate
+import Input.GML.ToRenderObject
 
 import Input.GML.Parser.ApplicativeParsec
 import Text.ParserCombinators.Parsec.Token

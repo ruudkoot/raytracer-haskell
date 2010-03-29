@@ -1,4 +1,4 @@
-module Renderer.Renderer (render) where
+module Renderer.Renderer (renderScene) where
 import Data.Maybe
 
 import Data.Colour (Colour(..), Colours, fromColour, toRGB, toColour)
@@ -22,42 +22,12 @@ import Control.Parallel.Strategies --(rnf, using, parListChunk, rdeepseq)
 import Control.Concurrent (forkIO)
 import Control.Concurrent.MVar
 import Control.Exception (finally)
-import Data.List (sort)
-import System.IO (hPutStr, stderr)
-import System.IO.Unsafe
-
-import Debug.Trace
- 
-
--- | The number of threads to use in 
--- the rendering process.
---
-type Threads = Int
 
 -- | A RayMaker produces a Ray when given 
 -- its pixel coordinates.
 --
 type RayMaker = Int -> Int -> Ray
 
--- | High level render function that uses renderScene 
--- when Thread is zero or one; and renderSceneConc otherwise.  
--- This is useful because renderSceneConc has a greater overhead.
---
-render :: Threads -> World -> IO () 
-render 0 = renderScene 
-render 1 = renderScene 
---render n = renderSceneConc n
-
-
--- | Render a progress bar on the screen. Only redraw if necessary.
---
-dot i j w h expr = if numberOfDots > previousNumberOfDots
-                   then unsafePerformIO $ do putDotsLine; return expr
-                   else expr
-  where numberOfDots = ((100 * (i * h + j)) `div` (w * h))
-        previousNumberOfDots = ((100 * (i * h + j - 1)) `div` (w * h))
-        putDotsLine = hPutStr stderr ("\r" ++ (replicate numberOfDots '.') ++
-                                                " " ++ show numberOfDots ++ "%")
 
 -- | Renders the World without using threads.
 --
@@ -92,7 +62,7 @@ renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (ra
                                  direction = negate (rDirection ray) + reflDir
                                  clearasil = origin + 0.01 * direction -- cures acne
                               in mkRay clearasil direction -- should this ray be transformed?
-              lightsv = filter (not.shadowed (location info) object) lights
+              lightsv = lights --filter (not.shadowed (location info) object) lights
           in if depth == 0 -- Are we at the bottom of the recursion?
                then f $ toVec3D 0 0 0 -- Yes, return intensity 0 ; or should that be 1???
                else renderPixel' (depth - 1) reflected -- No, shoot another ray..
@@ -115,7 +85,7 @@ mkShadowRay p l = let direction = l-p
 saveRendering :: World -> Colours Int -> IO ()
 saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
   where bad = error "Error: didn't produce a valid PPM image."
-        save = trace ("writing result to " ++ roFile (wOptions world)) writeFile $ roFile (wOptions world)
+        save p = putStrLn ("writing result to " ++ roFile (wOptions world)) >> (writeFile (roFile (wOptions world)) p)
         (w,h) = getDimensions world
 
 

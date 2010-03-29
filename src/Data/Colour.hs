@@ -53,9 +53,8 @@ clampedList mi ma = colourToList . clampColour mi ma
 toRGB :: ColourD -> Colour Int
 toRGB col = fmap (round . (255.0*)) col
 
+fromColour :: ColourD -> Vector3D 
+fromColour (Colour v) = vector3D v
 
 toColour :: Vector3D -> Colour Double
 toColour v = Colour $ fromVector3D v
-
-fromColour :: Colour Double -> Vector3D 
-fromColour (Colour c) = vector3D c
