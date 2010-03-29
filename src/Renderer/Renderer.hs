@@ -19,9 +19,6 @@ import Renderer.IntersectionInfo
 
 import Control.Parallel            --(par)
 import Control.Parallel.Strategies --(rnf, using, parListChunk, rdeepseq)
-import Control.Concurrent (forkIO)
-import Control.Concurrent.MVar
-import Control.Exception (finally)
 
 -- | A RayMaker produces a Ray when given 
 -- its pixel coordinates.
@@ -62,7 +59,7 @@ renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (ra
                                  direction = negate (rDirection ray) + reflDir
                                  clearasil = origin + 0.01 * direction -- cures acne
                               in mkRay clearasil direction -- should this ray be transformed?
-              lightsv = lights --filter (not.shadowed (location info) object) lights
+              lightsv = filter (not . shadowed (location info) object) lights
           in if depth == 0 -- Are we at the bottom of the recursion?
                then f $ toVec3D 0 0 0 -- Yes, return intensity 0 ; or should that be 1???
                else renderPixel' (depth - 1) reflected -- No, shoot another ray..
@@ -70,13 +67,13 @@ renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (ra
                       -- up the result in continuation passing style (lighter on memory)
                                     
 shadowed:: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = isJust.intersect (mkShadowRay p l) $ o
+shadowed p o (DirectLight l _)     = isJust . intersect (mkShadowRay p l) $ o
 shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
 shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
 
 mkShadowRay::Vector3D->Vector3D->Ray
-mkShadowRay p l = let direction = l-p
-                      p' = p + 0.01 * direction
+mkShadowRay p l = let direction = l - p
+                      p' = p + (0.01 * direction)
                   in mkRay p' direction
 
 -- | Saves the calculated colours to a PPM file (the 

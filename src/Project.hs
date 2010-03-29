@@ -1,6 +1,6 @@
 module Main where 
 
-import Input.GML.RunGML
+import Input.GML.RunGML (runGML, toWorld)
 import Renderer.Renderer (renderScene)
 --
 import System
