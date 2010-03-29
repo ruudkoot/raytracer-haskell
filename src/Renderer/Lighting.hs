@@ -22,11 +22,11 @@ localLighting :: Vec3D -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -
 localLighting ambient its lights surface r reflected = diffuse + specular
   where diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight
         specular   = col (specularReflectionCoefficient surface) reflected phong
-        col k i f  = (k*) `vmap` i * surfC + sum (map f lights)
+        col k i f  = (k*) `vmap` (i * surfC + sum (map f lights))
 
         dirLight l = light (n !.! dir l) l 
         phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
-        light  f l = (f*) `vmap` getIntensity l (location its) * surfC
+        light  f l = (f*) `vmap` (getIntensity l (location its) * surfC)
 
         dirhalf  l = normalize ((rDirection r) `cross` dir l) -- ?
         dir        = direction (location its)
