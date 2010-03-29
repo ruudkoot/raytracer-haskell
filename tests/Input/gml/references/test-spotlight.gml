@@ -59,7 +59,7 @@ green 0.0 3.0 4.0 3.0 sqrt subf point spot apply /blueSpot
 
 0.2 0.2	0.2 point		% ambient
 [redSpot greenSpot blueSpot]	% lights
-1.0 0.0 0.0 point		% light attenuation
+%1.0 0.0 0.0 point		% light attenuation
 scene				% object
 1				% depth
 90.0				% fov

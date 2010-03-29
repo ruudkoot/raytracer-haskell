@@ -100,9 +100,9 @@ renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (ra
                       -- up the result in continuation passing style (lighter on memory)
                                     
 shadowed:: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = not.isJust.intersect (mkRay p (l-p)) $ o
-shadowed p o (PointLight l _)      = hit (mkRay p (l-p)) $ o
-shadowed p o (SpotLight l _ _ _ _) = hit (mkRay p (l-p)) $ o
+shadowed p o (DirectLight l _)     = isJust.intersect (mkRay p (l-p)) $ o
+shadowed p o (PointLight l _)      = hit (mkRay p (l-p)) o
+shadowed p o (SpotLight l _ _ _ _) = hit (mkRay p (l-p)) o
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)

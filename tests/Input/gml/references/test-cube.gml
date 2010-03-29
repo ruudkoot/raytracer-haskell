@@ -35,7 +35,7 @@ union union union union /scene
 				% render
 1.0 1.0 1.0 point		  % ambient light
 [ ]				  % lights
-1.0 0.0 0.0 point		  % light attenuation
+%1.0 0.0 0.0 point		  % light attenuation
 scene				  % scene to render
 2				  % tracing depth
 90.0				  % field of view

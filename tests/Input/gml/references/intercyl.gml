@@ -45,7 +45,7 @@ union
 
 0.5 0.5 0.5 point                 % ambient light
 [ l1 l2 ]                         % lights
-1.0 0.01 0.01 point		  % light attenuation
+%1.0 0.01 0.01 point		  % light attenuation
 scene                             % scene to render
 20                                % tracing depth
 90.0                              % field of view

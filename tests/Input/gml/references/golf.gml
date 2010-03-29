@@ -141,7 +141,7 @@ light
 
 0.6 0.6 0.6 point %% Ambient
 [ sun ]		%% Lights
-1.0 0.0 0.0 point
+%1.0 0.0 0.0 point
 scene
 2		%% Depth
 90.0		%% fov

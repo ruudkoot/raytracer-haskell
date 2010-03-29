@@ -41,7 +41,7 @@
 
 1.0 1.0	1.0 point	% ambient
 []  			% lights
-1.0 0.01 0.001 point	% light attenuation
+%1.0 0.01 0.001 point	% light attenuation
 scene			% object
 1			% depth
 90.0			% fov
