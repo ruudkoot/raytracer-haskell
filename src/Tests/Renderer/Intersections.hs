@@ -1,7 +1,7 @@
 module Tests.Renderer.Intersections where
 
 import Test.QuickCheck
-import Renderer.Intersections2
+import Renderer.Intersections
 import Renderer.Scene
 import Data.Vector
 import Data.Matrix

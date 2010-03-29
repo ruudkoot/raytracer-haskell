@@ -11,7 +11,7 @@ import Output.PPM (toPPM)
 import Base.Light
 import Base.Shader
 
-import Renderer.Intersections2
+import Renderer.Intersections
 import Renderer.Scene 
 import Renderer.Shaders
 import Renderer.Lighting

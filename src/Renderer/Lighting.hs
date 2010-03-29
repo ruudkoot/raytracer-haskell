@@ -8,7 +8,7 @@ import Base.Shader (SurfaceProperty(..))
 import Data.Colour (Colour, fromColour)
 import Data.Vector 
 
-import Renderer.Intersections2
+import Renderer.Intersections
 import Renderer.IntersectionInfo
 
 import Control.Applicative ((<$>))
