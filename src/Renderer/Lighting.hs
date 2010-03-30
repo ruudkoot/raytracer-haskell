@@ -53,13 +53,14 @@ localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D ->
 --localLighting its world surface ray reflected = illumination world ray its surface
 localLighting its world surface r reflected = diffuse+specular
   where ambient    = fromColour . roAmbience $ wOptions world        
-        diffuse    = col (diffuseReflectionCoefficient surface) (surfC*ambient) dirLight lights
-        specular   = col (specularReflectionCoefficient surface) reflected phong lights
-        col k i f l= (k*) `vmap` (i + sum (map f l))
+        diffuse    = col (diffuseReflectionCoefficient surface) (surfC*ambient) dirLight lightsv
+        specular   = col (specularReflectionCoefficient surface) reflected phong lightsv
+        col k i f l= (k*) `vmap` (i + sum (map (clamp.f) l))
+        
+        clamp = vmap (max 0.0)
 
-        dirLight l = light (n !.! dir l) l 
-        phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
-        light  f l = (max 0.0) `vmap` ((f*) `vmap` (getIntensity l (location its) * surfC))
+        dirLight l = ((n !.! dir l)*) `vmap` (getIntensity l (location its) * surfC)
+        phong    l = (((n !.! dirhalf l) ** phongExponent surface)*) `vmap` (getIntensity l (location its))
 
         dirhalf  l = normalize $ (normalize (negate (rDirection r)) + dir l)
         dir        = direction (location its)
@@ -110,12 +111,11 @@ attenuate d = vmap ((/ dis) . (100*))
 
 shadowed :: Vector3D -> Object -> RenderLight -> Bool
 shadowed p o (DirectLight l _)     = not.null . intersect (mkShadowRay p (negate l)) $ o
-shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
-shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
+shadowed p o (PointLight l _)      = hit (mkShadowRay p (l-p)) o
+shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p (l-p)) o
 
 mkShadowRay :: Vector3D -> Vector3D -> Ray
-mkShadowRay p l = let direction = l - p
-                      p' = p + (0.01 * direction)
-                  in mkRay p' direction
+mkShadowRay p d = let p' = p + (0.01 * d)
+                  in mkRay p' d
 
 
