@@ -18,12 +18,12 @@ import Renderer.Scene
 
 
 -- Ruud's attempt at the illumination model
-{-
+
 d ~> f = f d
 r .* v = (r*) `vmap` v
 
-illumination :: World -> IntersectionInfo -> SurfaceProperty -> Vec3D
-illumination world intersectionInfo surfaceProperty =
+illumination :: World -> Ray -> IntersectionInfo -> SurfaceProperty -> Vec3D
+illumination world ray intersectionInfo surfaceProperty =
     let c'  = fromColour $ surfaceProperty  ~> surfaceColour  
         i_a = fromColour $ world            ~> (roAmbience . wOptions)
         k_d =              surfaceProperty  ~> diffuseReflectionCoefficient
@@ -37,20 +37,22 @@ illumination world intersectionInfo surfaceProperty =
         ambient    = k_d .* (i_a * c')
         diffuse    = k_d .* sum [(n' !.! l'_j)      .* (i'_j * c') | (l'_j, i'_j) <- j]
                       where j = map (\l -> (direction loc l, getIntensity l loc)) unshadowedLights
-        specular   = k_s .* sum [(n' !.! h'_j) ** n .* (i'_j * c') | (h'_j, i'_j) <- j]
-                      where j = map (\l -> (halfWay loc l, getIntensity l loc)) unshadowedLights
+        specular   = k_s .* sum [((n' !.! h'_j) ** n) .* (i'_j * c') | (h'_j, i'_j) <- j]
+                      where j = map (\l -> (normalize $ (normalize (negate (rDirection ray)) + normalize (direction loc l)), getIntensity l loc)) unshadowedLights
         reflection = undefined
         
-     in ambient + clamp diffuse -- + specular + reflection
+     in ambient + clamp diffuse + specular {- + reflection -}
         where clamp = vmap (max 0.0)
--}
+
 
 -- Calculate the local lighting.
 -- This basically implements the lighting model 
 -- from page 11 of the assigment.
 --
 localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
---localLighting its world surface r reflected = illumination world its surface
+localLighting its world surface ray reflected = illumination world ray its surface
+
+{-
 localLighting its world surface r reflected = diffuse + specular
   where ambient    = fromColour . roAmbience $ wOptions world        
         diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lights
@@ -68,6 +70,7 @@ localLighting its world surface r reflected = diffuse + specular
         n          = normal its
         lights     = wLights world 
         lightsv    = filter (not . shadowed (location its) (wObject world)) lights
+-}
 
 -- | Get the unit vector from a location 
 -- to a RenderLight's position.
