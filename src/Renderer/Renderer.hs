@@ -33,9 +33,9 @@ renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = map  (\(i,j) -> renderPixel depth i j raymaker world)
-                      [(i,j) | i <- [0..h-1], j <- [0..w-1]]
-                      `using` parListChunk (w*h `div` 4) rdeepseq
+        pixels = map (\(i,j) -> renderPixel depth i j raymaker world)
+                     [(i,j) | i <- [0..h-1], j <- [0..w-1]]
+                 `using` parListChunk (w*h `div` 2) rdeepseq
 
 
 -- | Calculates the colour for a single pixel position 

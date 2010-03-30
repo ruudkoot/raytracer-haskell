@@ -11,11 +11,11 @@ import Data.Vector                 (Vector3D(..), fromVector3D, fromVector, vect
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 
-newtype Colour a = Colour (a, a, a) deriving (Eq, Ord, Show)
+data Colour a = Colour !(a, a, a) deriving (Eq, Ord, Show)
 type Colours a = [Colour a]
 
 instance NFData (Colour a) where
-  rnf a = a `seq` ()
+  rnf (Colour a) = a `seq` ()
 
 instance Functor Colour where
   fmap f (Colour (a, b, c)) = Colour (f a, f b, f c)
