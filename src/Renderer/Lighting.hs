@@ -46,9 +46,9 @@ localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D ->
 --localLighting its world surface r reflected = illumination world its surface
 localLighting its world surface r reflected = diffuse+specular
   where ambient    = fromColour . roAmbience $ wOptions world        
-        diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lights
+        diffuse    = col (diffuseReflectionCoefficient surface) (surfC*ambient) dirLight lights
         specular   = col (specularReflectionCoefficient surface) reflected phong lights
-        col k i f l= (k*) `vmap` (i * surfC + sum (map f l))
+        col k i f l= (k*) `vmap` (i + sum (map f l))
 
         dirLight l = light (n !.! dir l) l 
         phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
