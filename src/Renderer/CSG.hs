@@ -2,8 +2,9 @@ module Renderer.CSG where
 import Data.Vector
 import Renderer.Scene
 import Renderer.IntersectionInfo
+import Data.Range
 
-type CSG = IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
+type CSG = Intersections -> Intersections -> Intersections
 
 -- * CSG 
 
@@ -12,33 +13,20 @@ type CSG = IntersectionInfoM -> IntersectionInfoM -> IntersectionInfoM
 -- the nearest intersection is choosen.
 --
 unionI :: CSG
-unionI (Just i) (Just j) = Just $ pickNearest i j
-unionI (Just i) Nothing  = Just i
-unionI Nothing  (Just i) = Just i
-unionI Nothing  Nothing  = Nothing 
+unionI i1 i2 = removeBehind $ unionRanges i1 i2
 
 -- | A & B 
 -- If A and B are both hit.
 --
 intersectI :: CSG
-intersectI (Just i) (Just j) = Just $ pickNearest i j
-intersectI _        _        = Nothing 
+intersectI i1 i2 = removeBehind $ intersectRanges i1 i2
 
 -- | A - B   
 -- Only if A is hit and B is not hit.
 --
 differenceI :: CSG
-differenceI (Just i) (Just j) | distance j < distance i && distance i <= exit j 
-                                = Just $ j { normal = negate (normal j)} 
-                              | distance j < exit j && exit j <= distance i
-                                = Just i
-                              | distance i < distance j 
-                                = Just i
-differenceI (Just i) Nothing  = Just i
-differenceI _        _        = Nothing 
+differenceI i1 i2 = removeBehind $ diffRanges i1 i2
 
 
--- | Pick the nearest intersection.
---
-pickNearest :: IntersectionInfo -> IntersectionInfo -> IntersectionInfo 
-pickNearest i j = if distance i <= distance j then i else j
+removeBehind :: Intersections -> Intersections
+removeBehind = dropWhile ((<0.0).distance.snd)

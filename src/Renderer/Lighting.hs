@@ -17,7 +17,7 @@ import Renderer.Scene
 
 
 -- Ruud's attempt at the illumination model
-
+{-
 d ~> f = f d
 r .* v = (r*) `vmap` v
 
@@ -42,16 +42,15 @@ illumination world intersectionInfo surfaceProperty =
         
      in ambient + clamp diffuse -- + specular + reflection
         where clamp = vmap (max 0.0)
-
+-}
 
 -- Calculate the local lighting.
 -- This basically implements the lighting model 
 -- from page 11 of the assigment.
 --
 localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
-localLighting its world surface r reflected = illumination world its surface
-{-
-localLighting its world surface r reflected = diffuse + specular
+--localLighting its world surface r reflected = illumination world its surface
+localLighting its world surface r reflected = {-diffuse + -}specular
   where ambient    = fromColour . roAmbience $ wOptions world
         diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lightsv
         specular   = col (specularReflectionCoefficient surface) reflected phong lightsv
@@ -61,14 +60,13 @@ localLighting its world surface r reflected = diffuse + specular
         phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
         light  f l = (max 0.0) `vmap` ((f*) `vmap` (getIntensity l (location its) * surfC))
 
-        dirhalf  l = normalize ((rDirection r) `cross` dir l) -- ?
+        dirhalf  l = normalize $ (normalize (negate (rDirection r)) + normalize (dir l))
         dir        = direction (location its)
         
         surfC      = fromColour $ surfaceColour surface
         n          = normal its
         lights     = wLights world 
         lightsv    = filter (not . shadowed (location its) (wObject world)) lights
--}
 
 -- | Get the unit vector from a location 
 -- to a RenderLight's position.
@@ -110,7 +108,7 @@ attenuate d = vmap ((/ dis) . (100*))
 
 
 shadowed :: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = isJust . intersect (mkShadowRay p (negate l)) $ o
+shadowed p o (DirectLight l _)     = not.null . intersect (mkShadowRay p (negate l)) $ o
 shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
 shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
 
