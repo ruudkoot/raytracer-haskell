@@ -15,7 +15,7 @@ import Renderer.Intersections    (intersect)
 import Renderer.Lighting         (localLighting)
 import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
 
-import Control.Parallel.Strategies (parListChunk, using, rdeepseq) 
+import Control.Parallel.Strategies (parListChunk, using, rdeepseq, rpar) 
 
 
 
@@ -33,9 +33,13 @@ renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = 
-                 [renderPixel depth i j raymaker world | i <- [0..h-1], j <- [0..w-1]]
-                 `using` parListChunk (w*h `div` 2) rdeepseq
+        -- TODO: Find a wway to generate this code based on an arbitrary number of threads :)
+        pixels = [renderPixel depth i j raymaker world | i <- [0..w-1], j <- [0..h-1]] --   `using` parListChunk (w*h `div` 4) rdeepseq
+                 -- `using` parListChunk (w*h `div` 4) rdeepseq
+        -- pixels = concat
+        --          [[renderPixel depth i j raymaker world | i <- [0..(h `div` 2 - 1)], j <- [0..w-1]] --   `using` parListChunk (w*h `div` 4) rdeepseq
+        --          ,[renderPixel depth i j raymaker world | i <- [(h `div` 2)..h-1], j <- [0..w-1]]]  --   `using` parListChunk (w*h `div` 4) rdeepseq
+        --          -- `using` parListChunk (w*h `div` 4) rdeepseq
 
 
 -- | Calculates the colour for a single pixel position 
@@ -89,5 +93,5 @@ getRayMaker world = mkRayMaker x y delta
 mkRayMaker :: Double -> Double -> Double -> RayMaker 
 mkRayMaker x y delta i j = mkRay eye dir
   where eye = vector3D (0, 0, -1)
-        dir = vector3D (x - (fromIntegral j + 0.5) * delta,
-                        y - (fromIntegral i + 0.5) * delta, 1)
+        dir = vector3D (x + (fromIntegral i + 0.5) * delta,
+                        y - (fromIntegral j + 0.5) * delta, 1)
