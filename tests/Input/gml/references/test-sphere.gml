@@ -7,7 +7,7 @@
 { /color
   { /v /u /face			  % bind arguments
     color			  % surface color
-    0.8 0.2 10.0		  % kd ks n
+    0.8 0.2 3.0		  % kd ks n
   } sphere
 } /mkSphere
 

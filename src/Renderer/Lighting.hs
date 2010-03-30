@@ -44,7 +44,7 @@ illumination world intersectionInfo surfaceProperty =
 --
 localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
 --localLighting its world surface r reflected = illumination world its surface
-localLighting its world surface r reflected = diffuse + specular
+localLighting its world surface r reflected = diffuse+specular
   where ambient    = fromColour . roAmbience $ wOptions world        
         diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lights
         specular   = col (specularReflectionCoefficient surface) reflected phong lights
@@ -54,7 +54,7 @@ localLighting its world surface r reflected = diffuse + specular
         phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
         light  f l = (max 0.0) `vmap` ((f*) `vmap` (getIntensity l (location its) * surfC))
 
-        dirhalf  l = normalize $ (normalize (negate (rDirection r)) + normalize (dir l))
+        dirhalf  l = normalize $ (normalize (negate (rDirection r)) + dir l)
         dir        = direction (location its)
         
         surfC      = fromColour $ surfaceColour surface
@@ -82,9 +82,6 @@ getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude (loc - p
         spot = ((dir !.! posDir) ** exp *) `vmap` i
         dir = normalize $ at - pos 
         posDir = normalize $ loc - pos
-        {-spot = (((dir / abs dir) !.! (posDir / abs posDir)) ** exp *) `vmap` i
-        dir = at - pos
-        posDir = loc - pos-}
         angle = acos(dir !.! posDir)
 
 
