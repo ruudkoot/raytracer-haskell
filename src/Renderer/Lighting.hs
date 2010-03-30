@@ -46,8 +46,8 @@ localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D ->
 --localLighting its world surface r reflected = illumination world its surface
 localLighting its world surface r reflected = diffuse+specular
   where ambient    = fromColour . roAmbience $ wOptions world        
-        diffuse    = col (diffuseReflectionCoefficient surface) (surfC*ambient) dirLight lights
-        specular   = col (specularReflectionCoefficient surface) reflected phong lights
+        diffuse    = col (diffuseReflectionCoefficient surface) (surfC*ambient) dirLight lightsv
+        specular   = col (specularReflectionCoefficient surface) reflected phong lightsv
         col k i f l= (k*) `vmap` (i + sum (map f l))
 
         dirLight l = light (n !.! dir l) l 
@@ -96,12 +96,11 @@ attenuate d = vmap ((/ dis) . (100*))
 
 shadowed :: Vector3D -> Object -> RenderLight -> Bool
 shadowed p o (DirectLight l _)     = not.null . intersect (mkShadowRay p (negate l)) $ o
-shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
-shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
+shadowed p o (PointLight l _)      = hit (mkShadowRay p (l-p)) o
+shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p (l-p)) o
 
 mkShadowRay :: Vector3D -> Vector3D -> Ray
-mkShadowRay p l = let direction = l - p
-                      p' = p + (0.01 * direction)
-                  in mkRay p' direction
+mkShadowRay p d = let p' = p + (0.01 * d)
+                  in mkRay p' d
 
 
