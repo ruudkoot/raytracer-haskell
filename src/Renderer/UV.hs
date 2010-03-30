@@ -31,7 +31,12 @@ uv Cube v | 0.0 `dEq` z = (5, x, y) -- front
               y = getY3D v
               z = getZ3D v
 
-uv Cylinder loc = (0,0.0,0.0)
+uv Cylinder v | 1.0 `dEq` y = (1, (x + 1)/2, (y + 1)/2)
+              | 0.0 `dEq` y = (2, (x + 1)/2, (y + 1)/2)
+              | otherwise = (0, acos(z)/360, y)
+      where x = getX3D v
+            y = getY3D v
+            z = getZ3D v
 
 uv Cone loc = (0,0.0,0.0)
 
