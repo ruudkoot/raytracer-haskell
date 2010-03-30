@@ -10,8 +10,8 @@ getNormal :: Shape -> Ray -> Pt3D -> Vec3D
 
 getNormal s ray loc = let normal = getNormal' s loc
                       in if inside s (rOrigin ray) 
-                         then normal
-                         else negate normal
+                         then negate normal
+                         else normal
 
 getNormal' :: Shape -> Pt3D -> Vec3D 
 
