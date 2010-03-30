@@ -152,8 +152,8 @@ operators = fromList [ ( "addi"      ,       iii (+)                    ) -- num
                      , ( "eqf"       ,       rrb (==)                   )
                      , ( "floor"     ,        ri floor                  )
                      , ( "frac"      ,        rr (snd . properFraction) ) -- ???
-                     , ( "lessi"     ,       iib (>)                    )
-                     , ( "lessf"     ,       rrb (>)                    )
+                     , ( "lessi"     ,       iib (<)                    )
+                     , ( "lessf"     ,       rrb (<)                    )
                      , ( "modi"      ,       iii mod                    )
                      , ( "muli"      ,       iii (*)                    )
                      , ( "mulf"      ,       rrr (*)                    )
