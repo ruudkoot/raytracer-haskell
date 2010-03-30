@@ -1,18 +1,17 @@
 module Renderer.Renderer (renderScene) where
 
-import Data.Colour (Colour(..), Colours, fromColour, toRGB, toColour)
-import Data.Vector (Vector3D(..), normalize, toVec3D, (!.!), Ray(..), rDirection, rOrigin, vector3D, mkRay, vmap)
+import Data.Colour (Colour(..), Colours, toRGB, toColour)
+import Data.Vector (Vector3D, toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap)
 import Data.Radians
 
 import Output.Output (toSize)
 import Output.PPM (toPPM)
 
-import Base.Light
-import Base.Shader
+
+import Base.Shader (runShader)
 
 import Renderer.Intersections
 import Renderer.Scene 
-import Renderer.Shaders
 import Renderer.Lighting
 import Renderer.IntersectionInfo
 
@@ -32,8 +31,8 @@ renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = map (\(i,j) -> renderPixel depth i j raymaker world)
-                     [(i,j) | i <- [0..h-1], j <- [0..w-1]]
+        pixels = 
+                 [renderPixel depth i j raymaker world | i <- [0..h-1], j <- [0..w-1]]
                  `using` parListChunk (w*h `div` 2) rdeepseq
 
 
@@ -43,8 +42,6 @@ renderScene world = saveRendering world pixels
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
 renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (raymaker x y) id
   where 
-    object = wObject world
-    ambient = fromColour $ (roAmbience.wOptions) world
     renderPixel' :: Int -> Ray -> (Vector3D -> Vector3D) -> Vector3D
     renderPixel' depth ray f = 
       case intersect ray (wObject world) of 
