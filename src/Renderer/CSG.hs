@@ -28,6 +28,12 @@ intersectI _        _        = Nothing
 -- Only if A is hit and B is not hit.
 --
 differenceI :: CSG
+differenceI (Just i) (Just j) | distance j < distance i && distance i <= exit j 
+                                = Just $ j { normal = negate (normal j)} 
+                              | distance j < exit j && exit j <= distance i
+                                = Just i
+                              | distance i < distance j 
+                                = Just i
 differenceI (Just i) Nothing  = Just i
 differenceI _        _        = Nothing 
 
