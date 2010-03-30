@@ -75,11 +75,11 @@ diffRanges::(Ord a) => Ranges a -> Ranges a -> Ranges a
 diffRanges []             _              = []
 diffRanges r              []             = r
 diffRanges (x@(xl,xh):xs) (y@(yl,yh):ys) 
-  | xl <= yl  = f                                          -- x lowest ?
+  | xl <  yl  = f                                          -- x lowest ?
   | yh <  xl  = diffRanges (x:xs) ys                       -- no overlap
   | yh >= xh  = diffRanges xs (y:ys)                       -- x fully in y
   | otherwise = diffRanges ((yh,xh):xs) ys
-  where f | xh < yl   = x:diffRanges xs (y:ys)             -- no overlap
+  where f | xh <= yl   = x:diffRanges xs (y:ys)             -- no overlap
           | xh >= yh  = (xl,yl):diffRanges ((yh,xh):xs) ys -- y fully in x
           | otherwise = (xl,yl):diffRanges xs (y:ys)
 

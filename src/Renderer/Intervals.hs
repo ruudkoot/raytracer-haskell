@@ -3,7 +3,7 @@ module Renderer.Intervals where
 import Renderer.Scene
 import Data.Vector
 import Base.Shape
-
+import Data.List (sort)
 type Intervals = Maybe (Double, Double)
 
 intervals :: Ray -> Shape -> Intervals
@@ -11,7 +11,7 @@ intervals r s = case intervals' r s of
                  [] -> Nothing
                  [t] -> if t>0.0 then Just (t,t) else Nothing
                  [t1,t2] -> if t2>0.0 then Just (sort2 (t1,t2)) else Nothing
-
+                 ls -> let ts = sort ls in Just (head ls, last ls)
 sort2::(Ord a)=>(a,a)->(a,a)
 sort2 (x,y) = if x<y then (x,y) else (y,x)
 
