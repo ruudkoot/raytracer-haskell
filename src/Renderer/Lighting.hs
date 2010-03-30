@@ -12,17 +12,20 @@ import Renderer.Intersections
 import Renderer.IntersectionInfo
 
 import Control.Applicative ((<$>))
+import Data.Maybe
+import Renderer.Scene 
 
 
 -- Calculate the local lighting.
 -- This basically implements the lighting model 
 -- from page 11 of the assigment.
 --
-localLighting :: Vec3D -> IntersectionInfo -> [RenderLight] -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
-localLighting ambient its lights surface r reflected = diffuse + specular
-  where diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight
-        specular   = col (specularReflectionCoefficient surface) reflected phong
-        col k i f  = (k*) `vmap` (i * surfC + sum (map f lights))
+localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
+localLighting its world surface r reflected = diffuse + specular
+  where ambient    = fromColour . roAmbience $ wOptions world
+        diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lights
+        specular   = col (specularReflectionCoefficient surface) reflected phong lightsv
+        col k i f l= (k*) `vmap` (i * surfC + sum (map f l))
 
         dirLight l = light (n !.! dir l) l 
         phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
@@ -33,7 +36,8 @@ localLighting ambient its lights surface r reflected = diffuse + specular
         
         surfC      = fromColour $ surfaceColour surface
         n          = normal its
- 
+        lights     = wLights world 
+        lightsv = filter (not . shadowed (location its) (wObject world)) lights
 
 -- | Get the unit vector from a location 
 -- to a RenderLight's position.
@@ -66,3 +70,13 @@ attenuate :: Double -> Vec3D -> Vec3D
 attenuate d = vmap ((/ dis) . (100*))
   where dis = 99 + d ** 2
 
+
+shadowed :: Vector3D -> Object -> RenderLight -> Bool
+shadowed p o (DirectLight l _)     = isJust . intersect (mkShadowRay p l) $ o
+shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
+shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
+
+mkShadowRay :: Vector3D -> Vector3D -> Ray
+mkShadowRay p l = let direction = l - p
+                      p' = p + (0.01 * direction)
+                  in mkRay p' direction

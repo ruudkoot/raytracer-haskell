@@ -1,5 +1,4 @@
 module Renderer.Renderer (renderScene) where
-import Data.Maybe
 
 import Data.Colour (Colour(..), Colours, fromColour, toRGB, toColour)
 import Data.Vector (Vector3D(..), normalize, toVec3D, (!.!), Ray(..), rDirection, rOrigin, vector3D, mkRay, vmap)
@@ -45,11 +44,10 @@ renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
 renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (raymaker x y) id
   where 
     object = wObject world
-    lights = wLights world
     ambient = fromColour $ (roAmbience.wOptions) world
     renderPixel' :: Int -> Ray -> (Vector3D -> Vector3D) -> Vector3D
     renderPixel' depth ray f = 
-      case intersect ray object of 
+      case intersect ray (wObject world) of 
         Nothing -> f $ toVec3D 0 0 0 -- No intersections. Intensity=0
         Just info ->                 -- An intersection. Find out intensity:
           let surface      = runShader (shader info) $ textureCoord info
@@ -59,22 +57,12 @@ renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (ra
                                  direction = negate (rDirection ray) + reflDir
                                  clearasil = origin + 0.01 * direction -- cures acne
                               in mkRay clearasil direction -- should this ray be transformed?
-              lightsv = filter (not . shadowed (location info) object) lights
           in if depth == 0 -- Are we at the bottom of the recursion?
                then f $ toVec3D 0 0 0 -- Yes, return intensity 0 ; or should that be 1???
                else renderPixel' (depth - 1) reflected -- No, shoot another ray..
-                      (f . localLighting ambient info lightsv surface ray) -- ..and build 
+                      (f . localLighting info world surface ray) -- ..and build 
                       -- up the result in continuation passing style (lighter on memory)
                                     
-shadowed:: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = isJust . intersect (mkShadowRay p l) $ o
-shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
-shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
-
-mkShadowRay::Vector3D->Vector3D->Ray
-mkShadowRay p l = let direction = l - p
-                      p' = p + (0.01 * direction)
-                  in mkRay p' direction
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
