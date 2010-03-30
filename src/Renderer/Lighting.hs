@@ -29,11 +29,18 @@ illumination world intersectionInfo surfaceProperty =
         n'  =              intersectionInfo ~> normal
         k_s =              surfaceProperty  ~> specularReflectionCoefficient 
         n   =              surfaceProperty  ~> phongExponent
-        ambient  = k_d .* (i_a * c')
-        diffuse  = k_d .* sum [(n' !.! l'_j) .* (i'_j * c') | (l'_j, i'_j) <- j]
-                    where j = map (\l -> (direction (location intersectionInfo) l, getIntensity l (location intersectionInfo) )) (filter (not . shadowed (location intersectionInfo) (wObject world)) $ wLights world)
-        specular = undefined
-     in ambient + clamp diffuse -- + specular
+
+        loc              = location intersectionInfo
+        unshadowedLights = filter (not . shadowed (location intersectionInfo) (wObject world)) $ wLights world
+
+        ambient    = k_d .* (i_a * c')
+        diffuse    = k_d .* sum [(n' !.! l'_j)      .* (i'_j * c') | (l'_j, i'_j) <- j]
+                      where j = map (\l -> (direction loc l, getIntensity l loc)) unshadowedLights
+        specular   = k_s .* sum [(n' !.! h'_j) ** n .* (i'_j * c') | (h'_j, i'_j) <- j]
+                      where j = map (\l -> (halfWay loc l, getIntensity l loc)) unshadowedLights
+        reflection = undefined
+        
+     in ambient + clamp diffuse -- + specular + reflection
         where clamp = vmap (max 0.0)
 
 
@@ -71,6 +78,13 @@ direction loc (SpotLight   pos _ _ _ _ ) = normalize $ pos - loc
 direction loc (PointLight  pos _       ) = normalize $ pos - loc
 direction _   (DirectLight dir _       ) = normalize $ negate dir
 
+
+-- | H vector
+--
+halfWay :: Pt3D -> RenderLight -> Vec3D
+halfWay loc (SpotLight   pos _ _ _ _ ) = normalize $ pos - loc
+halfWay loc (PointLight  pos _       ) = normalize $ pos - loc
+halfWay _   (DirectLight dir _       ) = normalize $ negate dir
 
 -- | Calculate the intensity of RenderLight 
 -- at a certain position. 
