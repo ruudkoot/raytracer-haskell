@@ -16,11 +16,34 @@ import Data.Maybe
 import Renderer.Scene 
 
 
+-- Ruud's attempt at the illumination model
+
+d ~> f = f d
+r .* v = (r*) `vmap` v
+
+illumination :: World -> IntersectionInfo -> SurfaceProperty -> Vec3D
+illumination world intersectionInfo surfaceProperty =
+    let c'  = fromColour $ surfaceProperty  ~> surfaceColour  
+        i_a = fromColour $ world            ~> (roAmbience . wOptions)
+        k_d =              surfaceProperty  ~> diffuseReflectionCoefficient
+        n'  =              intersectionInfo ~> normal
+        k_s =              surfaceProperty  ~> specularReflectionCoefficient 
+        n   =              surfaceProperty  ~> phongExponent
+        ambient  = k_d .* (i_a * c')
+        diffuse  = k_d .* sum [(n' !.! l'_j) .* (i'_j * c') | (l'_j, i'_j) <- j]
+                    where j = map (\l -> (direction (location intersectionInfo) l, getIntensity l (location intersectionInfo) )) (filter (not . shadowed (location intersectionInfo) (wObject world)) $ wLights world)
+        specular = undefined
+     in ambient + clamp diffuse -- + specular
+        where clamp = vmap (max 0.0)
+
+
 -- Calculate the local lighting.
 -- This basically implements the lighting model 
 -- from page 11 of the assigment.
 --
 localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
+localLighting its world surface r reflected = illumination world its surface
+{-
 localLighting its world surface r reflected = diffuse + specular
   where ambient    = fromColour . roAmbience $ wOptions world
         diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lightsv
@@ -38,6 +61,7 @@ localLighting its world surface r reflected = diffuse + specular
         n          = normal its
         lights     = wLights world 
         lightsv    = filter (not . shadowed (location its) (wObject world)) lights
+-}
 
 -- | Get the unit vector from a location 
 -- to a RenderLight's position.
