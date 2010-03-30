@@ -1,22 +1,24 @@
 module Renderer.Renderer (renderScene) where
 
-import Data.Colour (Colour(..), Colours, toRGB, toColour)
-import Data.Vector (Vector3D, toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap)
-import Data.Radians
+import Base.Shader   (runShader)
+
+import Data.Colour   (Colour(..), Colours, toRGB, toColour)
+import Data.Radians  (radians)
+import Data.Vector   (toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap)
+
 
 import Output.Output (toSize)
-import Output.PPM (toPPM)
+import Output.PPM    (toPPM)
+
+import Renderer.IntersectionInfo (IntersectionInfo(..))
+import Renderer.Intersections    (intersect)
+import Renderer.Lighting         (localLighting)
+import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
+
+import Control.Parallel.Strategies (parListChunk, using, rdeepseq) 
 
 
-import Base.Shader (runShader)
 
-import Renderer.Intersections
-import Renderer.Scene 
-import Renderer.Lighting
-import Renderer.IntersectionInfo
-
-import Control.Parallel            --(par)
-import Control.Parallel.Strategies --(rnf, using, parListChunk, rdeepseq)
 
 -- | A RayMaker produces a Ray when given 
 -- its pixel coordinates.
@@ -40,25 +42,26 @@ renderScene world = saveRendering world pixels
 -- by recursively shooting a ray into the World.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel depth x y raymaker world = toRGB $ toColour $ renderPixel' depth (raymaker x y) id
+renderPixel depth x y raymaker world = toRGB . toColour $ renderPixel' depth (raymaker x y) id
   where 
-    renderPixel' :: Int -> Ray -> (Vector3D -> Vector3D) -> Vector3D
-    renderPixel' depth ray f = 
+    renderPixel' depth ray k = 
       case intersect ray (wObject world) of 
-        Nothing -> f $ toVec3D 0 0 0 -- No intersections. Intensity=0
-        Just info ->                 -- An intersection. Find out intensity:
-          let surface      = runShader (shader info) $ textureCoord info
-              n            = normal info
-              reflDir      = vmap (2 * n !.! (rDirection ray) *) n
-              reflected    = let origin    = location info
-                                 direction = negate (rDirection ray) + reflDir
-                                 clearasil = origin + 0.01 * direction -- cures acne
-                              in mkRay clearasil direction -- should this ray be transformed?
-          in if depth == 0 -- Are we at the bottom of the recursion?
-               then f $ toVec3D 0 0 0 -- Yes, return intensity 0 ; or should that be 1???
-               else renderPixel' (depth - 1) reflected -- No, shoot another ray..
-                      (f . localLighting info world surface ray) -- ..and build 
-                      -- up the result in continuation passing style (lighter on memory)
+        Nothing   -> k $ toVec3D 0 0 0 -- No intersections. Intensity=0
+        Just info ->                   -- An intersection. Find out intensity:
+          let surface   = runShader (shader info) $ textureCoord info
+              n         = normal info
+              reflDir   = vmap (2 * n !.! (rDirection ray) *) n
+              reflected = let origin    = location info
+                              direction = negate (rDirection ray) + reflDir
+                              clearasil = origin + 0.01 * direction -- cures acne
+                          in mkRay clearasil direction -- should this ray be transformed?
+
+          -- Build result up in continuation passing style.
+          -- 
+          in if depth == 0 
+               then k $ toVec3D 0 0 0
+               else renderPixel' (depth - 1) reflected 
+                      (k . localLighting info world surface ray) 
                                     
 
 -- | Saves the calculated colours to a PPM file (the 

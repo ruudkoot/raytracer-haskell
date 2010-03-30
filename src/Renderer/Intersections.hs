@@ -40,7 +40,7 @@ csg f ray o1 o2 = f (iray o1) (iray o2)
 --
 hit :: Ray -> Object -> Bool
 hit r o = case intersect r o of
-            (Just i) -> distance i > 0.0 && distance i < 1.0
+            (Just i) -> distance i > 0.0 -- && distance i < 1.0
             Nothing -> False
 
 

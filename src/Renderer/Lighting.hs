@@ -37,7 +37,7 @@ localLighting its world surface r reflected = diffuse + specular
         surfC      = fromColour $ surfaceColour surface
         n          = normal its
         lights     = wLights world 
-        lightsv = filter (not . shadowed (location its) (wObject world)) lights
+        lightsv    = filter (not . shadowed (location its) (wObject world)) lights
 
 -- | Get the unit vector from a location 
 -- to a RenderLight's position.
@@ -72,7 +72,7 @@ attenuate d = vmap ((/ dis) . (100*))
 
 
 shadowed :: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = isJust . intersect (mkShadowRay p l) $ o
+shadowed p o (DirectLight l _)     = isJust . intersect (mkShadowRay p (negate l)) $ o
 shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
 shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
 
@@ -80,3 +80,5 @@ mkShadowRay :: Vector3D -> Vector3D -> Ray
 mkShadowRay p l = let direction = l - p
                       p' = p + (0.01 * direction)
                   in mkRay p' direction
+
+
