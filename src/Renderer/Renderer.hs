@@ -33,13 +33,8 @@ renderScene world = saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        -- TODO: Find a wway to generate this code based on an arbitrary number of threads :)
-        pixels = [renderPixel depth i j raymaker world | i <- [0..w-1], j <- [0..h-1]] --   `using` parListChunk (w*h `div` 4) rdeepseq
-                 -- `using` parListChunk (w*h `div` 4) rdeepseq
-        -- pixels = concat
-        --          [[renderPixel depth i j raymaker world | i <- [0..(h `div` 2 - 1)], j <- [0..w-1]] --   `using` parListChunk (w*h `div` 4) rdeepseq
-        --          ,[renderPixel depth i j raymaker world | i <- [(h `div` 2)..h-1], j <- [0..w-1]]]  --   `using` parListChunk (w*h `div` 4) rdeepseq
-        --          -- `using` parListChunk (w*h `div` 4) rdeepseq
+        pixels = [renderPixel depth i (h-j) raymaker world |  j <- [0..h-1], i <- [0..w-1]]
+                 `using` parListChunk (w*h `div` 2) rdeepseq
 
 
 -- | Calculates the colour for a single pixel position 
@@ -81,17 +76,17 @@ saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
 -- | Creates the RayMaker for the given world.
 --
 getRayMaker :: World -> RayMaker 
-getRayMaker world = mkRayMaker x y delta 
+getRayMaker world = mkRayMaker x y dx dy
   where (w,h) = getDimensions world
-        (x,y) = (tan(0.5 * radians fov), x * fromIntegral h / fromIntegral w)
-        delta = 2 * x / fromIntegral w
+        (x,y) = (-tan(0.5 * radians fov), x * fromIntegral h / fromIntegral w)
+        (dx,dy) = (-2 * x / fromIntegral w, -2 * y / fromIntegral h)
         fov = roFov (wOptions world)
 
 
 -- | A RayMakerMaker, if you will; but you won't.
 --
-mkRayMaker :: Double -> Double -> Double -> RayMaker 
-mkRayMaker x y delta i j = mkRay eye dir
+mkRayMaker :: Double -> Double -> Double-> Double -> RayMaker 
+mkRayMaker x y dx dy i j = mkRay eye dir
   where eye = vector3D (0, 0, -1)
-        dir = vector3D (x + (fromIntegral i + 0.5) * delta,
-                        y - (fromIntegral j + 0.5) * delta, 1)
+        dir = vector3D (x + (fromIntegral i + 0.5) * dx,
+                        y + (fromIntegral j + 0.5) * dy, 1)
