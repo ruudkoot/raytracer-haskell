@@ -62,7 +62,8 @@ intervals r Cylinder =
       a = vx ^ 2 + vz ^ 2
       b = 2 * (px * vx + pz * vz)
       c = px ^ 2 + pz ^ 2 - 1.0
-  in filter (\t -> let y = py + vy * t in 0 <= y && y <= 1) $ solveQuadratic a b c 
+      topAndBottom = filter (\t -> let r = (px + vx * t)^2 + (pz + vz * t)^2 in 0 <= r && r <= 1) [- py / vy, (1 - py) / vy]
+  in topAndBottom ++ (filter (\t -> let y = py + vy * t in 0 <= y && y <= 1) $ solveQuadratic a b c )
 
 
 -- | Intersection of a ray with a cone of 
@@ -95,12 +96,12 @@ intervals r Cone =
       a = vx ^ 2 + vz ^ 2 - vy ^ 2
       b = 2 * (px * vx + pz * vz - (py) * vy)
       c = px ^ 2 + pz ^ 2 - py ^ 2
+      -- If the side is hit on exactly one point, then there must be an intersection with the top too.
       solveTop s = case (filter (\t -> (py + vy * t) >= 0 && (py + vy * t) <= 1)) $ s of
                         [x] -> [(1 - py)/vy, x]
                         [] -> []
                         _ -> s
   in solveTop $ solveQuadratic a b c
-  -- missing: if 0 <= (py + vy * t) <= 1
 
 
 intervals r Cube     = 
