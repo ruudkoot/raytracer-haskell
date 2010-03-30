@@ -10,7 +10,7 @@ import Data.Vector   (toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap)
 import Output.Output (toSize)
 import Output.PPM    (toPPM)
 
-import Renderer.IntersectionInfo (IntersectionInfo(..))
+import Renderer.IntersectionInfo (IntersectionInfo(..),nearest)
 import Renderer.Intersections    (intersect)
 import Renderer.Lighting         (localLighting)
 import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
@@ -45,9 +45,10 @@ renderPixel depth x y raymaker world = toRGB . toColour $ renderPixel' depth (ra
   where 
     renderPixel' depth ray k = 
       case intersect ray (wObject world) of 
-        Nothing   -> k $ toVec3D 0 0 0 -- No intersections. Intensity=0
-        Just info ->                   -- An intersection. Find out intensity:
-          let surface   = runShader (shader info) $ textureCoord info
+        []   -> k $ toVec3D 0 0 0 -- No intersections. Intensity=0
+        rs ->                   -- An intersection. Find out intensity:
+          let info = nearest rs
+              surface   = runShader (shader info) $ textureCoord info
               n         = normal info
               reflDir   = vmap (2 * n !.! (rDirection ray) *) n
               reflected = let origin    = location info

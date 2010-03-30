@@ -96,7 +96,7 @@ attenuate d = vmap ((/ dis) . (100*))
 
 
 shadowed :: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = isJust . intersect (mkShadowRay p (negate l)) $ o
+shadowed p o (DirectLight l _)     = not.null. intersect (mkShadowRay p (negate l)) $ o
 shadowed p o (PointLight l _)      = hit (mkShadowRay p l) o
 shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p l) o
 

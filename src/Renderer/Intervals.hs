@@ -4,17 +4,26 @@ import Renderer.Scene
 import Data.Vector
 import Base.Shape
 
-type Intersections = [Double]
+type Intervals = Maybe (Double, Double)
+
+intervals :: Ray -> Shape -> Intervals
+intervals r s = case intervals' r s of
+                 [] -> Nothing
+                 [t] -> if t>0.0 then Just (t,t) else Nothing
+                 [t1,t2] -> if t2>0.0 then Just (sort2 (t1,t2)) else Nothing
+
+sort2::(Ord a)=>(a,a)->(a,a)
+sort2 (x,y) = if x<y then (x,y) else (y,x)
 
 -- | The interval functions return the t's 
 -- that solve the following equation:
 -- @intersection = eye + t*direction@
 --
-intervals :: Ray -> Shape -> Intersections
+intervals' :: Ray -> Shape -> [Double]
 
 
 -- Sphere
-intervals r Sphere =
+intervals' r Sphere =
   let (k, dir) = (rOrigin r, rDirection r)
       a = dot dir
       b = 2.0 * (k !.! dir)
@@ -23,7 +32,7 @@ intervals r Sphere =
 
 
 -- Plane
-intervals r Plane = 
+intervals' r Plane = 
   let (oy, ry) = (getY3D $ rOrigin r, getY3D $ rDirection r)
   in if (oy == 0) || (oy * ry >= 0)
         then []
@@ -56,7 +65,7 @@ intervals r Plane =
 --
 -- Good source: http://mrl.nyu.edu/~dzorin/intro-graphics/lectures/lecture11/sld002.htm
 --
-intervals r Cylinder = 
+intervals' r Cylinder = 
   let (px, py, pz) = fromVector3D $ rOrigin r
       (vx, vy, vz) = fromVector3D $ rDirection r
       a = vx ^ 2 + vz ^ 2
@@ -90,7 +99,7 @@ intervals r Cylinder =
 --   b = 2*(px*vx + pz*vz - (py + 1) * vy)
 --   c = px^2 + pz^2 - py^2 + 2*py - 1
 --
-intervals r Cone =
+intervals' r Cone =
   let (px, py, pz) = fromVector3D $ rOrigin r
       (vx, vy, vz) = fromVector3D $ rDirection r
       a = vx ^ 2 + vz ^ 2 - vy ^ 2
@@ -104,7 +113,7 @@ intervals r Cone =
   in solveTop $ solveQuadratic a b c
 
 
-intervals r Cube     = 
+intervals' r Cube     = 
  let (ox,oy,oz) = fromVector3D $ rOrigin r
      (dx,dy,dz) = fromVector3D $ rDirection r
      calcMinMax o d = let div = 1.0/d
@@ -124,7 +133,7 @@ intervals r Cube     =
 -- | Solves an equation of the form:
 --     @ax^2 + bx + c = 0@
 --
-solveQuadratic :: Double -> Double -> Double -> Intersections
+solveQuadratic :: Double -> Double -> Double -> [Double]
 solveQuadratic a b c = 
   case compare discr 0.0 of 
     LT -> [] 
