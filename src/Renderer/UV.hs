@@ -18,12 +18,12 @@ uv Sphere loc = let theta = acos  ( getY3D loc )
 
 uv Plane loc = (0, getX3D loc, getZ3D loc)
               
-uv Cube v | 0.0 `dEq` z = (0, x, y) -- front
-          | 1.0 `dEq` z = (1, x, y) -- back
-          | 0.0 `dEq` x = (2, z, y) -- left
-          | 1.0 `dEq` x = (3, z, y) -- right
-          | 0.0 `dEq` y = (4, x, z) -- top
-          | 1.0 `dEq` y = (5, x, z) -- bottom 
+uv Cube v | 0.0 `dEq` z = (5, x, y) -- front
+          | 1.0 `dEq` z = (4, x, y) -- back
+          | 0.0 `dEq` x = (3, z, y) -- left
+          | 1.0 `dEq` x = (2, z, y) -- right
+          | 0.0 `dEq` y = (0, x, z) -- top
+          | 1.0 `dEq` y = (1, x, z) -- bottom 
           | otherwise = error $ "Loc (" ++ show v ++ ") is not a valid "
                             ++ "cube coordinate... What where you "
                             ++ "thinking?"
