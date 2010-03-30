@@ -7,6 +7,7 @@ import Base.Shader (SurfaceProperty(..))
   
 import Data.Colour (Colour, fromColour)
 import Data.Vector 
+import Data.Radians
 
 import Renderer.Intersections
 import Renderer.IntersectionInfo
@@ -50,10 +51,10 @@ illumination world intersectionInfo surfaceProperty =
 --
 localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
 --localLighting its world surface r reflected = illumination world its surface
-localLighting its world surface r reflected = {-diffuse + -}specular
-  where ambient    = fromColour . roAmbience $ wOptions world
-        diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lightsv
-        specular   = col (specularReflectionCoefficient surface) reflected phong lightsv
+localLighting its world surface r reflected = diffuse + specular
+  where ambient    = fromColour . roAmbience $ wOptions world        
+        diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lights
+        specular   = col (specularReflectionCoefficient surface) reflected phong lights
         col k i f l= (k*) `vmap` (i * surfC + sum (map f l))
 
         dirLight l = light (n !.! dir l) l 
@@ -89,12 +90,15 @@ halfWay _   (DirectLight dir _       ) = normalize $ negate dir
 --
 getIntensity :: RenderLight -> Pt3D -> Vec3D               
 getIntensity (DirectLight _  i) _ = i 
-getIntensity (PointLight pos i) loc = attenuate (magnitude $ abs (loc - pos)) i
-getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude $ abs (loc - pos)) i'
-  where i' = if angle > cutoff then toVec3D 0 0 0 else spot 
-        spot = (((dir / abs dir) !.! (posDir / abs posDir)) ** exp *) `vmap` i
-        dir = at - pos 
-        posDir = loc - pos
+getIntensity (PointLight pos i) loc = attenuate (magnitude (loc - pos)) i
+getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude (loc - pos)) i'
+  where i' = if angle > radians cutoff then toVec3D 0 0 0 else spot
+        spot = ((dir !.! posDir) ** exp *) `vmap` i
+        dir = normalize $ at - pos 
+        posDir = normalize $ loc - pos
+        {-spot = (((dir / abs dir) !.! (posDir / abs posDir)) ** exp *) `vmap` i
+        dir = at - pos
+        posDir = loc - pos-}
         angle = acos(dir !.! posDir)
 
 
