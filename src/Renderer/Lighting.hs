@@ -50,27 +50,24 @@ illumination world ray intersectionInfo surfaceProperty =
 -- from page 11 of the assigment.
 --
 localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
-localLighting its world surface ray reflected = illumination world ray its surface
-
-{-
-localLighting its world surface r reflected = diffuse + specular
+--localLighting its world surface ray reflected = illumination world ray its surface
+localLighting its world surface r reflected = diffuse+specular
   where ambient    = fromColour . roAmbience $ wOptions world        
-        diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lights
+        diffuse    = col (diffuseReflectionCoefficient surface) (surfC*ambient) dirLight lights
         specular   = col (specularReflectionCoefficient surface) reflected phong lights
-        col k i f l= (k*) `vmap` (i * surfC + sum (map f l))
+        col k i f l= (k*) `vmap` (i + sum (map f l))
 
         dirLight l = light (n !.! dir l) l 
         phong    l = light ((n !.! dirhalf l) ** phongExponent surface) l
         light  f l = (max 0.0) `vmap` ((f*) `vmap` (getIntensity l (location its) * surfC))
 
-        dirhalf  l = normalize $ (normalize (negate (rDirection r)) + normalize (dir l))
+        dirhalf  l = normalize $ (normalize (negate (rDirection r)) + dir l)
         dir        = direction (location its)
         
         surfC      = fromColour $ surfaceColour surface
         n          = normal its
         lights     = wLights world 
         lightsv    = filter (not . shadowed (location its) (wObject world)) lights
--}
 
 -- | Get the unit vector from a location 
 -- to a RenderLight's position.
@@ -99,9 +96,6 @@ getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude (loc - p
         spot = ((dir !.! posDir) ** exp *) `vmap` i
         dir = normalize $ at - pos 
         posDir = normalize $ loc - pos
-        {-spot = (((dir / abs dir) !.! (posDir / abs posDir)) ** exp *) `vmap` i
-        dir = at - pos
-        posDir = loc - pos-}
         angle = acos(dir !.! posDir)
 
 

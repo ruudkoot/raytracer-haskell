@@ -52,7 +52,7 @@ renderPixel depth x y raymaker world = toRGB . toColour $ renderPixel' depth (ra
               n         = normal info
               reflDir   = vmap (2 * n !.! (rDirection ray) *) n
               reflected = let origin    = location info
-                              direction = negate (rDirection ray) + reflDir
+                              direction = rDirection ray - reflDir
                               clearasil = origin + 0.01 * direction -- cures acne
                           in mkRay clearasil direction -- should this ray be transformed?
 
