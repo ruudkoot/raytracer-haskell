@@ -95,7 +95,7 @@ p 0.0 -1.0 0.0 translate union
 scene                             % scene to render
 20                                % tracing depth
 90.0                              % field of view
-1024 768                          % image wid and height
+320 240                          % image wid and height
 "target/snowflake.ppm"                   % output file
 render
 

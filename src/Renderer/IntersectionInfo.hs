@@ -34,7 +34,7 @@ buildIntersection ray (Simple shape tr1 sh) =
   else Just IntersectionInfo 
        { location     = transformPoint tr1 loc --location in world
        , normal       = transformVector tr1 (getNormal shape rayt loc) --normal in world
-       , distance     = t -- magnitude $ (transformPoint tr1 loc) - (rOrigin rayt) 
+       , distance     = t 
        , textureCoord = uv shape loc
        , shader       = sh
        } 
