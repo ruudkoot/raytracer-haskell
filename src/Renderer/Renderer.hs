@@ -4,7 +4,7 @@ import Base.Shader   (runShader)
 
 import Data.Angle
 import Data.Colour   (Colour(..), Colours, toRGB, toColour)
-import Data.Vector   (toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap)
+import Data.Vector   (toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap, Pt3D, Vec3D)
 
 
 import Output.Output (toSize)
@@ -41,7 +41,7 @@ renderScene world = saveRendering world pixels
 -- by recursively shooting a ray into the World.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel depth x y raymaker world = toRGB . toColour $ renderPixel' depth (raymaker x y) id
+renderPixel depth x y raymaker world = toRGB . toColour $! renderPixel' depth (raymaker x y) id
   where 
     renderPixel' depth ray k = 
       case intersect ray (wObject world) of 
@@ -49,12 +49,7 @@ renderPixel depth x y raymaker world = toRGB . toColour $ renderPixel' depth (ra
         rs ->                   -- An intersection. Find out intensity:
           let info = nearest rs
               surface   = runShader (shader info) $ textureCoord info
-              n         = normal info
-              reflDir   = vmap (2 * n !.! (rDirection ray) *) n
-              reflected = let origin    = location info
-                              direction = rDirection ray - reflDir
-                              clearasil = origin + 0.01 * direction -- cures acne
-                          in mkRay clearasil direction -- should this ray be transformed?
+              reflected = reflectedRay (location info) (rDirection ray) (normal info)
 
           -- Build result up in continuation passing style.
           -- 
@@ -63,6 +58,13 @@ renderPixel depth x y raymaker world = toRGB . toColour $ renderPixel' depth (ra
                else renderPixel' (depth - 1) reflected 
                       (k . localLighting info world surface ray) 
                                     
+reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 
+reflectedRay origin rdirection normal = mkRay clearasil direction
+  where 
+    reflDir = vmap (2 * normal !.! rdirection *) normal
+    direction = rdirection - reflDir 
+    clearasil = origin + 0.01 * direction 
+
 
 -- | Saves the calculated colours to a PPM file (the 
 -- location of which is specified in the GML)
