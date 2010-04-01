@@ -4,10 +4,10 @@ module Renderer.Lighting (localLighting) where
 
 import Base.Light (RenderLight(..))
 import Base.Shader (SurfaceProperty(..))
-  
+
+import Data.Angle
 import Data.Colour (Colour, fromColour)
 import Data.Vector 
-import Data.Radians
 
 import Renderer.Intersections
 import Renderer.IntersectionInfo
@@ -93,7 +93,7 @@ getIntensity :: RenderLight -> Pt3D -> Vec3D
 getIntensity (DirectLight _  i) _ = i 
 getIntensity (PointLight pos i) loc = attenuate (magnitude (loc - pos)) i
 getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude (loc - pos)) i'
-  where i' = if angle > radians cutoff then toVec3D 0 0 0 else spot
+  where i' = if Radians angle > toRadians (Degrees cutoff) then toVec3D 0 0 0 else spot
         spot = ((dir !.! posDir) ** exp *) `vmap` i
         dir = normalize $ at - pos 
         posDir = normalize $ loc - pos

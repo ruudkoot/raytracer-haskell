@@ -5,12 +5,13 @@ module Input.GML.AST where
 
 import           Control.Monad
 
+import           Data.Angle
 import           Data.Char
 import qualified Data.Map        as Map
 import           Data.Vector
 
 import qualified Base.Light      as Light
-import qualified Base.Shape      as Shape
+import           Base.Shape
 
 import           Test.QuickCheck
 
@@ -21,46 +22,50 @@ data Scene = Scene
   , sceneLights   :: [Light.RenderLight]
   , sceneObj      :: Object
   , sceneDepth    :: Int
-  , sceneFov      :: Double
+  , sceneFov      :: Degrees
   , sceneWidth    :: Int
   , sceneHeight   :: Int
   , sceneFile     :: FilePath
   }
   --deriving (Show,Eq)
 
--- FIXME: GADT?
-data Object = forall s f. Shape.Shape s f => Simple s Closure
-            | Translate  Object Double Double Double
-            | Scale      Object Double Double Double
-            | UScale     Object Double 
-            | RotateX    Object Double
-            | RotateY    Object Double
-            | RotateZ    Object Double
-            | Union      Object Object
-            | Intersect  Object Object
-            | Difference Object Object
-            --deriving (Show, Eq)
+data Object where
+    Simple     :: forall s f. Shape s f => s -> Closure -> Object
+    Translate  :: Object -> Double -> Double -> Double  -> Object
+    Scale      :: Object -> Double -> Double -> Double  -> Object
+    UScale     :: Object -> Double                      -> Object
+    RotateX    :: Object -> Degrees                     -> Object
+    RotateY    :: Object -> Degrees                     -> Object
+    RotateZ    :: Object -> Degrees                     -> Object
+    Union      :: Object -> Object                      -> Object
+    Intersect  :: Object -> Object                      -> Object
+    Difference :: Object -> Object                      -> Object
+    --deriving (Show, Eq)
 
-newtype ImpredicativeShape r = ImpredicativeShape { impredicativeShape :: forall s f. Shape.Shape s f => s -> Closure -> r }
+-- | Wrap the transformations for simple shapes into a newtype, so the algebra
+-- doesn't need impredicative types.
+newtype SimpleTransformer r = SimpleTransformer {
+        transformation :: forall s f. Shape s f => s -> Closure -> r
+    }
 
 type ObjectAlgebra r =
-    ( ImpredicativeShape r
+    ( SimpleTransformer                  r
     , r -> Double -> Double -> Double -> r
     , r -> Double -> Double -> Double -> r
-    , r -> Double -> r
-    , r -> Double -> r
-    , r -> Double -> r
-    , r -> Double -> r
-    , r -> r -> r
-    , r -> r -> r
-    , r -> r -> r
+    , r -> Double                     -> r
+    , r -> Degrees                    -> r
+    , r -> Degrees                    -> r
+    , r -> Degrees                    -> r
+    , r -> r                          -> r
+    , r -> r                          -> r
+    , r -> r                          -> r
     )
 
 foldObject :: ObjectAlgebra r -> Object -> r
 foldObject (simple, translate, scale, uscale, rotatex, rotatey, rotatez, union,
               intersect, difference) = fold
     where fold x = case x of {
-        Simple     shape   shader   -> (impredicativeShape simple) shape shader;
+        Simple     shape   shader   -> (transformation simple) shape shader;
         Translate  object  d1 d2 d3 -> translate  (fold object ) d1 d2 d3;
         Scale      object  d1 d2 d3 -> scale      (fold object ) d1 d2 d3;
         UScale     object  double   -> uscale     (fold object ) double;

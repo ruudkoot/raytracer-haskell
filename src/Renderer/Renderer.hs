@@ -2,8 +2,8 @@ module Renderer.Renderer (renderScene) where
 
 import Base.Shader   (runShader)
 
+import Data.Angle
 import Data.Colour   (Colour(..), Colours, toRGB, toColour)
-import Data.Radians  (radians)
 import Data.Vector   (toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap)
 
 

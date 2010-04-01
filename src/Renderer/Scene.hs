@@ -2,6 +2,7 @@
 
 module Renderer.Scene where
 
+import Data.Angle
 import Data.Colour
 import Data.Vector
 import Data.Matrix (Transformation(..))
@@ -30,7 +31,7 @@ data RenderOptions = RenderOptions
   {
     roAmbience :: ColourD -- amb
   , roDepth    :: Int
-  , roFov      :: Double -- fov
+  , roFov      :: Radians -- fov
   , roWidth    :: Int -- wid
   , roHeight   :: Int -- ht
   , roFile     :: FilePath

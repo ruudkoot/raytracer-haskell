@@ -8,6 +8,7 @@ import Control.Applicative
 import Control.Monad.State
 import Control.Monad.Error
 
+import Data.Angle
 import Data.Maybe
 import Data.Map                                  hiding (map)
 import Data.Vector
@@ -185,9 +186,9 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
                      , ( "translate" ,     orrro Translate                 ) --Transformations
                      , ( "scale"     ,     orrro Scale                     ) 
                      , ( "uscale"    ,       oro UScale                    )
-                     , ( "rotatex"   ,       oro RotateX                   )
-                     , ( "rotatey"   ,       oro RotateY                   )
-                     , ( "rotatez"   ,       oro RotateZ                   )
+                     , ( "rotatex"   ,       oro (\o r -> RotateX o (Degrees r)))
+                     , ( "rotatey"   ,       oro (\o r -> RotateY o (Degrees r)))
+                     , ( "rotatez"   ,       oro (\o r -> RotateZ o (Degrees r)))
                      , ( "light"     ,       ppl Light.DirectLight         ) --Lights
                      , ( "pointlight",       ppl Light.PointLight          )
                      , ( "spotlight" ,    ppprrl Light.SpotLight           )
@@ -199,7 +200,7 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
 
 --Convert light array types
 renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Scene
-renderF p = Scene p . map (\(Light l) -> l)
+renderF p a o i1 d i2 i3 s = Scene p (map (\(Light l) -> l) a) o i1 (Degrees d) i2 i3 s
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator " ++ nm ++ ": " ++e ++ show st)

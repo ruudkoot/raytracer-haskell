@@ -7,9 +7,12 @@ module Data.Matrix where
 
 import Control.Applicative
 import Control.Monad (liftM3, liftM4)
-import Test.QuickCheck
+
+import Data.Angle
 import Data.List (intercalate, transpose)
 import Data.Vector
+
+import Test.QuickCheck
 
 
 import Data.Glome.Vec hiding (translate, scale)
@@ -31,6 +34,6 @@ identityTransformation = ident_xfm
 translate x y z = G.translate (vec x y z)
 scale x y z = G.scale (vec x y z)
 
-rotateX = rotate (vec 1 0 0)
-rotateY = rotate (vec 0 1 0)
-rotateZ = rotate (vec 0 0 1)
+rotateX r = rotate (vec 1 0 0) (radians r)
+rotateY r = rotate (vec 0 1 0) (radians r)
+rotateZ r = rotate (vec 0 0 1) (radians r)
