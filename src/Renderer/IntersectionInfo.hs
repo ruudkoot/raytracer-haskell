@@ -5,11 +5,9 @@ import Data.Matrix
 import Data.Range
 
 import Base.Shader
+import Base.Shape
 
-import Renderer.Normals (getNormal)
 import Renderer.Scene   (Object(..))
-import Renderer.UV      (uv)
-import Renderer.Intervals
 -- * Datastructures
 
 -- | Intersection functions return this structure 

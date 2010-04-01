@@ -1,3 +1,6 @@
+{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE GADTs      #-}
+
 module Input.GML.AST where
 
 import           Control.Monad
@@ -23,9 +26,10 @@ data Scene = Scene
   , sceneHeight   :: Int
   , sceneFile     :: FilePath
   }
-  deriving (Show,Eq)
+  --deriving (Show,Eq)
 
-data Object = Simple     Shape.Shape   Closure
+-- FIXME: GADT?
+data Object = forall s f. Shape.Shape s f => Simple s Closure
             | Translate  Object Double Double Double
             | Scale      Object Double Double Double
             | UScale     Object Double 
@@ -35,10 +39,12 @@ data Object = Simple     Shape.Shape   Closure
             | Union      Object Object
             | Intersect  Object Object
             | Difference Object Object
-            deriving (Show,Eq)
-          
+            --deriving (Show, Eq)
+
+newtype ImpredicativeShape r = ImpredicativeShape { impredicativeShape :: forall s f. Shape.Shape s f => s -> Closure -> r }
+
 type ObjectAlgebra r =
-    ( Shape.Shape -> Closure -> r
+    ( ImpredicativeShape r
     , r -> Double -> Double -> Double -> r
     , r -> Double -> Double -> Double -> r
     , r -> Double -> r
@@ -54,7 +60,7 @@ foldObject :: ObjectAlgebra r -> Object -> r
 foldObject (simple, translate, scale, uscale, rotatex, rotatey, rotatez, union,
               intersect, difference) = fold
     where fold x = case x of {
-        Simple     shape   shader   -> simple     shape          shader;
+        Simple     shape   shader   -> (impredicativeShape simple) shape shader;
         Translate  object  d1 d2 d3 -> translate  (fold object ) d1 d2 d3;
         Scale      object  d1 d2 d3 -> scale      (fold object ) d1 d2 d3;
         UScale     object  double   -> uscale     (fold object ) double;
@@ -103,7 +109,11 @@ data Value     = BaseValue BaseValue
                | Object    Object
                | Light     Light
                | Render    Scene
-               deriving (Show, Eq)
+               --deriving (Show, Eq)
+
+-- deriving non-haskell 98 types is not possible in 6.10 :/
+instance Show Value where
+    show = const "<<value>>"
                
 type Array     = [Value]
 type Stack     = [Value]

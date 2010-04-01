@@ -1,3 +1,5 @@
+{-# LANGUAGE ExistentialQuantification #-}
+
 module Renderer.Scene where
 
 import Data.Colour
@@ -34,11 +36,11 @@ data RenderOptions = RenderOptions
   , roFile     :: FilePath
   }
   
-data Object   = Simple Shape Transformation Shader
+data Object   = forall s f. Shape s f => Simple s Transformation Shader
               | Union      Object Object
               | Intersect  Object Object
               | Difference Object Object
-              deriving Show
+              --deriving Show
 
 
 -- | Returns the width and height of 

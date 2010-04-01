@@ -2,18 +2,25 @@
 
 module Input.GML.Operators (operators,runOp,Operator) where
 
+import Postlude
+
 import Control.Applicative
 import Control.Monad.State
 import Control.Monad.Error
 
 import Data.Maybe
-import Data.Map                              hiding (map)
+import Data.Map                                  hiding (map)
 import Data.Vector
 
-import qualified Base.Light        as Light
-import qualified Base.Shape        as Shape
+import qualified Base.Light          as Light
+import qualified Base.Shape          as Shape
+import qualified Base.Shape.Sphere   as Sphere
+import qualified Base.Shape.Plane    as Plane
+import qualified Base.Shape.Cylinder as Cylinder
+import qualified Base.Shape.Cube     as Cube
+import qualified Base.Shape.Cone     as Cone
 
-import           Input.GML.AST               hiding (State)
+import           Input.GML.AST                   hiding (State)
 
 type Op = StateT Stack (Either String) 
 
@@ -140,54 +147,54 @@ ooo       op = (flip op <$> popo <*> popo)                              >>= push
 paoiriisR op = (flip8 op<$> pops <*> popi <*> popi <*> popr <*> popi <*> popo <*> popa <*> popp) >>= pushR
 
 operators :: Map String Operator
-operators = fromList [ ( "addi"      ,       iii (+)                    ) -- numbers
-                     , ( "addf"      ,       rrr (+)                    )
-                     , ( "acos"      ,        rr acos                   )
-                     , ( "asin"      ,        rr asin                   )
-                     , ( "clampf"    ,        rr clampf                 )
-                     , ( "cos"       ,        rr cos                    )
-                     , ( "divi"      ,       iii div                    )
-                     , ( "divf"      ,       rrr (/)                    )
-                     , ( "eqi"       ,       iib (==)                   )
-                     , ( "eqf"       ,       rrb (==)                   )
-                     , ( "floor"     ,        ri floor                  )
-                     , ( "frac"      ,        rr (snd . properFraction) ) -- ???
-                     , ( "lessi"     ,       iib (<)                    )
-                     , ( "lessf"     ,       rrb (<)                    )
-                     , ( "modi"      ,       iii mod                    )
-                     , ( "muli"      ,       iii (*)                    )
-                     , ( "mulf"      ,       rrr (*)                    )
-                     , ( "negi"      ,        ii negate                 )
-                     , ( "negf"      ,        rr negate                 )
-                     , ( "real"      ,        ir fromIntegral           )
-                     , ( "sin"       ,        rr sin                    )
-                     , ( "sqrt"      ,        rr sqrt                   )
-                     , ( "subi"      ,       iii (-)                    )
-                     , ( "subf"      ,       rrr (-)                    )
-                     , ( "getx"      ,        pr getX3D                 ) -- points
-                     , ( "gety"      ,        pr getY3D                 )
-                     , ( "getz"      ,        pr getZ3D                 )
+operators = fromList [ ( "addi"      ,       iii (+)                       ) -- numbers
+                     , ( "addf"      ,       rrr (+)                       )
+                     , ( "acos"      ,        rr acos                      )
+                     , ( "asin"      ,        rr asin                      )
+                     , ( "clampf"    ,        rr clampf                    )
+                     , ( "cos"       ,        rr cos                       )
+                     , ( "divi"      ,       iii div                       )
+                     , ( "divf"      ,       rrr (/)                       )
+                     , ( "eqi"       ,       iib (==)                      )
+                     , ( "eqf"       ,       rrb (==)                      )
+                     , ( "floor"     ,        ri floor                     )
+                     , ( "frac"      ,        rr (snd . properFraction)    ) -- ???
+                     , ( "lessi"     ,       iib (<)                       )
+                     , ( "lessf"     ,       rrb (<)                       )
+                     , ( "modi"      ,       iii mod                       )
+                     , ( "muli"      ,       iii (*)                       )
+                     , ( "mulf"      ,       rrr (*)                       )
+                     , ( "negi"      ,        ii negate                    )
+                     , ( "negf"      ,        rr negate                    )
+                     , ( "real"      ,        ir fromIntegral              )
+                     , ( "sin"       ,        rr sin                       )
+                     , ( "sqrt"      ,        rr sqrt                      )
+                     , ( "subi"      ,       iii (-)                       )
+                     , ( "subf"      ,       rrr (-)                       )
+                     , ( "getx"      ,        pr getX3D                    ) -- points
+                     , ( "gety"      ,        pr getY3D                    )
+                     , ( "getz"      ,        pr getZ3D                    )
                      , ( "point"     ,      rrrp (\x y z -> vector3D (x, y, z)))
-                     , ( "get"       ,       aiv (!!)                   ) -- arrays
-                     , ( "length"    ,        ai length                 )
-                     , ( "sphere"    ,        co (Simple Shape.Sphere  )) -- Primitive Objects
-                     , ( "cube"      ,        co (Simple Shape.Cube    ))
-                     , ( "cylinder"  ,        co (Simple Shape.Cylinder))
-                     , ( "cone"      ,        co (Simple Shape.Cone    ))
-                     , ( "plane"     ,        co (Simple Shape.Plane   ))
-                     , ( "translate" ,     orrro Translate              ) --Transformations
-                     , ( "scale"     ,     orrro Scale                  ) 
-                     , ( "uscale"    ,       oro UScale                 )
-                     , ( "rotatex"   ,       oro RotateX                )
-                     , ( "rotatey"   ,       oro RotateY                )
-                     , ( "rotatez"   ,       oro RotateZ                )
-                     , ( "light"     ,       ppl Light.DirectLight      ) --Lights
-                     , ( "pointlight",       ppl Light.PointLight       )
-                     , ( "spotlight" ,    ppprrl Light.SpotLight        )
-                     , ( "union"     ,       ooo Union                  ) --Boolean operators
-                     , ( "intersect" ,       ooo Intersect              )
-                     , ( "difference",       ooo Difference             )
-                     , ( "render"    , paoiriisR renderF                )
+                     , ( "get"       ,       aiv (!!)                      ) -- arrays
+                     , ( "length"    ,        ai length                    )
+                     , ( "sphere"    ,        co (Simple (Sphere.Sphere ())   )) -- Primitive Objects
+                     , ( "cube"      ,        co (Simple (Cube.Cube ())       ))
+                     , ( "cylinder"  ,        co (Simple (Cylinder.Cylinder ())))
+                     , ( "cone"      ,        co (Simple (Cone.Cone ())       ))
+                     , ( "plane"     ,        co (Simple (Plane.Plane ())     ))
+                     , ( "translate" ,     orrro Translate                 ) --Transformations
+                     , ( "scale"     ,     orrro Scale                     ) 
+                     , ( "uscale"    ,       oro UScale                    )
+                     , ( "rotatex"   ,       oro RotateX                   )
+                     , ( "rotatey"   ,       oro RotateY                   )
+                     , ( "rotatez"   ,       oro RotateZ                   )
+                     , ( "light"     ,       ppl Light.DirectLight         ) --Lights
+                     , ( "pointlight",       ppl Light.PointLight          )
+                     , ( "spotlight" ,    ppprrl Light.SpotLight           )
+                     , ( "union"     ,       ooo Union                     ) --Boolean operators
+                     , ( "intersect" ,       ooo Intersect                 )
+                     , ( "difference",       ooo Difference                )
+                     , ( "render"    , paoiriisR renderF                   )
                      ]
 
 --Convert light array types
@@ -198,8 +205,5 @@ runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator " ++ nm ++ ": " ++e ++ show st)
                    in either er id (execStateT op st)
 
-clampf :: Double -> Double
-clampf r1 | r1 < 0.0  = 0.0
-          | r1 > 1.0  = 1.0
-          | otherwise = r1
+
 
