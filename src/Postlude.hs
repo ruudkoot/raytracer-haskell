@@ -29,3 +29,7 @@ solveQuadratic a b c = let discr  = b ^ 2 - 4 * a * c
                              EQ -> [-b / (2 * a)]
                              GT -> [abc (-), abc (+)]
 
+-- | Order a tuple.
+sort2 :: (Ord a) => (a,a) -> (a,a)
+sort2 (x,y) = if x < y then (x,y) else (y,x)
+
