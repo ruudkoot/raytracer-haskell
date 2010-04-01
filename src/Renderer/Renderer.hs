@@ -45,19 +45,14 @@ renderPixel depth x y raymaker world = toRGB . toColour $! renderPixel' depth (r
   where 
     renderPixel' depth ray k = 
       case intersect ray (wObject world) of 
-        []   -> k $ toVec3D 0 0 0 -- No intersections. Intensity=0
-        rs ->                   -- An intersection. Find out intensity:
-          let info = nearest rs
-              surface   = runShader (shader info) $ textureCoord info
-              reflected = reflectedRay (location info) (rDirection ray) (normal info)
-
-          -- Build result up in continuation passing style.
-          -- 
-          in if depth == 0 
-               then k $ toVec3D 0 0 0
-               else renderPixel' (depth - 1) reflected 
-                      (k . localLighting info world surface ray) 
-                                    
+        []   -> k $! toVec3D 0 0 0 -- No intersections. Intensity=0
+        rs -> if depth == 0 then k $! toVec3D 0 0 0
+              else let info      = nearest rs
+                       surface   = runShader (shader info) $! textureCoord info
+                       reflected = reflectedRay (location info) (rDirection ray) (normal info)
+                   in renderPixel' (depth - 1) reflected (k . localLighting info world surface ray) 
+                
+                    
 reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 
 reflectedRay origin rdirection normal = mkRay clearasil direction
   where 
