@@ -15,7 +15,7 @@ import Renderer.Intersections    (intersect)
 import Renderer.Lighting         (localLighting)
 import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
 
-import Control.Parallel.Strategies (parListChunk, using, rdeepseq, rpar) 
+import Control.Parallel.Strategies (parListChunk, using, rdeepseq, rpar, parMap) 
 
 
 
@@ -29,12 +29,11 @@ type RayMaker = Int -> Int -> Ray
 -- | Renders the World without using threads.
 --
 renderScene :: World -> IO ()
-renderScene world = saveRendering world pixels
+renderScene world = saveRendering world $! pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = [renderPixel depth i (h-j) raymaker world |  j <- [0..h-1], i <- [0..w-1]]
-                 `using` parListChunk (w*h `div` 2) rdeepseq
+        pixels = parMap rdeepseq (\(j,i) -> renderPixel depth i (h-j) raymaker world) [(j,i) |  j <- [0..h-1], i <- [0..w-1]]
 
 
 -- | Calculates the colour for a single pixel position 

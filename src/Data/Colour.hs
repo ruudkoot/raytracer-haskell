@@ -17,8 +17,9 @@ type Colours a = [Colour a]
 instance NFData (Colour a) where
   rnf (Colour x y z) = x `seq` y `seq` z `seq` ()
 
-instance Functor Colour where
-  fmap f (Colour a b c) = Colour (f a) (f b) (f c)
+instance Functor Colour where 
+  fmap f (Colour r g b) = Colour (f r) (f g) (f b) 
+
 
 -- * Synonyms
 type ColourD = Colour Double
