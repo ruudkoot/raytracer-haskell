@@ -15,7 +15,7 @@ import Renderer.Intersections    (intersect)
 import Renderer.Lighting         (localLighting)
 import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
 
-import Control.Parallel.Strategies (parListChunk, using, rdeepseq, rpar, parMap) 
+import Control.Parallel.Strategies -- (parListChunk, using, rdeepseq, rpar, parMap) 
 
 
 
@@ -26,14 +26,15 @@ import Control.Parallel.Strategies (parListChunk, using, rdeepseq, rpar, parMap)
 type RayMaker = Int -> Int -> Ray
 
 
--- | Renders the World without using threads.
+-- | Renders the World.
 --
 renderScene :: World -> IO ()
-renderScene world = saveRendering world $! pixels
+renderScene world = pixels `seq` saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world
-        pixels = parMap rdeepseq (\(j,i) -> renderPixel depth i (h-j) raymaker world) [(j,i) |  j <- [0..h-1], i <- [0..w-1]]
+        pixels = [renderPixel depth i (h-j) raymaker world |  j <- [0..h-1], i <- [0..w-1]]
+                    `using` parListChunk w rdeepseq
 
 
 -- | Calculates the colour for a single pixel position 
@@ -49,7 +50,7 @@ renderPixel depth x y raymaker world = toRGB . toColour $! renderPixel' depth (r
               else let info      = nearest rs
                        surface   = runShader (shader info) $! textureCoord info
                        reflected = reflectedRay (location info) (rDirection ray) (normal info)
-                   in renderPixel' (depth - 1) reflected (k . localLighting info world surface ray) 
+                   in renderPixel' (depth - 1) reflected $! (k . localLighting info world surface ray) 
                 
                     
 reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 
@@ -64,7 +65,7 @@ reflectedRay origin rdirection normal = mkRay clearasil direction
 -- location of which is specified in the GML)
 --
 saveRendering :: World -> Colours Int -> IO ()
-saveRendering world pixels = maybe bad save $ toPPM (toSize w) (toSize h) pixels
+saveRendering world pixels = maybe bad save $! toPPM (toSize w) (toSize h) pixels
   where bad = error "Error: didn't produce a valid PPM image."
         save p = putStrLn ("writing result to " ++ roFile (wOptions world)) >> (writeFile (roFile (wOptions world)) p)
         (w,h) = getDimensions world
