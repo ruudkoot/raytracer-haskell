@@ -6,14 +6,12 @@ import Base.Light (RenderLight(..))
 import Base.Shader (SurfaceProperty(..))
 
 import Data.Angle
-import Data.Colour (Colour, fromColour)
+import Data.Colour (fromColour)
 import Data.Vector 
 
 import Renderer.Intersections
 import Renderer.IntersectionInfo
 
-import Control.Applicative ((<$>))
-import Data.Maybe
 import Renderer.Scene 
 
 
@@ -75,12 +73,12 @@ attenuate d = vmap ((/ dis) . (100*))
 
 
 shadowed :: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = not.null . intersect (mkShadowRay p (negate l)) $ o
+shadowed p o (DirectLight l _)     = not . null . intersect (mkShadowRay p (negate l)) $ o
 shadowed p o (PointLight l _)      = hit (mkShadowRay p (l-p)) o
 shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p (l-p)) o
 
 mkShadowRay :: Vector3D -> Vector3D -> Ray
-mkShadowRay p d = let p' = p + (0.00001 * d)
+mkShadowRay p d = let p' = p + (0.001 * d)
                   in mkRay p' d
 
 
