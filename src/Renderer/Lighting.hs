@@ -80,7 +80,7 @@ shadowed p o (PointLight l _)      = hit (mkShadowRay p (l-p)) o
 shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p (l-p)) o
 
 mkShadowRay :: Vector3D -> Vector3D -> Ray
-mkShadowRay p d = let p' = p + (0.01 * d)
+mkShadowRay p d = let p' = p + (0.00001 * d)
                   in mkRay p' d
 
 
