@@ -18,8 +18,6 @@ import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
 import Control.Parallel.Strategies -- (parListChunk, using, rdeepseq, rpar, parMap) 
 
 
-
-
 -- | A RayMaker produces a Ray when given 
 -- its pixel coordinates.
 --
