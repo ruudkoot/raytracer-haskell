@@ -7,9 +7,9 @@
 % rendered (or only partially rendered).
 %
 
-#include "surface.ins"
-#include "loops.ins"
-#include "rgb.ins"
+%include "surface.ins"
+%include "loops.ins"
+%include "rgb.ins"
 
 % get array[i % length array]
 %
