@@ -155,6 +155,7 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
                      , ( "addf"      ,       rrr (+)                       )
                      , ( "acos"      ,        rr acos                      )
                      , ( "asin"      ,        rr asin                      )
+                     , ( "atan2"     ,       rrr atan2                     )
                      , ( "clampf"    ,        rr clampf                    )
                      , ( "cos"       ,        rr cos                       )
                      , ( "divi"      ,       iii div                       )
