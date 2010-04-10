@@ -118,7 +118,15 @@ data Value     = BaseValue BaseValue
 
 -- deriving non-haskell 98 types is not possible in 6.10 :/
 instance Show Value where
-    show = const "<<value>>"
+    show x = case x of
+               BaseValue v -> show v
+               Closure (e, c) -> "Closure " ++ show c
+               Array a -> show a
+               Point p -> show p
+               Object o -> "<<object>>"
+               Light l -> show l
+               Render s -> "<<scene>>"
+               _ -> "<<impossible>>"
                
 type Array     = [Value]
 type Stack     = [Value]
