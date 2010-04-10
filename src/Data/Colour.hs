@@ -36,6 +36,10 @@ colour r g b = Colour r g b
 colourToList :: Colour a -> [a]
 colourToList (Colour a b c) = [a, b, c]
 
+-- | Adds the value of two colors
+--
+addColour::(Num a)=>Colour a->Colour a->Colour a
+addColour (Colour a1 a2 a3) (Colour b1 b2 b3) = Colour (a1+b1) (a2+b2) (a3+b3)
 
 -- | Clamps the values in Colour, given a minimum and 
 -- maximum value.

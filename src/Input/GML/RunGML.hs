@@ -38,7 +38,7 @@ incDef = LanguageDef
    , opStart        = empty
    , opLetter       = empty
    , reservedOpNames= []
-   , reservedNames  = ["%include"]
+   , reservedNames  = ["%include","%texture"]
    , caseSensitive  = False  
    }
 
@@ -49,5 +49,10 @@ parseIncludes::String -> Either ParseError [String]
 parseIncludes = parse (whiteSpace incLexer *> many parseInclude) ""
 
 parseInclude::Parser String
-parseInclude = reserved incLexer "%include" *> stringLiteral incLexer
-            
+parseInclude = reserved incLexer "%include" *> stringLiteral incLexer       
+               <?> "include"
+
+parseTexture::Parser (String,String)
+parseTexture = reserved incLexer "%texture" *> 
+            ((,) <$> stringLiteral incLexer <*> stringLiteral incLexer)
+               <?> "texture"
