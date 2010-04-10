@@ -8,8 +8,8 @@ import System.IO
 
 main :: IO()
 main = do args <- getArgs           
-          scenes <- runGML $ head args
-          mapM_ (renderScene . toWorld) scenes
+          (scenes, textures) <- runGML $ head args
+          mapM_ (renderScene . toWorld textures) scenes
 
 
 usage :: IO ()

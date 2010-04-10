@@ -1,5 +1,6 @@
 module Input.GML.Evaluate (evaluate, shader) where
 
+import           Data.Texture
 import           Data.Colour
 import qualified Data.Map      as Map
 
@@ -34,14 +35,22 @@ get x = Map.findWithDefault (error ("unknown identifier: " ++ x)) x
 
 
 
-shader :: Closure -> Shader
-shader (e, c) = Shader { runShader = \(face, u, v) -> let s                                                                       = [BaseValue (Real v),BaseValue (Real u),BaseValue (Int face)]
-                                                          (e', s', c')                                                            = evaluate (e, s, c)
-                                                          [BaseValue (Real n), BaseValue (Real ks), BaseValue (Real kd), Point p] = s'
-                                                       in SurfaceProperty { surfaceColour                 = toColour p
-                                                                          , diffuseReflectionCoefficient  = kd
-                                                                          , specularReflectionCoefficient = ks
-                                                                          , phongExponent                 = n
-                                                                          }
+shader :: Textures -> Closure -> Shader
+shader txs (e, c) = Shader { runShader = \(face, u, v) -> let s            = [BaseValue (Real v),BaseValue (Real u),BaseValue (Int face)]
+                                                              (e', s', c') = evaluate (e, s,c)                                                          
+                                                          in case s' of
+                                                              [BaseValue (Real n), BaseValue (Real ks), BaseValue (Real kd), Point p] ->
+                                                                SurfaceProperty { surfaceColour                 = toColour p
+                                                                                , diffuseReflectionCoefficient  = kd
+                                                                                , specularReflectionCoefficient = ks
+                                                                                , phongExponent                 = n
+                                                                                }
+                                                              [BaseValue (Real n), BaseValue (Real ks), BaseValue (Real kd), BaseValue (String tx)] ->
+                                                                SurfaceProperty { surfaceColour                 = getLinear' (txs Map.! tx) (u,v)
+                                                                                , diffuseReflectionCoefficient  = kd
+                                                                                , specularReflectionCoefficient = ks
+                                                                                , phongExponent                 = n
+                                                                                }                
+                                                              _ -> error "Illegal pattern in return value of shader"
                        }
 
