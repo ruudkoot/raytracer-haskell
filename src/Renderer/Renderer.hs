@@ -84,5 +84,5 @@ getRayMaker world = mkRayMaker x y dx dy
 mkRayMaker :: Double -> Double -> Double-> Double -> RayMaker 
 mkRayMaker x y dx dy i j = mkRay eye dir
   where eye = vector3D (0, 0, -1)
-        dir = vector3D (x + 0.5 + (fromIntegral i + 0.5) * dx,
-                        y + 0.5 + (fromIntegral j + 0.5) * dy, 1)
+        dir = vector3D (x + ((fromIntegral i) + 0.5) * dx,
+                        y + ((fromIntegral j) + 0.5) * dy, 1)
