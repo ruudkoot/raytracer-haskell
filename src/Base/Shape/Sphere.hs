@@ -20,6 +20,6 @@ instance Shape Sphere () where
                          phi   = atan2 (getX3D p) (getZ3D p)
                          pi2   = 2*pi
                          u     = phi / pi2
-                         v     = (pi - theta) / pi
-                      in (0, u, v)
+                         v     = (pi - theta) / pi                        
+                     in (0, u, v)
 

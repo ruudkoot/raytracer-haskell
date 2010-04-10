@@ -1,6 +1,9 @@
 {-# LANGUAGE ParallelListComp,RankNTypes, GADTs,TypeSynonymInstances #-}
 module Data.Texture where
 
+import Data.List.Split
+import Data.List 
+
 import Data.Bitmap
 import Codec.Image.STB
 
@@ -20,8 +23,8 @@ type Texture = TextureArray
 --Plain textures
 class Texture2D a where
     getLinear::a->(Double,Double)->ColourD
-    getLinear t (x,y) = getat t (floor x, floor y)
-                        {-let lx = floor x --Square boundarys
+    getLinear t (x,y) = --getat t (floor x, floor y)
+                        let lx = floor x --Square boundarys
                             hx = ceiling x
                             ly = floor y
                             hy = ceiling y
@@ -33,7 +36,7 @@ class Texture2D a where
                             dy = y - fromIntegral ly
                             top = fmap ((1.0-dx)*) tl `addColour` fmap (dx*) tr
                             bottom = fmap ((1.0-dx)*) bl `addColour` fmap (dx*) bl
-                         in fmap ((1.0-dy)*) top `addColour` fmap (dy*) bottom-}
+                         in fmap ((1.0-dy)*) top `addColour` fmap (dy*) bottom
 
     getLinear'::a->(Double,Double)->ColourD
     getLinear' t (x,y) = let (w,h) = getDimension t
@@ -65,7 +68,7 @@ loadTexture file =
 
 bitmapToTextureArray::Bitmap Word8 -> TextureArray
 bitmapToTextureArray img = 
-    let dim = bitmapSize img
+    let (w,h) = bitmapSize img
         bs = bitmapToByteString img
         convertColor::BS.ByteString -> ColourD
         convertColor = fromRGB.listToColour.map fromIntegral. BS.unpack
@@ -73,7 +76,9 @@ bitmapToTextureArray img =
         convertBS bs | BS.null bs = []
                      | otherwise  =  let (clr, rest) = BS.splitAt 3 bs
                                      in convertColor clr:convertBS rest
-    in listArray ((1,1),dim) (convertBS (bitmapToByteString img))              
+        lData = convertBS (bitmapToByteString img)
+        transData = concat.transpose.splitEvery w $ lData
+    in listArray ((1,1),(w,h)) transData
 
 
 --list-based texture
