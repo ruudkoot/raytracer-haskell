@@ -3,6 +3,7 @@ module Renderer.IntersectionInfo where
 import Data.Vector
 import Data.Transformation
 import Data.Range
+import Data.Function
 
 import Base.Shader
 import Base.Shape
@@ -25,10 +26,10 @@ data IntersectionInfo = IntersectionInfo {
     } deriving (Show)
 
 instance Eq IntersectionInfo where
-    (==) i1 i2 = (==) `on` distance
+    (==) = (==) `on` distance
 
 instance Ord IntersectionInfo where
-    (<=) i1 i2 = (<=) `on` distance
+    (<=) = (<=) `on` distance
 
 type Intersections = Ranges IntersectionInfo
 

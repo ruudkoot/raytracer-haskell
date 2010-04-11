@@ -180,7 +180,7 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
                      , ( "length"    ,        ai length                    )
                      , ( "sphere"    ,        co (Simple (Sphere.Sphere ())   )) -- Primitive Objects
                      , ( "cube"      ,        co (Simple (Cube.Cube ())       ))
-                     , ( "gmlshape"  ,       co4 (Simple .GMLShape.GMLShape))
+                     , ( "gmlshape"  ,       co4 (\x y z -> Simple (GMLShape.GMLShape x y z)))
                      , ( "cylinder"  ,        co (Simple (Cylinder.Cylinder ())))
                      , ( "cone"      ,        co (Simple (Cone.Cone ())       ))
                      , ( "plane"     ,        co (Simple (Plane.Plane ())     ))
