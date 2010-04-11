@@ -13,7 +13,6 @@ data GMLShape = GMLShape () Closure Closure Closure Closure
 
 instance Shape GMLShape () where
     getNormal' (GMLShape () c1 _ _ _) v = getNormalCosure' c1 v
-    inside     (GMLShape () _ c2 _ _)  p = insideClosure c2 p
     intervals' (GMLShape () _ _ c3 _) r = intervalsClosure' c3 r
     uv         (GMLShape () _ _ _ c4) v = uvClosure c4 v
     
@@ -24,15 +23,6 @@ getNormalCosure' (e, c) p = let s = [Point p]
                                 [Point r] -> r
                                 _ -> error ("error in normal closure: expected point on stack, found " ++ show s')
                             
-insideClosure :: Closure -> Pt3D -> Bool
-insideClosure (e, c) p = let s = [Point p]
-                             (e', s', c') = evaluate (e, s, c)
-                             x = getX3D p
-                             y = getY3D p
-                             z = getZ3D p
-                          in case s' of
-                               [BaseValue (Boolean b)] -> b
-                               _ -> error ("error in inside closure: expected bool on stack, found " ++ show s')
                             
 intervalsClosure' :: Closure -> Ray -> [Double]
 intervalsClosure' (e, c) r = let s = [Point o,Point d]

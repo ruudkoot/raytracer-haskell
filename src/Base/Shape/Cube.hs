@@ -20,8 +20,6 @@ instance Shape Cube Face where
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
-    inside     _  p = let (x,y,z) = fromVector3D p
-                       in x > 0.0 && x < 1.0 && y > 0.0 && y < 1.0 && z > 0.0 && z < 1.0
     intervals' _ r =  let (ox,oy,oz)     = fromVector3D $ rOrigin r
                           (dx,dy,dz)     = fromVector3D $ rDirection r
                           calcMinMax o d = let div = 1.0/d

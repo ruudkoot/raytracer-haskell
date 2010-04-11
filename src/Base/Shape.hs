@@ -13,7 +13,6 @@ type Intervals = Maybe (Double, Double)
 class Shape s f | s -> f where
     getNormal    :: s -> Ray  -> Pt3D -> Vec3D
     getNormal'   :: s -> Pt3D         -> Vec3D 
-    inside       :: s -> Pt3D         -> Bool
     intervals    :: Ray -> s          -> Intervals
     intervals'   :: s -> Ray          -> [Double]
     uv           :: s -> Pt3D         -> SurfaceCoord

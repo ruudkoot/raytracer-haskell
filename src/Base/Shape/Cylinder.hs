@@ -16,8 +16,6 @@ instance Shape Cylinder Face where
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
-    inside     _ p = let (x,y,z) = fromVector3D p
-                      in y < 1.0 && y > 0.0 && x*x+z*z < 0.0
     intervals' _ r =  let (px, py, pz) = fromVector3D $ rOrigin r
                           (vx, vy, vz) = fromVector3D $ rDirection r
                           a            = vx ^ 2 + vz ^ 2
@@ -32,30 +30,3 @@ instance Shape Cylinder Face where
                          y = getY3D v
                          z = getZ3D v
 
-{-
-| Calculate intersection of a ray and an
-cylinder of height one.
-
-
-Ray: p + vt
-Cylinder: x^2 + z^2 = r^2
-
-
-    (px + vx * t)^2 + (pz + vz * t)^2 = r^2 
-  => (radius is 1)
-    (px + vx * t)^2 + (pz + vz * t)^2 - 1 = 0
-  => (expand)
-    (px^2 + (vx*t)^2 + 2*(px*vx*t)) + (pz^2 + (vz*t)^2 + 2*(pz*vz*t) - 1 = 0
-  => (regroup)
-    (px^2 + pz^2 + (vx * t)^2 + (vz*t)^2 + 2*(px*vx*t + pz*vz*t) - 1 = 0
-  => (regroup)
-    (vx^2 + vz^2)*t^2 + 2*(px*vx + pz*vz)*t + px^2 + pz^2 - 1 = 0
-
-
-Solve with quadratic equation, where
-  a = (vx^2 + vz^2) 
-  b = 2*(px*vx + pz*vz)
-  c = px^2 + pz^2 - 1
-
-Good source: http://mrl.nyu.edu/~dzorin/intro-graphics/lectures/lecture11/sld002.htm
--}
