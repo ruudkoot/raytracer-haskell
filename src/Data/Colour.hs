@@ -7,7 +7,7 @@ module Data.Colour where
 
 import Control.DeepSeq             (NFData)
 import Control.Parallel.Strategies
-import Data.Vector                 (Vector3D(..), fromVector3D, fromVector, toVec3D)
+import Data.Vector                 (Vector3D(..), tupleFromVector, toVec3D)
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 
@@ -70,4 +70,4 @@ fromColour :: ColourD -> Vector3D
 fromColour (Colour r g b) = toVec3D r g b
 
 toColour :: Vector3D -> Colour Double
-toColour = (\ (r, g, b) -> Colour r g b) . fromVector3D
+toColour = (\ (r, g, b) -> Colour r g b) . tupleFromVector

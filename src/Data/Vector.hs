@@ -6,13 +6,9 @@
 module Data.Vector where
   
 import           Data.Glome.Vec hiding (x, y, z, vmap, Ray(..), abs, invxfm_ray)
-import qualified Data.Glome.Vec as   G (x, y, z, vmap, Ray(..), abs)
+import qualified Data.Glome.Vec as   G (x, y, z, vmap, Ray(..))
 
-
--- * Vectors
-
-
--- ** Type Synonyms
+-- ** Type Synonyms (for compatiblity with the more general module we had first)
 --
 type Pt3D     = Vec
 type Vec3D    = Vec
@@ -22,7 +18,7 @@ type Ray      = G.Ray
 
 
 
--- Instances which should have been in GlomeVec.
+-- Instances which _should_ have been in GlomeVec.
 --
 instance Eq Vec where
   (==) = veq
@@ -62,12 +58,8 @@ getX3D = G.x
 getY3D = G.y
 getZ3D = G.z
 
-fromVector3D :: Vec -> (Flt, Flt, Flt)
-fromVector3D v = (G.x v, G.y v, G.z v)
-
-fromVector :: Vec -> [Flt]
-fromVector v = [G.x v, G.y v, G.z v]
-
+tupleFromVector :: Vec -> (Flt, Flt, Flt)
+tupleFromVector v = (G.x v, G.y v, G.z v)
 
 
 -- ** Vector Operations
@@ -78,6 +70,9 @@ normalize = vnorm
 magnitude :: Vec -> Flt
 magnitude = vlen
 
+
+-- | Sadly, we cannot define Vec as an instance of Functor, as it has kind *.
+-- but this will do.
 vmap :: (Flt -> Flt) -> Vec -> Vec
 vmap = G.vmap
 
@@ -90,19 +85,11 @@ dot v = vdot v v
 cross :: Vec -> Vec -> Vec
 cross = vcross
 
-
-
-
-
 -- * Rays 
 --
 
-
--- | Construct a ray out of two vectors.
---
-mkRay :: Vec3D -> Vec3D -> Ray
-mkRay !o !d = G.Ray o d
-
+mkRay :: Vec -> Vec -> Ray
+mkRay = G.Ray
 
 -- | Ray projection.
 --
@@ -110,7 +97,7 @@ rOrigin, rDirection :: Ray -> Vec
 rOrigin    = G.origin
 rDirection = G.dir
 
-
+-- | Redefined, because glomevec was wrong.
 invxfm_ray :: Xfm -> Ray -> Ray
 invxfm_ray !xfm !(G.Ray orig dir) =
  G.Ray (invxfm_point xfm orig) (invxfm_vec xfm dir)

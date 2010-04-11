@@ -20,8 +20,8 @@ instance Shape Cube Face where
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
-    intervals' _ r =  let (ox,oy,oz)     = fromVector3D $ rOrigin r
-                          (dx,dy,dz)     = fromVector3D $ rDirection r
+    intervals' _ r =  let (ox,oy,oz)     = tupleFromVector $ rOrigin r
+                          (dx,dy,dz)     = tupleFromVector $ rDirection r
                           calcMinMax o d = let div = 1.0/d
                                                t1  = -o*div
                                                t2  = (1.0-o)*div

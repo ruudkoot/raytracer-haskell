@@ -8,7 +8,7 @@ import Base.Shape  (Shape(..))
 
 import Data.Maybe  (isJust)
 import Data.Vector 
-import Data.Matrix
+import Data.Transformation
 
 import Renderer.CSG
 import Renderer.IntersectionInfo

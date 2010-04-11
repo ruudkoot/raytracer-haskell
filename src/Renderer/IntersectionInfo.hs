@@ -1,7 +1,7 @@
 module Renderer.IntersectionInfo where
 
 import Data.Vector
-import Data.Matrix
+import Data.Transformation
 import Data.Range
 
 import Base.Shader

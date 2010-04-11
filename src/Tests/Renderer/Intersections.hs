@@ -4,7 +4,7 @@ import Test.QuickCheck
 import Renderer.Intersections
 import Renderer.Scene
 import Data.Vector
-import Data.Matrix
+import Data.Transformation
 import Base.Shape
 import Control.Monad
 

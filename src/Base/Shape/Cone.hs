@@ -15,8 +15,8 @@ instance Shape Cone Face where
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
-    intervals' _ r = let (px, py, pz) = fromVector3D $ rOrigin r
-                         (vx, vy, vz) = fromVector3D $ rDirection r
+    intervals' _ r = let (px, py, pz) = tupleFromVector $ rOrigin r
+                         (vx, vy, vz) = tupleFromVector $ rDirection r
                          a            = vx ^ 2 + vz ^ 2 - vy ^ 2
                          b            = 2 * (px * vx + pz * vz - (py) * vy)
                          c            = px ^ 2 + pz ^ 2 - py ^ 2

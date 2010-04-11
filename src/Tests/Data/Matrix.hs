@@ -1,4 +1,4 @@
-module Tests.Data.Matrix where 
+module Tests.Data.Transformation where 
 
 import Test.QuickCheck
 

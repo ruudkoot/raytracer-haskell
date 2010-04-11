@@ -4,7 +4,7 @@ import Base.Shader   (runShader)
 
 import Data.Angle
 import Data.Colour   (Colour(..), Colours, toRGB, toColour)
-import Data.Vector   (toVec3D, (!.!), Ray, rDirection, vector3D, mkRay, vmap, Pt3D, Vec3D)
+import Data.Vector   (toVec3D, (!.!), Ray, mkRay, rDirection, vector3D, vmap, Pt3D, Vec3D)
 
 
 import Output.Output (toSize)
