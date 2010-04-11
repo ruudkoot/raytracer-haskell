@@ -10,18 +10,16 @@ newtype Cube = Cube ()
 data    Face = Front | Back | Top | Bottom | Left | Right deriving Enum
 
 instance Shape Cube Face where
-    getNormal' _ v | 0.0 ~= z  = vector3D ( 0.0, 0.0,-1.0) -- front
-                   | 1.0 ~= z  = vector3D ( 0.0, 0.0, 1.0) -- back
-                   | 0.0 ~= x  = vector3D (-1.0, 0.0, 0.0) -- left
-                   | 1.0 ~= x  = vector3D ( 1.0, 0.0, 0.0) -- right
-                   | 0.0 ~= y  = vector3D ( 0.0,-1.0, 0.0) -- top
-                   | 1.0 ~= y  = vector3D ( 0.0, 1.0, 0.0) -- bottom 
+    getNormal' _ v | z ~= 0.0  = vector3D ( 0.0, 0.0,-1.0) -- front
+                   | z ~= 1.0  = vector3D ( 0.0, 0.0, 1.0) -- back
+                   | x ~= 0.0  = vector3D (-1.0, 0.0, 0.0) -- left
+                   | x ~= 1.0  = vector3D ( 1.0, 0.0, 0.0) -- right
+                   | y ~= 0.0  = vector3D ( 0.0,-1.0, 0.0) -- top
+                   | y ~= 1.0  = vector3D ( 0.0, 1.0, 0.0) -- bottom 
                    | otherwise = error "the impossible happened"
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
-    inside     _  p = let (x,y,z) = fromVector3D p
-                       in x > 0.0 && x < 1.0 && y > 0.0 && y < 1.0 && z > 0.0 && z < 1.0
     intervals' _ r =  let (ox,oy,oz)     = fromVector3D $ rOrigin r
                           (dx,dy,dz)     = fromVector3D $ rDirection r
                           calcMinMax o d = let div = 1.0/d

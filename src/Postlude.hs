@@ -21,6 +21,8 @@ clampf r1 | r1 < 0.0  = 0.0
 -- | Solves an equation of the form:
 --     @ax^2 + bx + c = 0@
 --
+
+
 solveQuadratic :: Double -> Double -> Double -> [Double]
 solveQuadratic a b c = let discr  = b ^ 2 - 4 * a * c
                            abc op = (-b `op` sqrt discr) / (2 * a)

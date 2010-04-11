@@ -10,7 +10,6 @@ newtype Sphere = Sphere ()
 
 instance Shape Sphere () where
     getNormal' _ p = normalize p
-    inside     _ p = magnitude p < 1.0
     intervals' _ r = let (k, dir) = (rOrigin r, rDirection r)
                          a        = dot dir
                          b        = 2.0 * (k !.! dir)
