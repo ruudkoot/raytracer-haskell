@@ -109,7 +109,7 @@ rrb    :: (Double -> Double                               -> Bool  ) -> Operator
 aiv    :: (Array  -> Int                                  -> Value ) -> Operator
 ai     :: (Array                                          -> Int   ) -> Operator
 co     :: (Closure                                        -> Object) -> Operator
-co5    :: (Closure -> Closure -> Closure -> Closure -> Closure -> Object) -> Operator
+co4    :: (Closure -> Closure -> Closure -> Closure       -> Object) -> Operator
 orrro  :: (Object -> Double -> Double -> Double           -> Object) -> Operator
 oro    :: (Object -> Double                               -> Object) -> Operator
 ppl    :: (Point  -> Point                                -> Light ) -> Operator
@@ -142,7 +142,7 @@ rrb       op = (flip op <$> popr <*> popr)                              >>= push
 aiv       op = (flip op <$> popi <*> popa)                              >>= push
 ai        op = (op      <$> popa)                                       >>= pushi
 co        op = (op      <$> popc)                                       >>= pusho
-co5       op = (flip5 op <$> popc <*> popc <*> popc <*> popc <*> popc)  >>= pusho
+co4       op = (flip4 op<$> popc <*> popc <*> popc <*> popc)            >>= pusho
 orrro     op = (flip4 op<$> popr <*> popr <*> popr <*> popo)            >>= pusho
 oro       op = (flip op <$> popr <*> popo)                              >>= pusho
 ppl       op = (flip op <$> popp <*> popp)                              >>= pushl
@@ -184,7 +184,7 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
                      , ( "length"    ,        ai length                    )
                      , ( "sphere"    ,        co (Simple (Sphere.Sphere ())   )) -- Primitive Objects
                      , ( "cube"      ,        co (Simple (Cube.Cube ())       ))
-                     , ( "gmlshape"  ,       co5 (\x y z u -> Simple (GMLShape.GMLShape x y z u)))
+                     , ( "gmlshape"  ,       co4 (\x y z -> Simple (GMLShape.GMLShape x y z)))
                      , ( "cylinder"  ,        co (Simple (Cylinder.Cylinder ())))
                      , ( "cone"      ,        co (Simple (Cone.Cone ())       ))
                      , ( "plane"     ,        co (Simple (Plane.Plane ())     ))

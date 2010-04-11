@@ -50,10 +50,6 @@ b negf sqd subf a 2.0 mulf divf /x2
 0.0 1.0 0.0 point
 }
 
-{ /p
-p gety 0.0 lessf
-}
-
 { /o /r
 o gety /oy
 r gety /ry
@@ -77,10 +73,6 @@ p getx
 { /shader
 { /p
 p normalize apply
-}
-
-{ /p
-p magnitude apply 1.0 lessf
 }
 
 { /k /dir

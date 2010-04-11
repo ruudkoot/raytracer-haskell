@@ -11,7 +11,6 @@ import Input.GML.Evaluate
 
 data GMLShape = GMLShape
     { closureGetNormal' :: Closure
-    , closureInside     :: Closure
     , closureIntervals' :: Closure
     , closureUV         :: Closure }
 

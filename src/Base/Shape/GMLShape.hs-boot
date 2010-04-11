@@ -6,7 +6,6 @@ import Base.Shape
 
 data GMLShape = GMLShape
     { closureGetNormal' :: Closure
-    , closureInside     :: Closure
     , closureIntervals' :: Closure
     , closureUV         :: Closure }
 
