@@ -10,5 +10,5 @@ Build-Type:         Simple
 Executable raytrace
   Main-Is:          Project.hs
   Build-Depends:    base >= 3 && < 5, haskell98, parsec == 2.1.0.1, QuickCheck >= 2.1.0.3, containers >= 0.2, mtl >= 1.1, filepath >= 1.1.0.2, parallel >= 2.2.0.1, deepseq >= 1.1.0.0, GlomeVec >= 0.1.2, stb-image, bitmap, array >= 0.2.0.0, bytestring >= 0.9.1, split >= 0.1
-  GHC-Options:      -O3 -Wall -auto-all -funbox-strict-fields -threaded
+  GHC-Options:      -O3 -Wall -funbox-strict-fields -threaded
   Hs-Source-Dirs:   src/

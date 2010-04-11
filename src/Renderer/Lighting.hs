@@ -23,7 +23,7 @@ localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D ->
 localLighting its world surface r reflected = surfC * diffuse + specular
   where ambient    = fromColour . roAmbience $ wOptions world        
         diffuse    = col (diffuseReflectionCoefficient surface) (ambient) dirLight lightsv
-        specular   = col (specularReflectionCoefficient surface) (reflected) phong lightsv
+        specular   = col (specularReflectionCoefficient surface) (surfC * reflected) phong lightsv
         col k i f l= (k*) `vmap` (i + sum (map (clamp . f) l))
         
         clamp = vmap (\i -> max (min i 1.0) 0.0)

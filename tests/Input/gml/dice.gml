@@ -103,7 +103,7 @@ union /scene
 scene			% object
 3			% depth
 90.0			% fov
-640 400			% wid ht
+1440 900			% wid ht
 "target/dice.ppm"		% output file
 render
 
