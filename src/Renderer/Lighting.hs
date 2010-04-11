@@ -37,7 +37,7 @@ localLighting its world surface r reflected = surfC * diffuse + specular
         surfC      = fromColour $ surfaceColour surface
         n          = normal its
         lights     = wLights world 
-        lightsv    = filter (not . shadowed (location its) (wObject world)) lights
+        lightsv    = filter (not . shadowed (location its) (wObject world) n) lights
 
 
 -- | Get the unit vector from a location 
@@ -72,13 +72,13 @@ attenuate d = vmap ((/ dis) . (100*))
   where dis = 99 + d ** 2
 
 
-shadowed :: Vector3D -> Object -> RenderLight -> Bool
-shadowed p o (DirectLight l _)     = not . null . intersect (mkShadowRay p (negate l)) $ o
-shadowed p o (PointLight l _)      = hit (mkShadowRay p (l-p)) o
-shadowed p o (SpotLight l _ _ _ _) = hit (mkShadowRay p (l-p)) o
+shadowed :: Vector3D -> Object -> Vector3D -> RenderLight -> Bool
+shadowed p o n (DirectLight l _)     = not . null . intersect (mkShadowRay p (negate l) n) $ o
+shadowed p o n (PointLight l _)      = hit (mkShadowRay p (l-p) n) o
+shadowed p o n (SpotLight l _ _ _ _) = hit (mkShadowRay p (l-p) n) o
 
-mkShadowRay :: Vector3D -> Vector3D -> Ray
-mkShadowRay p d = let p' = p + (0.001 * d)
-                  in mkRay p' d
+mkShadowRay :: Vector3D -> Vector3D -> Vector3D -> Ray
+mkShadowRay p d n = let p' = p + (0.001 * n)
+                    in mkRay p' d
 
 

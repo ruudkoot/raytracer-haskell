@@ -10,7 +10,7 @@ newtype Cone = Cone ()
 data    Face = Base | LateralSurface deriving Enum
 
 instance Shape Cone Face where
-    getNormal' _ v | 1.0 ~= y  = vector3D (0.0,1.0,0.0)
+    getNormal' _ v | 1.0 ~= y  = vector3D (0.0,-1.0,0.0)
                    | otherwise = normalize $ vector3D (2*x,-2*y,2*z)
                    where x = getX3D v
                          y = getY3D v
@@ -25,7 +25,7 @@ instance Shape Cone Face where
                          solveTop s   = case (filter (\t -> (py + vy * t) >= 0 && (py + vy * t) <= 1)) $ s of
                                           [x] -> [(1 - py)/vy, x]
                                           []  -> []
-                                          _    -> s
+                                          ls  -> ls
                       in solveTop $ solveQuadratic a b c
     uv         _ v | y ~= 1.0  = (1, (x + 1)/2, (z + 1)/2)
                    | otherwise = (0, acos(z/y)/(2*pi), y)
