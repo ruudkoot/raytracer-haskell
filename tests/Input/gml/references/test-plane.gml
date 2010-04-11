@@ -18,7 +18,7 @@
   u floor /j
   i j addi 2 modi 0 eqi
   { red 1.0 0.0 1.0 }
-  { black 0.0 1.0 20.0 }
+  { white 0.0 1.0 20.0 }
   if
 } plane 0.0 -2.0 0.0 translate /p1
 
