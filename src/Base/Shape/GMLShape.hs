@@ -9,17 +9,21 @@ import Data.Vector
 import Input.GML.AST
 import Input.GML.Evaluate
 
-data GMLShape = GMLShape () Closure Closure Closure Closure
+data GMLShape = GMLShape
+    { closureGetNormal' :: Closure
+    , closureInside     :: Closure
+    , closureIntervals' :: Closure
+    , closureUV         :: Closure }
 
 instance Shape GMLShape () where
-    getNormal' (GMLShape () c1 _ _ _) v = getNormalCosure' c1 v
-    intervals' (GMLShape () _ _ c3 _) r = intervalsClosure' c3 r
-    uv         (GMLShape () _ _ _ c4) v = uvClosure c4 v
+    getNormal' s v = getNormalClosure' (closureGetNormal' s) v
+    intervals' s r = intervalsClosure' (closureIntervals' s) r
+    uv         s v = uvClosure         (closureUV         s) v
     
-getNormalCosure' :: Closure -> Pt3D -> Vec3D
-getNormalCosure' (e, c) p = let s = [Point p]
-                                (e', s', c') = evaluate (e, s, c)
-                            in case s' of
+getNormalClosure' :: Closure -> Pt3D -> Vec3D
+getNormalClosure' (e, c) p = let s = [Point p]
+                                 (e', s', c') = evaluate (e, s, c)
+                              in case s' of
                                 [Point r] -> r
                                 _ -> error ("error in normal closure: expected point on stack, found " ++ show s')
                             
