@@ -33,7 +33,7 @@ class Shape s f | s -> f where
                       [t1, t2] -> if t2 > 0.0
                                     then Just (sort2 (t1,t2))
                                     else Nothing
-                      ls       -> let ts = sort ls
-                                   in Just (head ls, last ls)
+                      ls       -> error "Oh shit" --let ts = sort ls
+                                  --  in Just (head ls, last ls)
 
 
