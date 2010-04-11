@@ -10,8 +10,8 @@ newtype Cone = Cone ()
 data    Face = Base | LateralSurface deriving Enum
 
 instance Shape Cone Face where
-    getNormal' _ v | 1.0 ~= y  = vector3D (0.0,-1.0,0.0)
-                   | otherwise = normalize $ vector3D (2*x,-2*y,2*z)
+    getNormal' _ v | 1.0 ~= y  = vector3D (0.0,1.0,0.0)
+                   | otherwise = normalize $ vector3D (-2*x,2*y,-2*z)
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
@@ -23,7 +23,7 @@ instance Shape Cone Face where
                          -- If the side is hit on exactly one point, then there must
                          -- be an intersection with the top too.
                          solveTop s   = case (filter (\t -> (py + vy * t) >= 0 && (py + vy * t) <= 1)) $ s of
-                                          [x] -> [(1 - py)/vy, x]
+                                          [x] -> [(py)/vy, x]
                                           []  -> []
                                           ls  -> ls
                       in solveTop $ solveQuadratic a b c

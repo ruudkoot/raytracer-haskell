@@ -110,6 +110,6 @@ transformRay r m = invxfm_ray m r
 -- | Instantiates a ray starting on some point 
 -- and calculates the ending point given a certain t.
 --
-getPostition :: Ray -> Double -> Vec3D
-getPostition r t = vscaleadd (rOrigin r) (rDirection r) t
+getPosition :: Ray -> Double -> Vec3D
+getPosition r t = vscaleadd (rOrigin r) (rDirection r) t
 
