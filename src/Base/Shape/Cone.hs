@@ -10,8 +10,8 @@ newtype Cone = Cone ()
 data    Face = Base | LateralSurface deriving Enum
 
 instance Shape Cone Face where
-    getNormal' _ v | 1.0 ~= y  = vector3D (0.0,-1.0,0.0)
-                   | otherwise = normalize $ vector3D (2*x,-2*y,2*z)
+    getNormal' _ v | 1.0 ~= y  = vector3D (0.0,1.0,0.0)
+                   | otherwise = normalize $ vector3D (-2*x,2*y,-2*z)
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v

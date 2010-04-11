@@ -55,7 +55,7 @@ buildIntersection rayt (Simple shape tr1 sh) t =
        , textureCoord = uv shape loc
        , shader       = sh
        } 
-  where loc = getPostition rayt t --local intersection point
+  where loc = getPosition rayt t --local intersection point
 buildIntersection  _   _                    _  = error "Impossible!"
 
 -- | Returns the nearest @t@.
