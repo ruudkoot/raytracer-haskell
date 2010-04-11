@@ -27,6 +27,8 @@ multiplyTransformations t1 t2 = xfm_mult t2 t1
 transformPoint = xfm_point
 transformVector = xfm_vec
 
+transformVector' = invxfm_vec
+
 -- * Renaming
 
 identityTransformation = ident_xfm

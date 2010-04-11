@@ -5,8 +5,8 @@
 % A crude house.  This example exercises most of the mechanisms.
 %
 
-#include "surface.ins"
-#include "rgb.ins"
+%include "surface.ins"
+%include "rgb.ins"
 
 % the main body of the house
 { /v /u /face

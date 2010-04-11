@@ -3,7 +3,7 @@
 % OUTPUTS: ellipsoid-1.ppm ellipsoid-2.ppm
 %
 
-#include "surface.ins"
+%include "surface.ins"
 
 yellow matte apply sphere
   2.0 1.0 1.0 scale
