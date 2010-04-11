@@ -39,7 +39,7 @@ renderScene world = pixels `seq` saveRendering world pixels
 -- by recursively shooting a ray into the World.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel depth x y raymaker world = toRGB . toColour $! renderPixel' depth (raymaker x y) id
+renderPixel dep x y raymaker world = toRGB . toColour $! renderPixel' dep (raymaker x y) id
   where 
     renderPixel' depth ray k = 
       case intersect ray (wObject world) of 
@@ -52,9 +52,9 @@ renderPixel depth x y raymaker world = toRGB . toColour $! renderPixel' depth (r
                 
                     
 reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 
-reflectedRay origin rdirection normal = mkRay clearasil direction
+reflectedRay origin rdirection norm = mkRay clearasil direction
   where 
-    reflDir = vmap (2 * normal !.! rdirection *) normal
+    reflDir = vmap (2 * norm !.! rdirection *) norm
     direction = rdirection - reflDir 
     clearasil = origin + 0.01 * direction 
 

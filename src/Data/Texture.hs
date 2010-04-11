@@ -13,15 +13,15 @@ import qualified Data.Map as M
 import qualified Data.ByteString as BS
 import Data.Array
 
-import Control.Monad
 import Control.Monad.Error
 
 type TextureRef = String
 type Textures = M.Map TextureRef Texture
 type Texture = TextureArray
 
---Plain textures
+-- | Base class for unmipmapped textures. 
 class Texture2D a where
+    -- | Linear sampling, texture coordinates in range ((0,0),(w,h))
     getLinear::a->(Double,Double)->ColourD
     getLinear t (x,y) = --getat t (floor x, floor y)
                         let lx = floor x --Square boundarys
@@ -35,9 +35,10 @@ class Texture2D a where
                             dx = x - fromIntegral lx --Distances to square boundary topleft
                             dy = y - fromIntegral ly
                             top = fmap ((1.0-dx)*) tl `addColour` fmap (dx*) tr
-                            bottom = fmap ((1.0-dx)*) bl `addColour` fmap (dx*) bl
+                            bottom = fmap ((1.0-dx)*) bl `addColour` fmap (dx*) br
                          in fmap ((1.0-dy)*) top `addColour` fmap (dy*) bottom
 
+    -- | Linear sampling, texture coordinates in range ((0,0),(1,1))    
     getLinear'::a->(Double,Double)->ColourD
     getLinear' t (x,y) = let (w,h) = getDimension t
                          in getLinear t (x*fromIntegral w,y*fromIntegral h)
@@ -46,7 +47,7 @@ class Texture2D a where
     getDimension::a->(Int,Int)
 --    createMipmap::a->a
 
---Array-based texture
+-- | Array-based texture2D impplementation.
 type TextureArray = Array (Int,Int) ColourD
 
 instance Texture2D TextureArray where
@@ -54,22 +55,23 @@ instance Texture2D TextureArray where
     getat tx (x,y) = let (w,h) = getDimension tx
                      in tx ! (1+(x `mod` w), 1+(y `mod` h))
 
+-- | Load texture from image file. Image file should have 3 color channels and 
+-- have the png or jpg extension.
 loadTexture:: FilePath -> IO TextureArray
 loadTexture file = 
    do e <- loadImage file
-      let img = either (\e -> error $ "Error loading texture: "++file++" - "++e) id e
+      let img = either (\er -> error $ "Error loading texture: "++file++" - "++er) id e
       let chans = bitmapNChannels img
       guard (chans == 3)
       let tx = bitmapToTextureArray img
       putStrLn $ "Texture loaded: "++file
       putStrLn $ "Dimensions: "++show (getDimension tx)
---      putStrLn $ "     
       return tx
 
+-- | Helper function for loadTexture.
 bitmapToTextureArray::Bitmap Word8 -> TextureArray
 bitmapToTextureArray img = 
     let (w,h) = bitmapSize img
-        bs = bitmapToByteString img
         convertColor::BS.ByteString -> ColourD
         convertColor = fromRGB.listToColour.map fromIntegral. BS.unpack
         convertBS::BS.ByteString -> [ColourD]
@@ -79,25 +81,6 @@ bitmapToTextureArray img =
         lData = convertBS (bitmapToByteString img)
         transData = concat.transpose.splitEvery w $ lData
     in listArray ((1,1),(w,h)) transData
-
-
---list-based texture
-data TextureList= TextureList
-    {width::Int
-    ,height::Int
-    ,pixels::[[ColourD]]
-    }
-
-instance Texture2D TextureList where
-    getDimension lt = (width lt, height lt)
-    getat lt (x,y) = let (w,h) = getDimension lt
-                     in (pixels lt !! (y `mod` h)) !! (x `mod` w)
-{-    createMipmap lt = let (nw,nh)=(width lt `div` 2, height lt `div` 2)
-                          npixels = [[getLinear lt (fromIntegral x, fromIntegral y) | x <- [1..nw]] | y <- [1..nh]]
-                      in TextureList nw nh npixels-}
-
-
-
 
    
 --Mipmapped textures

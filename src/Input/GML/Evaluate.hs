@@ -16,13 +16,13 @@ evaluate = until (null . \(_, _ , x) -> x) evaluate'
           evaluate' (g, v                : a, Binder     x       : c) = (set x v g,                   a, c)
           evaluate' (g,                    a, Identifier x       : c) = (        g, get x g         : a, c)
           evaluate' (g,                    a, Function   c'      : c) = (        g, Closure (g, c') : a, c)
-          evaluate' (g, Closure (g', c') : a, Operator   "apply" : c) = let (g'', b, []) = evaluate (g',  a, c')
+          evaluate' (g, Closure (g', c') : a, Operator   "apply" : c) = let (_, b, []) = evaluate (g',  a, c')
                                                                          in (g, b, c)
-          evaluate' (g,                    a, TArray      c'     : c) = let (g', vs, []) = evaluate (g, [], c')
+          evaluate' (g,                    a, TArray      c'     : c) = let (_, vs, []) = evaluate (g, [], c')
                                                                          in (g, Array vs: a, c)
-          evaluate' (g, Closure (g2, c2) : Closure (g1, c1) : BaseValue (Boolean True ) : a, Operator   "if"    : c) = let (g'', b, []) = evaluate (g1, a, c1)
+          evaluate' (g, Closure _ : Closure (g1, c1) : BaseValue (Boolean True ) : a, Operator   "if"    : c) = let (_, b, []) = evaluate (g1, a, c1)
                                                                          in (g, b, c)
-          evaluate' (g, Closure (g2, c2) : Closure (g1, c1) : BaseValue (Boolean False) : a, Operator   "if"    : c) = let (g'', b, []) = evaluate (g2, a, c2)
+          evaluate' (g, Closure (g2, c2) : Closure _ : BaseValue (Boolean False) : a, Operator   "if"    : c) = let (_, b, []) = evaluate (g2, a, c2)
                                                                          in (g, b, c)
           evaluate' (g,                    b, Operator   o       : c) = (g, runOp (o, operator o) b, c)
           evaluate' st                                                = error ("Error in evaluation, state dump:\n"++show st)
@@ -30,14 +30,15 @@ evaluate = until (null . \(_, _ , x) -> x) evaluate'
 operator :: String -> Operator
 operator o = Map.findWithDefault (error ("unknown operator: " ++ o)) o operators
 
+set::(Ord k)=>k -> a -> Map.Map k a -> Map.Map k a
 set = Map.insert
+
+get::String -> Map.Map String a -> a
 get x = Map.findWithDefault (error ("unknown identifier: " ++ x)) x
 
-
-
 shader :: Textures -> Closure -> Shader
-shader txs (e, c) = Shader { runShader = \(face, u, v) -> let s            = [BaseValue (Real v),BaseValue (Real u),BaseValue (Int face)]
-                                                              (e', s', c') = evaluate (e, s,c)                                                          
+shader txs (e, c) = Shader { runShader = \(face, u, v) -> let s          = [BaseValue (Real v),BaseValue (Real u),BaseValue (Int face)]
+                                                              (_, s', _) = evaluate (e, s,c)                                                          
                                                           in case s' of
                                                               [BaseValue (Real n), BaseValue (Real ks), BaseValue (Real kd), Point p] ->
                                                                 SurfaceProperty { surfaceColour                 = toColour p

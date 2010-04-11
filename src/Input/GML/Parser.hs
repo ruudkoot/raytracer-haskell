@@ -10,6 +10,7 @@ import Input.GML.Parser.ApplicativeParsec
 import Input.GML.AST
 import Input.GML.Operators
 
+gmlOperators::[String]
 gmlOperators = ["apply","if"] ++ Map.keys operators
 
 --Definitions for the lexer created by parsec, see parsec documentation 2.8/2.9 and refernce guide

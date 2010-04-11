@@ -120,13 +120,12 @@ data Value     = BaseValue BaseValue
 instance Show Value where
     show x = case x of
                BaseValue v -> show v
-               Closure (e, c) -> "Closure " ++ show c
+               Closure (_, c) -> "Closure " ++ show c
                Array a -> show a
                Point p -> show p
-               Object o -> "<<object>>"
+               Object _ -> "<<object>>"
                Light l -> show l
-               Render s -> "<<scene>>"
-               _ -> "<<impossible>>"
+               Render _ -> "<<scene>>"              
                
 type Array     = [Value]
 type Stack     = [Value]

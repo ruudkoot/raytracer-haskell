@@ -14,7 +14,6 @@ import Data.Map                                  hiding (map)
 import Data.Vector
 
 import qualified Base.Light                         as Light
-import qualified Base.Shape                         as Shape
 import qualified Base.Shape.Sphere                  as Sphere
 import qualified Base.Shape.Plane                   as Plane
 import qualified Base.Shape.Cylinder                as Cylinder
@@ -40,7 +39,6 @@ popr::Op Double
 popp::Op Point
 popa::Op Array
 popo::Op Object
-popl::Op Light
 popc::Op Closure
 pops::Op String
 
@@ -51,7 +49,7 @@ pushp::Point -> Op Value
 pushb::Bool -> Op Value
 pusho::Object -> Op Value
 pushl::Light -> Op Value
-
+pushR::Scene -> Op Value
 
 -- * Pop
 pop = let cf []     = lift (throwError "Empty stack")
@@ -73,8 +71,6 @@ popa = popt (\x -> case x of (Array a)   -> Just a; _ -> Nothing)
        "Array"
 popo = popt (\x -> case x of (Object a)  -> Just a; _ -> Nothing)
        "Object"
-popl = popt (\x -> case x of (Light a)   -> Just a; _ -> Nothing)
-       "Light"
 popc = popt (\x -> case x of (Closure a) -> Just a; _ -> Nothing)
        "Closure"
 pops = popt (\x -> case x of (BaseValue (String s)) -> Just s; _ -> Nothing)

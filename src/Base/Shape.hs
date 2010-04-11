@@ -4,7 +4,6 @@
 module Base.Shape (Shape (..), Intervals) where
 
 import Postlude
-import Data.List   (sort)
 import Data.Vector
 import Base.Shader
 
@@ -33,7 +32,7 @@ class Shape s f | s -> f where
                       [t1, t2] -> if t2 > 0.0
                                     then Just (sort2 (t1,t2))
                                     else Nothing
-                      ls       -> error "Oh shit" --let ts = sort ls
+                      _        -> error "Oh shit" --let ts = sort ls
                                   --  in Just (head ls, last ls)
 
 

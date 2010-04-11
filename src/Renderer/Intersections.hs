@@ -2,13 +2,7 @@
 --
 module Renderer.Intersections where
 
-
-import Base.Shader (SurfaceCoord, Shader)
-import Base.Shape  (Shape(..))
-
-import Data.Maybe  (isJust)
 import Data.Vector 
-import Data.Transformation
 
 import Renderer.CSG
 import Renderer.IntersectionInfo
@@ -21,7 +15,7 @@ import Renderer.Scene
 -- ray and an object.
 --
 intersect :: Ray -> Object -> Intersections
-intersect ray o@(Simple s tr1 shader) = intersectObject ray o
+intersect ray o@(Simple _ _ _) = intersectObject ray o
 intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
 intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
 intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
