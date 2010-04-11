@@ -27,7 +27,7 @@ type ColourD = Colour Double
 -- | Abstracted Colour constructor.
 --
 colour :: a -> a -> a -> Colour a
-colour r g b = Colour r g b
+colour = Colour
 
 
 -- | The (r, g, b) values in Colour as [r, g, b].
@@ -50,7 +50,7 @@ addColour (Colour a1 a2 a3) (Colour b1 b2 b3) = Colour (a1+b1) (a2+b2) (a3+b3)
 -- maximum value.
 --
 clampColour :: Ord a => a -> a -> Colour a -> Colour a
-clampColour mi ma col = (fmap c col)
+clampColour mi ma col = fmap c col
   where c v = max (min v ma) mi
 
 
@@ -61,10 +61,10 @@ clampedList mi ma = colourToList . clampColour mi ma
 
 
 toRGB :: ColourD -> Colour Int
-toRGB col = fmap (round . (255.0*)) col
+toRGB = fmap (round . (255.0*))
 
 fromRGB :: Colour Int -> ColourD
-fromRGB col = fmap (\x -> fromIntegral x/255.0) col
+fromRGB = fmap (\x -> fromIntegral x/255.0)
 
 fromColour :: ColourD -> Vector3D 
 fromColour (Colour r g b) = toVec3D r g b

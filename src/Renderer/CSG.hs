@@ -11,19 +11,19 @@ type CSG = Intersections -> Intersections -> Intersections
 -- the nearest intersection is choosen.
 --
 unionI :: CSG
-unionI i1 i2 = removeBehind $ unionRanges i1 i2
+unionI = removeBehind . unionRanges 
 
 -- | A & B 
 -- If A and B are both hit.
 --
 intersectI :: CSG
-intersectI i1 i2 = removeBehind $ intersectRanges i1 i2
+intersectI = removeBehind .intersectRanges
 
 -- | A - B   
 -- Only if A is hit and B is not hit.
 --
 differenceI :: CSG
-differenceI i1 i2 = removeBehind $ diffRanges i1 i2
+differenceI = removeBehind.diffRanges
 
 
 removeBehind :: Intersections -> Intersections

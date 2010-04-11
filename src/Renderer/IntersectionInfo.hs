@@ -25,10 +25,10 @@ data IntersectionInfo = IntersectionInfo {
     } deriving (Show)
 
 instance Eq IntersectionInfo where
-    (==) i1 i2 = distance i1 == distance i2
+    (==) i1 i2 = (==) `on` distance
 
 instance Ord IntersectionInfo where
-    (<=) i1 i2 = distance i1 <= distance i2
+    (<=) i1 i2 = (<=) `on` distance
 
 type Intersections = Ranges IntersectionInfo
 

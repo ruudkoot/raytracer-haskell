@@ -11,4 +11,4 @@ toPPM :: ImageWriter
 toPPM w h cs = if fromSize w * fromSize h /= toInteger (length cs)
                  then Nothing
                  else Just $ concat ["P6\n#Team the ray team.\n", show w, " ", show h, "\n255\n",
-                             concatMap (map chr . (clampedList 0 255)) cs]
+                             concatMap (map chr . clampedList 0 25) cs]

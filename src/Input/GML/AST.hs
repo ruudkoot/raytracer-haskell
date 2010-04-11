@@ -65,7 +65,7 @@ foldObject :: ObjectAlgebra r -> Object -> r
 foldObject (simple, translate, scale, uscale, rotatex, rotatey, rotatez, union,
               intersect, difference) = fold
     where fold x = case x of {
-        Simple     shape   shader   -> (transformation simple) shape shader;
+        Simple     shape   shader   -> transformation simple shape shader;
         Translate  object  d1 d2 d3 -> translate  (fold object ) d1 d2 d3;
         Scale      object  d1 d2 d3 -> scale      (fold object ) d1 d2 d3;
         UScale     object  double   -> uscale     (fold object ) double;

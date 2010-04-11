@@ -1,4 +1,4 @@
-{-# LANGUAGE ParallelListComp,RankNTypes, GADTs,TypeSynonymInstances #-}
+{-# LANGUAGE RankNTypes, GADTs,TypeSynonymInstances #-}
 module Data.Texture where
 
 import Data.List.Split

@@ -42,10 +42,10 @@ scale::Flt -> Flt -> Flt -> Transformation
 scale x y z = G.scale (vec x y z)
 
 rotateX::Radians -> Transformation
-rotateX r = rotate (vec 1 0 0) (radians r)
+rotateX = rotate (vec 1 0 0) .radians
 
 rotateY::Radians -> Transformation
-rotateY r = rotate (vec 0 1 0) (radians r)
+rotateY = rotate (vec 0 1 0) .radians
 
 rotateZ::Radians -> Transformation
-rotateZ r = rotate (vec 0 0 1) (radians r)
+rotateZ = rotate (vec 0 0 1) .radians

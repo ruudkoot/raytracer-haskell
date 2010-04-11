@@ -180,16 +180,16 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
                      , ( "length"    ,        ai length                    )
                      , ( "sphere"    ,        co (Simple (Sphere.Sphere ())   )) -- Primitive Objects
                      , ( "cube"      ,        co (Simple (Cube.Cube ())       ))
-                     , ( "gmlshape"  ,       co4 (\x y z -> Simple (GMLShape.GMLShape x y z)))
+                     , ( "gmlshape"  ,       co4 (Simple .GMLShape.GMLShape))
                      , ( "cylinder"  ,        co (Simple (Cylinder.Cylinder ())))
                      , ( "cone"      ,        co (Simple (Cone.Cone ())       ))
                      , ( "plane"     ,        co (Simple (Plane.Plane ())     ))
                      , ( "translate" ,     orrro Translate                 ) --Transformations
                      , ( "scale"     ,     orrro Scale                     ) 
                      , ( "uscale"    ,       oro UScale                    )
-                     , ( "rotatex"   ,       oro (\o r -> RotateX o (Degrees r)))
-                     , ( "rotatey"   ,       oro (\o r -> RotateY o (Degrees r)))
-                     , ( "rotatez"   ,       oro (\o r -> RotateZ o (Degrees r)))
+                     , ( "rotatex"   ,       oro (\o -> RotateX o.Degrees ))
+                     , ( "rotatey"   ,       oro (\o -> RotateY o.Degrees ))
+                     , ( "rotatez"   ,       oro (\o -> RotateZ o.Degrees ))
                      , ( "light"     ,       ppl Light.DirectLight         ) --Lights
                      , ( "pointlight",       ppl Light.PointLight          )
                      , ( "spotlight" ,    ppprrl Light.SpotLight           )
@@ -201,7 +201,7 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
 
 --Convert light array types
 renderF::Point -> Array -> Object -> Int -> Double -> Int -> Int -> String -> Scene
-renderF p a o i1 d i2 i3 s = Scene p (map (\(Light l) -> l) a) o i1 (Degrees d) i2 i3 s
+renderF p a o i1 d = Scene p (map (\(Light l) -> l) a) o i1 (Degrees d)
 
 runOp::(String,Operator) -> Stack -> Stack
 runOp (nm,op) st = let er e = error ("error running operator " ++ nm ++ ": " ++e ++ show st)

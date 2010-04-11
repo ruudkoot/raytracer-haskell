@@ -22,17 +22,17 @@ import Renderer.Scene
 localLighting :: IntersectionInfo -> World -> SurfaceProperty -> Ray -> Vec3D -> Vec3D
 localLighting its world surface r reflected = surfC * diffuse + specular
   where ambient    = fromColour . roAmbience $ wOptions world        
-        diffuse    = col (diffuseReflectionCoefficient surface) (ambient) dirLight lightsv
+        diffuse    = col (diffuseReflectionCoefficient surface) ambient dirLight lightsv
         specular   = col (specularReflectionCoefficient surface) (surfC * reflected) phong lightsv
         col k i f l= (k*) `vmap` (i + sum (map (clamp . f) l))
         
         clamp = vmap (\i -> max (min i 1.0) 0.0)
 
-        dirLight l = ((n !.! dir l)*) `vmap` (getIntensity l (location its))
-        phong    l = (((n !.! dirhalf l) ** phongExponent surface)*) `vmap` (getIntensity l (location its))
+        dirLight l = ((n !.! dir l)*) `vmap` getIntensity l (location its)
+        phong    l = (((n !.! dirhalf l) ** phongExponent surface)*) `vmap` getIntensity l (location its)
 
-        dirhalf  l = normalize $ ((normalize (negate (rDirection r))) + dir l)
-        dir      l = normalize $ (direction (location its) l)
+        dirhalf  l = normalize (normalize (negate (rDirection r)) + dir l)
+        dir        = normalize . direction (location its)
         
         surfC      = fromColour $ surfaceColour surface
         n          = normal its

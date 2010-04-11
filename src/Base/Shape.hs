@@ -17,7 +17,7 @@ class Shape s f | s -> f where
     uv           :: s -> Pt3D         -> SurfaceCoord
     
     getNormal s ray loc = let normal = getNormal' s loc
-                           in if normal !.! (rDirection ray) > 0.0 
+                           in if normal !.! rDirection ray > 0.0 
                               then negate normal
                               else normal
 

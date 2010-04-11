@@ -18,11 +18,11 @@ instance Shape Cone Face where
     intervals' _ r = let (px, py, pz) = tupleFromVector $ rOrigin r
                          (vx, vy, vz) = tupleFromVector $ rDirection r
                          a            = vx ^ 2 + vz ^ 2 - vy ^ 2
-                         b            = 2 * (px * vx + pz * vz - (py) * vy)
+                         b            = 2 * (px * vx + pz * vz - py * vy)
                          c            = px ^ 2 + pz ^ 2 - py ^ 2
                          -- If the side is hit on exactly one point, then there must
                          -- be an intersection with the top too.
-                         solveTop s   = case (filter (\t -> (py + vy * t) >= 0 && (py + vy * t) <= 1)) $ s of
+                         solveTop s   = case filter (\t -> (py + vy * t) >= 0 && (py + vy * t) <= 1) s of
                                           [x] -> [(1 - py)/vy, x]
                                           []  -> []
                                           ls  -> ls

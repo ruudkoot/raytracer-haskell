@@ -9,7 +9,7 @@ import Data.Vector
 newtype Sphere = Sphere ()
 
 instance Shape Sphere () where
-    getNormal' _ p = normalize p
+    getNormal' _   = normalize
     intervals' _ r = let (k, dir) = (rOrigin r, rDirection r)
                          a        = dot dir
                          b        = 2.0 * (k !.! dir)

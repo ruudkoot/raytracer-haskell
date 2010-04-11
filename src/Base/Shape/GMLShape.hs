@@ -14,9 +14,9 @@ data GMLShape = GMLShape
     , closureUV         :: Closure }
 
 instance Shape GMLShape () where
-    getNormal' s v = getNormalClosure' (closureGetNormal' s) v
-    intervals' s r = intervalsClosure' (closureIntervals' s) r
-    uv         s v = uvClosure         (closureUV         s) v
+    getNormal' = getNormalClosure'.closureGetNormal'
+    intervals' = intervalsClosure'.closureIntervals'
+    uv         = uvClosure.closureUV
     
 getNormalClosure' :: Closure -> Pt3D -> Vec3D
 getNormalClosure' (e, c) p = let s = [Point p]
