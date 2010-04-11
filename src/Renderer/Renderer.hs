@@ -65,7 +65,7 @@ reflectedRay origin rdirection norm = mkRay clearasil direction
 saveRendering :: World -> Colours Int -> IO ()
 saveRendering world pixels = maybe bad save $! toPPM (toSize w) (toSize h) pixels
   where bad = error "Error: didn't produce a valid PPM image."
-        save p = putStrLn ("writing result to " ++ roFile (wOptions world)) >> (writeFile (roFile (wOptions world)) p)
+        save p = putStrLn ("writing result to " ++ roFile (wOptions world)) >> writeFile (roFile (wOptions world)) p
         (w,h) = getDimensions world
 
 
@@ -84,5 +84,5 @@ getRayMaker world = mkRayMaker x y dx dy
 mkRayMaker :: Double -> Double -> Double-> Double -> RayMaker 
 mkRayMaker x y dx dy i j = mkRay eye dir
   where eye = vector3D (0, 0, -1)
-        dir = vector3D (x + ((fromIntegral i) + 0.5) * dx,
-                        y + ((fromIntegral j) + 0.5) * dy, 1)
+        dir = vector3D (x + (fromIntegral i + 0.5) * dx,
+                        y + (fromIntegral j + 0.5) * dy, 1)

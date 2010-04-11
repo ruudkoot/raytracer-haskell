@@ -166,7 +166,7 @@ p 0.0 -3.0 0.0 translate union
 scene                             % scene to render
 10                                % tracing depth
 90.0                              % field of view
-640 480                           % image wid and height
+1280 960                           % image wid and height
 "target/aspirin.ppm"                     % output file
 render
 
