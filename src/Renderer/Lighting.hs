@@ -55,9 +55,9 @@ direction _   (DirectLight dir _       ) = normalize $ negate dir
 getIntensity :: RenderLight -> Pt3D -> Vec3D               
 getIntensity (DirectLight _  i) _ = i 
 getIntensity (PointLight pos i) loc = attenuate (magnitude (loc - pos)) i
-getIntensity (SpotLight pos at i cutoff exp) loc = attenuate (magnitude (loc - pos)) i'
+getIntensity (SpotLight pos at i cutoff xp) loc = attenuate (magnitude (loc - pos)) i'
   where i' = if Radians angle > toRadians (Degrees cutoff) then toVec3D 0 0 0 else spot
-        spot = ((dir !.! posDir) ** exp *) `vmap` i
+        spot = ((dir !.! posDir) ** xp *) `vmap` i
         dir = normalize $ at - pos 
         posDir = normalize $ loc - pos
         angle = acos(dir !.! posDir)

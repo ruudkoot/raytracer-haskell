@@ -1,5 +1,4 @@
 module Data.Range where
-import Data.Set
 
 type Range a = (a,a)
 type Ranges a = [Range a]

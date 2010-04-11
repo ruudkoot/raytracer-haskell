@@ -39,7 +39,7 @@ renderScene world = pixels `seq` saveRendering world pixels
 -- by recursively shooting a ray into the World.
 --
 renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel depth x y raymaker world = toRGB . toColour $! renderPixel' depth (raymaker x y) id
+renderPixel dep x y raymaker world = toRGB . toColour $! renderPixel' dep (raymaker x y) id
   where 
     renderPixel' depth ray k = 
       case intersect ray (wObject world) of 
@@ -52,9 +52,9 @@ renderPixel depth x y raymaker world = toRGB . toColour $! renderPixel' depth (r
                 
                     
 reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 
-reflectedRay origin rdirection normal = mkRay clearasil direction
+reflectedRay origin rdirection norm = mkRay clearasil direction
   where 
-    reflDir = vmap (2 * normal !.! rdirection *) normal
+    reflDir = vmap (2 * norm !.! rdirection *) norm
     direction = rdirection - reflDir 
     clearasil = origin + 0.01 * direction 
 
@@ -65,7 +65,7 @@ reflectedRay origin rdirection normal = mkRay clearasil direction
 saveRendering :: World -> Colours Int -> IO ()
 saveRendering world pixels = maybe bad save $! toPPM (toSize w) (toSize h) pixels
   where bad = error "Error: didn't produce a valid PPM image."
-        save p = putStrLn ("writing result to " ++ roFile (wOptions world)) >> (writeFile (roFile (wOptions world)) p)
+        save p = putStrLn ("writing result to " ++ roFile (wOptions world)) >> writeFile (roFile (wOptions world)) p
         (w,h) = getDimensions world
 
 
@@ -84,5 +84,5 @@ getRayMaker world = mkRayMaker x y dx dy
 mkRayMaker :: Double -> Double -> Double-> Double -> RayMaker 
 mkRayMaker x y dx dy i j = mkRay eye dir
   where eye = vector3D (0, 0, -1)
-        dir = vector3D (x + ((fromIntegral i) + 0.5) * dx,
-                        y + ((fromIntegral j) + 0.5) * dy, 1)
+        dir = vector3D (x + (fromIntegral i + 0.5) * dx,
+                        y + (fromIntegral j + 0.5) * dy, 1)

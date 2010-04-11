@@ -22,9 +22,9 @@ instance Shape Cube Face where
                          z = getZ3D v
     intervals' _ r =  let (ox,oy,oz)     = tupleFromVector $ rOrigin r
                           (dx,dy,dz)     = tupleFromVector $ rDirection r
-                          calcMinMax o d = let div = 1.0/d
-                                               t1  = -o*div
-                                               t2  = (1.0-o)*div
+                          calcMinMax o d = let dv = 1.0/d
+                                               t1  = -o*dv
+                                               t2  = (1.0-o)*dv
                                             in if d >= 0.0
                                                  then (t1,t2)
                                                  else (t2,t1)

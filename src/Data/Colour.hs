@@ -5,9 +5,8 @@
 -- 
 module Data.Colour where 
 
-import Control.DeepSeq             (NFData)
 import Control.Parallel.Strategies
-import Data.Vector                 (Vector3D(..), tupleFromVector, toVec3D)
+import Data.Vector                 (Vector3D, tupleFromVector, toVec3D)
 
 -- | Colour is a triple of three values 'r', 'g' and 'b'
 -- 
@@ -40,6 +39,7 @@ colourToList (Colour a b c) = [a, b, c]
 --
 listToColour :: [a] -> Colour a
 listToColour [r,g,b] = Colour r g b
+listToColour _       = error "Invalid color"
 
 -- | Adds the value of two colors
 --

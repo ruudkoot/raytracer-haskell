@@ -4,8 +4,7 @@ module Renderer.Scene where
 
 import Data.Angle
 import Data.Colour
-import Data.Vector
-import Data.Transformation (Transformation(..))
+import Data.Transformation
 
 import Base.Light
 import Base.Shape

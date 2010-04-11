@@ -41,6 +41,7 @@ intersectObject ray obj@(Simple shape tr1 _) =
                Just t -> let (t1, t2) = sort2 t 
                          in [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
                Nothing -> []
+intersectObject _ _ = error "Impossible!"
 
 -- | Helper function used by @intersectObject@ to 
 -- build the resulting IntersectionInfo. Ray shoudl be a ray
@@ -55,12 +56,13 @@ buildIntersection rayt (Simple shape tr1 sh) t =
        , shader       = sh
        } 
   where loc = getPosition rayt t --local intersection point
-
+buildIntersection  _   _                    _  = error "Impossible!"
 
 -- | Returns the nearest @t@.
 --
 nearest :: Intersections -> IntersectionInfo
 nearest ((i1,i2):_) = if distance i1 > 0.0 then i1 else i2
+nearest _           = error "No intersections!"
 
 {-
 nearesttwo :: Intersections -> (Double, Double)

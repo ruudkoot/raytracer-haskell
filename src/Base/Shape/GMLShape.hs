@@ -2,7 +2,6 @@
 
 module Base.Shape.GMLShape where
 
-import Postlude
 import Base.Shape
 import Base.Shader
 import Data.Vector
@@ -21,7 +20,7 @@ instance Shape GMLShape () where
     
 getNormalClosure' :: Closure -> Pt3D -> Vec3D
 getNormalClosure' (e, c) p = let s = [Point p]
-                                 (e', s', c') = evaluate (e, s, c)
+                                 (_, s', _) = evaluate (e, s, c)
                               in case s' of
                                 [Point r] -> r
                                 _ -> error ("error in normal closure: expected point on stack, found " ++ show s')
@@ -29,11 +28,11 @@ getNormalClosure' (e, c) p = let s = [Point p]
                             
 intervalsClosure' :: Closure -> Ray -> [Double]
 intervalsClosure' (e, c) r = let s = [Point o,Point d]
-                                 (e', s', c') = evaluate (e, s, c)
+                                 (_, s', _) = evaluate (e, s, c)
                                  o = rOrigin r
                                  d = rDirection r
-                                 extractDoubles e = case e of
-                                                      (BaseValue (Real r)) -> r
+                                 extractDoubles ev = case ev of
+                                                      (BaseValue (Real rv)) -> rv
                                                       _ -> error ("error in intervals closure: expected array of reals on stack, found " ++ show s')
                              in case s' of
                                   [Array a] -> map extractDoubles a
@@ -42,7 +41,7 @@ intervalsClosure' (e, c) r = let s = [Point o,Point d]
                              
 uvClosure :: Closure -> Pt3D -> SurfaceCoord
 uvClosure (e, c) p = let s = [Point p]
-                         (e', s', c') = evaluate (e, s, c)
+                         (_, s', _) = evaluate (e, s, c)
                      in case s' of
                           [BaseValue (Int i), BaseValue (Real u), BaseValue (Real v)] -> (i, u, v)
                           _ -> error ("error in uv closure: expected Int, Real, Real on stack, found " ++ show s')

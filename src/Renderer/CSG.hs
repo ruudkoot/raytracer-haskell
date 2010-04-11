@@ -1,6 +1,4 @@
 module Renderer.CSG where
-import Data.Vector
-import Renderer.Scene
 import Renderer.IntersectionInfo
 import Data.Range
 

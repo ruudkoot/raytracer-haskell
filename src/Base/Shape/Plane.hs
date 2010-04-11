@@ -2,7 +2,6 @@
 
 module Base.Shape.Plane where
 
-import Postlude
 import Base.Shape
 import Data.Vector
 
