@@ -1,7 +1,30 @@
   Ray Tracer, Team The Ray Team
   =============================
 
-  Oh, hai.
+  O hai, welcome to our very first Haskell Ray Tracer. In this file we will 
+  explain how our ray tracer basically works and which features we have added
+  on top of the Tier 3 Ray Tracer specs from the assignment.
+  
+  First of all we chose our name as we intended to make a great Ray Tracer in
+  analogy of the great television series `The A - Team'.
+  
+  We started out with the idea that the program should be written in pure 
+  Haskell in order to demonstrate the power of Haskell. However, after finishing
+  our work we notice that we have used GHC Language extensions quite often, and
+  almost always for the best.
+  
+  First of all, we have made it fairly easy to add any input format or output
+  format you'd want in a later stage. This has been achieved by abstracting a 
+  list of things, namely: 
+  
+    The World / Object description into our own Abstract World Description;
+    
+    Abstracting our basic shapes (spheres, cubes, planes, etc.) to type classes
+    which makes it very easy to very locally define every function we need on
+    the shapes. Including, but not limited to, the intersection and UV-mapping
+    functions.
+    
+    
 
 
   IRC
