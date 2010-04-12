@@ -1,6 +1,6 @@
 module Renderer.Renderer (renderScene) where
 
-import Base.CLI      (CLIArg(..))
+import Base.CLI      (ProgramOptions(..))
 import Base.Shader   (runShader)
 
 import Data.Angle
@@ -16,32 +16,37 @@ import Renderer.Intersections    (intersect)
 import Renderer.Lighting         (localLighting)
 import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
 
-import Control.Parallel.Strategies -- (parListChunk, using, rdeepseq, rpar, parMap) 
+import Control.Parallel.Strategies
 
 
 -- | A RayMaker produces a Ray when given 
 -- its pixel coordinates.
 --
-type RayMaker = Int -> Int -> Ray
+type RayMaker = Int -> Int -> Int -> Int -> Ray
 
 
 -- | Renders the World.
 --
-renderScene :: CLIArg -> World -> IO ()
-renderScene clarg world = pixels `seq` saveRendering world pixels
-  where raymaker = getRayMaker world
-        (w,h) = getDimensions world
-        depth = (roDepth.wOptions) world
-        pixels = [renderPixel depth i (h-j) raymaker world |  j <- [0..h-1], i <- [0..w-1]]
-                    `using` parListChunk w rdeepseq
+renderScene :: ProgramOptions -> World -> IO ()
+renderScene poptions world = pixels `seq` saveRendering world pixels
+  where raymaker = getRayMaker world poptions
+        (w,h)    = getDimensions world
+        depth    = (roDepth.wOptions) world
+        renderer = renderPixel depth (aa poptions) raymaker world
+        pixels   = [renderer i (h-j)  |  j <- [0..h-1], i <- [0..w-1]]
+                     `using` parListChunk w rdeepseq
 
 
 -- | Calculates the colour for a single pixel position 
 -- by recursively shooting a ray into the World.
 --
-renderPixel :: Int -> Int -> Int -> RayMaker -> World -> Colour Int
-renderPixel dep x y raymaker world = toRGB . toColour $! renderPixel' dep (raymaker x y) id
+renderPixel :: Int -> Int -> RayMaker -> World -> Int -> Int -> Colour Int
+renderPixel dep aa raymaker world x y = toRGB . toColour . vmap ( / aasquared) . sum $! 
+                                       map (\ (aai, aaj) -> renderPixel' dep (aaraymaker aai aaj) id)
+                                           [(i,j) | i <- [1..aa], j <- [1..aa]]
   where 
+    aasquared  = fromIntegral $ aa*aa
+    aaraymaker = raymaker x y
     renderPixel' depth ray k = 
       case intersect ray (wObject world) of 
         []   -> k $! toVec3D 0 0 0 -- No intersections. Intensity=0
@@ -72,8 +77,8 @@ saveRendering world pixels = maybe bad save $! toPPM (toSize w) (toSize h) pixel
 
 -- | Creates the RayMaker for the given world.
 --
-getRayMaker :: World -> RayMaker 
-getRayMaker world = mkRayMaker x y dx dy
+getRayMaker :: World -> ProgramOptions -> RayMaker 
+getRayMaker world options = mkRayMaker (aa options)  x y dx dy
   where (w,h) = getDimensions world
         (x,y) = (-tan(0.5 * radians fov), x * fromIntegral h / fromIntegral w)
         (dx,dy) = (-2 * x / fromIntegral w, -2 * y / fromIntegral h)
@@ -82,8 +87,12 @@ getRayMaker world = mkRayMaker x y dx dy
 
 -- | A RayMakerMaker, if you will; but you won't.
 --
-mkRayMaker :: Double -> Double -> Double-> Double -> RayMaker 
-mkRayMaker x y dx dy i j = mkRay eye dir
+mkRayMaker :: Int -> Double -> Double -> Double-> Double -> RayMaker 
+mkRayMaker aa x y dx dy i j aai aaj = mkRay eye dir
   where eye = vector3D (0, 0, -1)
-        dir = vector3D (x + (fromIntegral i + 0.5) * dx,
-                        y + (fromIntegral j + 0.5) * dy, 1)
+        dir = vector3D ( x + fromIntegral i * dx + 0.5*aadx + fromIntegral aai * aadx
+                       , y + fromIntegral j * dy + 0.5*aady + fromIntegral aaj * aady
+                       , 1
+                       )
+        aadx = dx / (fromIntegral aa)
+        aady = dy / (fromIntegral aa)

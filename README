@@ -24,6 +24,10 @@
     the shapes. Including, but not limited to, the intersection and UV-mapping
     functions.
     
+  In the end we didn't achieve to implement all the features we wanted, but some
+  should be fairly trivial to add. The internal data structure can be changed
+  to use KD-trees. And some form of bounding boxes should be trivial to add.
+    
     
 
 

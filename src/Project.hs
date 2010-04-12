@@ -1,6 +1,6 @@
 module Main where 
 
-import Base.CLI(CLIArg(..))
+import Base.CLI(ProgramOptions(..))
 import Input.GML.RunGML (runGML, toWorld)
 import Renderer.Renderer (renderScene)
 --
@@ -22,8 +22,8 @@ usage = unlines
           [ "raytrace 1.0 - Yet Another Haskell Ray Tracer",
             "Copyright 2010, The Ray Team" ]
 
-standard :: Mode CLIArg
-standard = mode $ CLIArg 
+standard :: Mode ProgramOptions
+standard = mode $ ProgramOptions 
             { 
               bloom = def &= text "Enable bloom filter"  & empty "False"
             , aa    = def &= text "Enable anti-aliasing" & empty "1"

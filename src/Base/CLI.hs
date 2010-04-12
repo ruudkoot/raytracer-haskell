@@ -5,7 +5,7 @@ module Base.CLI where
 
 import System.Console.CmdArgs
 
-data CLIArg = CLIArg 
+data ProgramOptions = ProgramOptions
   { bloom :: Bool
   , aa    :: Int
   , files :: [String]
