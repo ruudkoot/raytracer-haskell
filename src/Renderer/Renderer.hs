@@ -1,5 +1,6 @@
 module Renderer.Renderer (renderScene) where
 
+import Base.CLI      (CLIArg(..))
 import Base.Shader   (runShader)
 
 import Data.Angle
@@ -26,8 +27,8 @@ type RayMaker = Int -> Int -> Ray
 
 -- | Renders the World.
 --
-renderScene :: World -> IO ()
-renderScene world = pixels `seq` saveRendering world pixels
+renderScene :: CLIArg -> World -> IO ()
+renderScene clarg world = pixels `seq` saveRendering world pixels
   where raymaker = getRayMaker world
         (w,h) = getDimensions world
         depth = (roDepth.wOptions) world

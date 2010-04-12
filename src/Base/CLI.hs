@@ -1,26 +1,12 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+-- | File containing the commandline args datastructure, factored out for usage
+--   further in the program.
 module Base.CLI where
 
-data CLArgs = CLArgs 
-  { aa    :: Int
-  , bloom :: Bool
-  , file  :: String
-  } deriving Show
-  
-defaultargs = CLArgs { aa = 1,bloom = False, file = "" }
+import System.Console.CmdArgs
 
--- | This looks an awful lot like what we used to do in T&C
-parseCArgs :: [(String, (CLArgs, [String]) -> (CLArgs, [String]) )] -> CLArgs -> [String]  -> CLArgs
-parseCArgs funcs def input = p (def, input)
-  where p (res , [])                = res
-        p (res , ('-':flag) : xs) = p (sLookup flag res xs)
-        p (res , xs)              = res { file = concat xs }
-        sLookup key def inp = maybe (def, inp) 
-                                    (\f -> f (def, inp)) 
-                                    (lookup key funcs)
-
--- | Example usage of parseVargs.
-ex = parseCArgs [
-                 ("bloom", \(args, inp)  -> (args { bloom = True  }, inp))
-                ,("aa"   , \(args, i:xs) -> (args { aa    = read i}, xs ))
-                ]
-                defaultargs
+data CLIArg = CLIArg 
+  { bloom :: Bool
+  , aa    :: Int
+  , files :: [String]
+  } deriving (Show, Data, Typeable)
