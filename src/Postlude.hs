@@ -18,7 +18,7 @@ d # f = f d
 -- | Approxiately equals
 --
 (~=) :: (Fractional t, Ord t) => t -> t -> Bool
-x ~= y = abs (x - y) < 0.001
+x ~= y = abs (x - y) < 0.00001
 
 clampf :: Double -> Double
 clampf r1 | r1 < 0.0  = 0.0
