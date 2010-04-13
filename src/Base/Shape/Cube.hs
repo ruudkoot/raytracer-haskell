@@ -2,20 +2,21 @@
 
 module Base.Shape.Cube where
 
+import Prelude     hiding (Left, Right)
 import Postlude
 import Base.Shape
 import Data.Vector
 
-newtype Cube = Cube ()
-data    Face = Front | Back | Top | Bottom | Left | Right deriving Enum
+data Cube = Cube
+data Face = Front | Back | Left | Right | Top | Bottom deriving Enum
 
 instance Shape Cube Face where
-    getNormal' _ v | z ~= 0.0  = vector3D ( 0.0, 0.0,-1.0) -- front
-                   | z ~= 1.0  = vector3D ( 0.0, 0.0, 1.0) -- back
-                   | x ~= 0.0  = vector3D (-1.0, 0.0, 0.0) -- left
-                   | x ~= 1.0  = vector3D ( 1.0, 0.0, 0.0) -- right
-                   | y ~= 0.0  = vector3D ( 0.0,-1.0, 0.0) -- top
-                   | y ~= 1.0  = vector3D ( 0.0, 1.0, 0.0) -- bottom 
+    getNormal' _ v | z ~= 0.0  = vector3D ( 0.0, 0.0,-1.0) -- Front
+                   | z ~= 1.0  = vector3D ( 0.0, 0.0, 1.0) -- Back
+                   | x ~= 0.0  = vector3D (-1.0, 0.0, 0.0) -- Left
+                   | x ~= 1.0  = vector3D ( 1.0, 0.0, 0.0) -- Right
+                   | y ~= 0.0  = vector3D ( 0.0,-1.0, 0.0) -- Top
+                   | y ~= 1.0  = vector3D ( 0.0, 1.0, 0.0) -- Bottom 
                    | otherwise = error "the impossible happened"
                    where x = getX3D v
                          y = getY3D v
@@ -34,12 +35,12 @@ instance Shape Cube Face where
                           tmin           = max txl $ max tyl tzl
                           tmax           = min txh $ min tyh tzh
                        in if tmin < tmax then [tmin,tmax] else []
-    uv         _ v | z ~= 0.0  = (0, x, y) -- front
-                   | z ~= 1.0  = (1, x, y) -- back
-                   | x ~= 0.0  = (2, z, y) -- left
-                   | x ~= 1.0  = (3, z, y) -- right
-                   | y ~= 0.0  = (4, x, z) -- top
-                   | y ~= 1.0  = (5, x, z) -- bottom 
+    uv'        _ v | z ~= 0.0  = (Front , x, y)
+                   | z ~= 1.0  = (Back  , x, y)
+                   | x ~= 0.0  = (Left  , z, y)
+                   | x ~= 1.0  = (Right , z, y)
+                   | y ~= 0.0  = (Top   , x, z)
+                   | y ~= 1.0  = (Bottom, x, z)
                    | otherwise = error "the impossible happened"
                    where x = getX3D v
                          y = getY3D v

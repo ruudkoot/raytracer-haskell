@@ -6,7 +6,7 @@ import Base.Shape
 import Data.Vector
 import Postlude
 
-newtype Plane = Plane ()
+data Plane = Plane
 
 instance Shape Plane () where
     getNormal' _ _ = vector3D (0.0,1.0,0.0)
@@ -22,5 +22,5 @@ instance Shape Plane () where
                                  else if t > 0.0
                                       then [t, positiveInfinity]
                                       else [negativeInfinity ,t]
-    uv         _ v = (0, getX3D v, getZ3D v)
+    uv'        _ v = ((), getX3D v, getZ3D v)
 
