@@ -16,9 +16,9 @@ import Renderer.Scene
 --
 intersect :: Ray -> Object -> Intersections
 intersect ray o@(Simple _ _ _) = let x = intersectObject ray o in x--if not (null x) then trace (show x) x else x
-intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
-intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
-intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
+intersect ray (Union      o1 o2 _) = csg unionI      ray o1 o2
+intersect ray (Difference o1 o2 _) = csg differenceI ray o1 o2
+intersect ray (Intersect  o1 o2 _) = csg intersectI  ray o1 o2
 
 -- | Helper function for perofrming CSG using the functions defined 
 -- in Renderer.CSG

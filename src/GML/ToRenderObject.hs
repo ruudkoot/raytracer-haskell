@@ -1,9 +1,11 @@
 module GML.ToRenderObject where
 
+import           Base.Shape
 import           Data.Angle
 import           Data.Colour
 import           Data.Transformation
 import           Data.Texture
+import           Data.Glome.Vec (Bbox(..), bbjoin, bboverlap) 
 
 import qualified GML.AST        as GML
 import qualified GML.Evaluate   as Evil
@@ -12,18 +14,25 @@ import qualified Renderer.Scene as Renderer
 toRenderObject :: Textures -> GML.Object -> Renderer.Object
 toRenderObject txs = flip (GML.foldObject algebra) identityTransformation
     where algebra = ( GML.SimpleTransformer $
-                      \shape closure transformation -> Renderer.Simple shape transformation (Evil.shader txs closure)
-                    , \o d1 d2 d3    transformation -> o (transformation !*! translate d1 d2 d3)
-                    , \o d1 d2 d3    transformation -> o (transformation !*! scale d1 d2 d3)
-                    , \o d           transformation -> o (transformation !*! scale d d d)
-                    , \o d           transformation -> o (transformation !*! rotateX (toRadians d))
-                    , \o d           transformation -> o (transformation !*! rotateY (toRadians d))
-                    , \o d           transformation -> o (transformation !*! rotateZ (toRadians d))
-                    , \o1 o2         transformation -> Renderer.Union      (o1 transformation) (o2 transformation)
-                    , \o1 o2         transformation -> Renderer.Intersect  (o1 transformation) (o2 transformation)
-                    , \o1 o2         transformation -> Renderer.Difference (o1 transformation) (o2 transformation)
-                    )
+              \shape closure trans -> Renderer.Simple shape trans (Evil.shader txs closure)
+            , \o d1 d2 d3    trans -> o (trans !*! translate d1 d2 d3)
+            , \o d1 d2 d3    trans -> o (trans !*! scale d1 d2 d3)
+            , \o d           trans -> o (trans !*! scale d d d)
+            , \o d           trans -> o (trans !*! rotateX (toRadians d))
+            , \o d           trans -> o (trans !*! rotateY (toRadians d))
+            , \o d           trans -> o (trans !*! rotateZ (toRadians d))
+            , \o1 o2         trans -> Renderer.Union      (o1 trans) (o2 trans) (bbjoin (bbox $ o1 trans) (bbox $ o2 trans))
+            , \o1 o2         trans -> Renderer.Intersect  (o1 trans) (o2 trans) (bboverlap (bbox $ o1 trans) (bbox $ o2 trans))
+            , \o1 o2         trans -> Renderer.Difference (o1 trans) (o2 trans) (bbjoin (bbox $ o1 trans) (bbox $ o2 trans))
+            )
                     
+bbox :: Renderer.Object -> Bbox 
+bbox (Renderer.Simple s _ _) = boundingBox s
+bbox (Renderer.Union _ _ b) = b
+bbox (Renderer.Intersect _ _ b) = b
+bbox (Renderer.Difference _ _ b) = b
+
+
 toWorld :: Textures -> GML.Scene -> Renderer.Scene
 toWorld txs (GML.Scene amb l obj dp fov w h fil) = 
        Renderer.Scene (Renderer.Options (toColour amb) dp (toRadians fov) w h fil) (toRenderObject txs obj) l
