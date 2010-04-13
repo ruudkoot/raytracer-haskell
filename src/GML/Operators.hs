@@ -208,4 +208,7 @@ runOp (nm,op) st = let er e = error ("error running operator " ++ nm ++ ": " ++e
                    in either er id (execStateT op st)
 
 
-
+clampf :: Double -> Double
+clampf r1 | r1 < 0.0  = 0.0
+          | r1 > 1.0  = 1.0
+          | otherwise = r1
