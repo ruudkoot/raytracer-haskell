@@ -19,7 +19,6 @@ import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
 
 import Control.Parallel.Strategies
 
-import Postlude
 
 -- | A RayMaker produces a Ray when given 
 -- its pixel coordinates.
@@ -78,30 +77,31 @@ reflectedRay origin rdirection norm = mkRay clearasil direction
 -- location of which is specified in the GML)
 --
 saveRendering :: World -> Colours Int -> IO ()
-saveRendering world pixels = maybe bad save $! toPPM (toSize w) (toSize h) pixels
-  where bad = error "Error: didn't produce a valid PPM image."
-        save p = putStrLn ("writing result to " ++ roFile (wOptions world)) >> writeFile (roFile (wOptions world)) p
-        (w,h) = getDimensions world
+saveRendering world pix = maybe bad save $! toPPM (toSize w) (toSize h) pix
+  where bad    = error "Error: didn't produce a valid PPM image."
+        (w,h)  = getDimensions world
+        save p = do putStrLn ("writing result to " ++ roFile (wOptions world)) ;
+		            writeFile (roFile (wOptions world)) p
 
 
 -- | Creates the RayMaker for the given world.
 --
 getRayMaker :: World -> ProgramOptions -> RayMaker 
 getRayMaker world options = mkRayMaker (aa options)  x y dx dy
-  where (w,h) = getDimensions world
-        (x,y) = (-tan(0.5 * radians fov), x * fromIntegral h / fromIntegral w)
+  where (w,h)   = getDimensions world
+        (x,y)   = (-tan(0.5 * radians fov), x * fromIntegral h / fromIntegral w)
         (dx,dy) = (-2 * x / fromIntegral w, -2 * y / fromIntegral h)
-        fov = roFov (wOptions world)
+        fov     = roFov (wOptions world)
 
 
 -- | A RayMakerMaker, if you will; but you won't.
 --
 mkRayMaker :: Int -> Double -> Double -> Double-> Double -> RayMaker 
 mkRayMaker aa x y dx dy i j aai aaj = mkRay eye dir
-  where eye = vector3D (0, 0, -1)
-        dir = vector3D ( x + fromIntegral i * dx + 0.5*aadx + fromIntegral aai * aadx
-                       , y + fromIntegral j * dy + 0.5*aady + fromIntegral aaj * aady
-                       , 1
-                       )
-        aadx = dx / fromIntegral aa
+  where aadx = dx / fromIntegral aa
         aady = dy / fromIntegral aa
+        eye  = vector3D (0, 0, -1)
+        dir  = vector3D ( x + fromIntegral i * dx + 0.5 * aadx + fromIntegral aai * aadx
+                        , y + fromIntegral j * dy + 0.5 * aady + fromIntegral aaj * aady
+                        , 1
+                        )
