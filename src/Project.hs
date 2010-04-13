@@ -9,13 +9,13 @@ import System.IO
 
 main :: IO()
 main = do cargs <- cmdArgs usage [standard]
-          mapM_ (\ file -> do putStrLn $ "Rendering file: " ++ file
-                              (scenes, textures) <- runGML file
-                              mapM_ (renderScene cargs . toWorld textures) 
-                                    scenes
-                )
-                (files cargs)
-          
+          mapM_ (renderFile cargs) (files cargs)
+ 
+
+renderFile :: ProgramOptions -> FilePath -> IO ()
+renderFile cargs fp = do putStrLn $ "Rendering file: " ++ fp 
+                         (scenes, textures) <- runGML fp
+                         mapM_ (renderScene cargs . toWorld textures) scenes          
 
 usage :: String
 usage = unlines 
@@ -25,8 +25,8 @@ usage = unlines
 standard :: Mode ProgramOptions
 standard = mode $ ProgramOptions 
             { 
-              bloom = def &= text "Enable bloom filter"  & empty "False"
-            , aa    = def &= text "Enable anti-aliasing" & empty "1"
+              bloom = def &= text "Enable bloom filter"  & empty False
+            , aa    = 1   &= text "Enable anti-aliasing" 
             , files = def &= text "FILE"                 & args
             }
 
