@@ -46,6 +46,11 @@ b negf sqd subf a 2.0 mulf divf /x2
 /solveQuadratic
 
 { /shader
+
+{ -10000 -10000 -10000 point
+10000 10000 10000 point % approximately infinity
+}
+
 { /p
 0.0 1.0 0.0 point
 }
@@ -71,6 +76,12 @@ p getx
 
 
 { /shader
+
+{
+-1 -1 -1 point
+1 1 1 point
+}
+
 { /p
 p normalize apply
 }
