@@ -33,4 +33,14 @@ Executable raytrace
                     Base.Shape.Cone Base.Shape.Cube Base.Shape.Cylinder 
                     Base.Shape.GMLShape Base.Shape.Plane 
                     Base.Shape.Sphere	
+                    Data.Angle Data.Colour Data.Range Data.Texture
+                    Data.Transformation Data.Vector
+                    GML.AST GML.Evaluate GML.Operators 
+                    GML.Parser GML.RunGML GML.ToRenderObject
+                    GML.Parser.ApplicativeParsec  Output.PPM
+                    Renderer.ConstructiveSolidGeometry
+                    Renderer.IlluminationModel Renderer.IntersectionInfo
+                    Renderer.Intersections Renderer.Renderer 
+                    Renderer.Scene
+
   Hs-Source-Dirs:   src/
