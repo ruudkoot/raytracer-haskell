@@ -10,6 +10,7 @@ Author:             Alessandro Vermeulen
 Synopsis:           Ray Tracer 
 Description:        Ray Tracer
 Build-Type:         Simple
+Data-files:         README
 
 Executable raytrace
   Main-Is:          Main.hs
