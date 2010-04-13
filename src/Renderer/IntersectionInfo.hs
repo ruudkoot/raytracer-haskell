@@ -39,9 +39,8 @@ intersectObject::Ray -> Object -> Intersections
 intersectObject ray obj@(Simple shape tr1 _) = 
     let rayt = transformRay ray tr1
     in case intervals rayt shape of
-               Just t -> let (t1, t2) = sort2 t 
-                         in [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
-               Nothing -> []
+               Just (t1,t2) -> [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
+               Nothing      -> []
 intersectObject _ _ = error "Impossible!"
 
 -- | Helper function used by @intersectObject@ to 

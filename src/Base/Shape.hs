@@ -26,12 +26,8 @@ class Shape s f | s -> f where
     -- @intersection = eye + t*direction@
     intervals r s = case intervals' s r of
                       []       -> Nothing
-                      [t]      -> if t  > 0.0
-                                    then Just (t, t)
-                                    else Nothing
-                      [t1, t2] -> if t2 > 0.0
-                                    then Just (sort2 (t1,t2))
-                                    else Nothing
+                      [t]      -> Just (t, t)                                  
+                      [t1, t2] -> Just (sort2 (t1,t2))
                       _        -> error "Oh shit" --let ts = sort ls
                                   --  in Just (head ls, last ls)
 
