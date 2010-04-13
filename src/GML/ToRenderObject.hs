@@ -16,9 +16,13 @@ data SBox = SingleBox Bbox
           | UnionBox SBox SBox
           | IntersectBox SBox SBox
 
+
+
+
 toRenderObject :: Textures -> GML.Object -> Renderer.Object
-toRenderObject txs = fst $ flip (GML.foldObject algebra) identityTransformation
-    where algebra = ( GML.SimpleTransformer $
+toRenderObject txs = ob undefined
+    where (ob, box, trans) = flip (GML.foldObject algebra) identityTransformation
+          algebra = ( GML.SimpleTransformer $
               \shape closure    trans      -> (Renderer.Simple shape trans (Evil.shader txs closure), 
                                                SingleBox (boundingBox shape), trans)
             , \(o,b,t) d1 d2 d3 trans      -> (o (trans !*! translate d1 d2 d3), b, undefined)
