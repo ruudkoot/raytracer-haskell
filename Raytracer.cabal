@@ -43,6 +43,6 @@ Executable raytrace
                     Renderer.Intersections Renderer.Renderer 
                     Renderer.Scene Postlude
                     Tests.Data.Range Tests.Data.Transformation Tests.Data.Vector
-                    Tests.Input.GML.AST Tests.Input.GML.Parser
+                    Tests.GML.AST Tests.GML.Parser
                     Tests.Renderer.Datatypes Tests.Renderer.Intersections
   Hs-Source-Dirs:   src/
