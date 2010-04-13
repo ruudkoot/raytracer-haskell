@@ -1,4 +1,4 @@
-module Input.GML.Evaluate (evaluate, shader) where
+module GML.Evaluate (evaluate, shader) where
 
 import           Data.Texture
 import           Data.Colour
@@ -6,8 +6,8 @@ import qualified Data.Map      as Map
 
 import           Base.Shader
 
-import           Input.GML.AST
-import           Input.GML.Operators
+import           GML.AST
+import           GML.Operators
 
 evaluate :: State -> State
 evaluate = until (null . \(_, _ , x) -> x) evaluate'

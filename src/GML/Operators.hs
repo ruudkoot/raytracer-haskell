@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Input.GML.Operators (operators,runOp,Operator) where
+module GML.Operators (operators,runOp,Operator) where
 
 import Postlude
 
@@ -21,7 +21,7 @@ import qualified Base.Shape.Cube                    as Cube
 import {-# SOURCE #-} qualified Base.Shape.GMLShape as GMLShape (GMLShape(..))
 import qualified Base.Shape.Cone                    as Cone
 
-import           Input.GML.AST                   hiding (State)
+import           GML.AST                   hiding (State)
 
 type Op = StateT Stack (Either String) 
 
@@ -178,12 +178,12 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
                      , ( "point"     ,      rrrp (\x y z -> vector3D (x, y, z)))
                      , ( "get"       ,       aiv (!!)                      ) -- arrays
                      , ( "length"    ,        ai length                    )
-                     , ( "sphere"    ,        co (Simple (Sphere.Sphere ())   )) -- Primitive Objects
-                     , ( "cube"      ,        co (Simple (Cube.Cube ())       ))
+                     , ( "sphere"    ,        co (Simple (Sphere.Sphere)   )) -- Primitive Objects
+                     , ( "cube"      ,        co (Simple (Cube.Cube)       ))
                      , ( "gmlshape"  ,       co4 (\x y z -> Simple (GMLShape.GMLShape x y z)))
-                     , ( "cylinder"  ,        co (Simple (Cylinder.Cylinder ())))
-                     , ( "cone"      ,        co (Simple (Cone.Cone ())       ))
-                     , ( "plane"     ,        co (Simple (Plane.Plane ())     ))
+                     , ( "cylinder"  ,        co (Simple (Cylinder.Cylinder)))
+                     , ( "cone"      ,        co (Simple (Cone.Cone)       ))
+                     , ( "plane"     ,        co (Simple (Plane.Plane)     ))
                      , ( "translate" ,     orrro Translate                 ) --Transformations
                      , ( "scale"     ,     orrro Scale                     ) 
                      , ( "uscale"    ,       oro UScale                    )

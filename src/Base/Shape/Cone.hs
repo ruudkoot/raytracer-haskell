@@ -6,12 +6,12 @@ import Postlude
 import Base.Shape
 import Data.Vector
 
-newtype Cone = Cone ()
-data    Face = Base | LateralSurface deriving Enum
+data Cone = Cone
+data Face = Base | LateralSurface deriving Enum
 
 instance Shape Cone Face where
-    getNormal' _ v | 1.0 ~= y  = vector3D (0.0,1.0,0.0)
-                   | otherwise = normalize $ vector3D (-2*x,2*y,-2*z)
+    getNormal' _ v | 1.0 ~= y  = vector3D (0.0, 1.0, 0.0)
+                   | otherwise = normalize $ vector3D (2*x, -2*y, 2*z)
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
@@ -27,8 +27,8 @@ instance Shape Cone Face where
                                           []  -> []
                                           ls  -> ls
                       in solveTop $ solveQuadratic a b c
-    uv         _ v | y ~= 1.0  = (1, (x + 1)/2, (z + 1)/2)
-                   | otherwise = (0, acos(z/y)/(2*pi), y)
+    uv'        _ v | y ~= 1.0  = (LateralSurface, (x + 1)/2, (z + 1)/2)
+                   | otherwise = (Base          , acos(z/y)/(2*pi), y)
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
