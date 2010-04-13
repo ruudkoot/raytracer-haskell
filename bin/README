@@ -1,0 +1,22 @@
+  Scripts 
+  =======
+
+
+  The scripts in this directory are not all suitable for running on your 
+  own machine, since they are specifically written for the build server. 
+  However, some might be usable for running locally.
+
+
+    FILE                       LOCAL?      DESCRIPTION
+    ----                       ------      -----------
+    post-receive.sh            NO          Build server git hook. 
+		                                   Run whenever a new changeset 
+                                           is pushed.
+    qCheck.py                  YES         Looks for functions starting 
+                                           with prop_ in the files given 
+                                           via the command line arguments
+                                           and runs them in a ghci process.
+    update_instance.sh         NO          Pulls from the 'central' repository 
+                                           into an instance, which is used for 
+                                           testing, building, etc.
+    update_redmine_mirror.sh   NO          Updates the redmine repository.

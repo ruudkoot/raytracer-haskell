@@ -1,4 +1,4 @@
-module Renderer.Renderer (renderScene) where
+module Renderer.Renderer (renderFile) where
 
 import Base.CLI      (ProgramOptions(..))
 import Base.Shader   (runShader)
@@ -7,6 +7,7 @@ import Data.Angle
 import Data.Colour   (Colour(..), Colours, toRGB, toColour)
 import Data.Vector   (toVec3D, (!.!), Ray, mkRay, rDirection, vector3D, vmap, Pt3D, Vec3D)
 
+import Input.GML.RunGML (runGML, toWorld)
 
 import Output.Output (toSize)
 import Output.PPM    (toPPM)
@@ -24,6 +25,15 @@ import Postlude
 -- its pixel coordinates.
 --
 type RayMaker = Int -> Int -> Int -> Int -> Ray
+
+
+
+-- | Render a single file. 
+--
+renderFile :: ProgramOptions -> FilePath -> IO ()
+renderFile cargs fp = do putStrLn $ "Rendering file: " ++ fp 
+                         (scenes, textures) <- runGML fp
+                         mapM_ (renderScene cargs . toWorld textures) scenes          
 
 
 -- | Renders the World.
@@ -54,8 +64,7 @@ renderPixel dep aa raymaker world x y = toRGB . toColour . vmap ( / aasquared) .
         (Just info) -> if depth == 0 then k $! toVec3D 0 0 0
                        else let surface   = runShader (shader info) $! textureCoord info
                                 reflected = reflectedRay (location info) (rDirection ray) (normal info)
-                            in renderPixel' (depth - 1) reflected $! (k . localLighting info world surface ray) 
-                
+                            in renderPixel' (depth - 1) reflected $! (k . localLighting info world surface ray)                 
                     
 reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 
 reflectedRay origin rdirection norm = mkRay clearasil direction
@@ -94,5 +103,5 @@ mkRayMaker aa x y dx dy i j aai aaj = mkRay eye dir
                        , y + fromIntegral j * dy + 0.5*aady + fromIntegral aaj * aady
                        , 1
                        )
-        aadx = dx / (fromIntegral aa)
-        aady = dy / (fromIntegral aa)
+        aadx = dx / fromIntegral aa
+        aady = dy / fromIntegral aa

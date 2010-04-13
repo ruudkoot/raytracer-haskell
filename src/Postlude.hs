@@ -1,6 +1,5 @@
 module Postlude where
 
-infixr 0 #
 infix  4 ~=
 
 positiveInfinity :: (Fractional t) => t
@@ -9,11 +8,6 @@ positiveInfinity =  1.0 / 0.0
 negativeInfinity :: (Fractional t) => t
 negativeInfinity = -1.0 / 0.0
 
-
--- | Flipped application
---
-(#) :: a -> (a -> b) -> b
-d # f = f d
 
 -- | Approxiately equals
 --

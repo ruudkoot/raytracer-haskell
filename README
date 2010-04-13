@@ -28,6 +28,14 @@
   should be fairly trivial to add. The internal data structure can be changed
   to use KD-trees. And some form of bounding boxes should be trivial to add.
     
+
+  Directory Structure
+  ===================
+
+  bin/        Scripts used by our buildserver (see bin/README)
+  doc/        Some project reports
+  src/        The actual ray tracer source
+  www/        The website hosted at http://projects.spockz.nl/projects/afp2009/
     
 
 
