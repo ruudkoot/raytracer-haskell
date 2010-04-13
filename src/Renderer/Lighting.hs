@@ -71,7 +71,7 @@ attenuate :: Double -> Vec3D -> Vec3D
 attenuate d = vmap ((/ dis) . (100*))
   where dis = 99 + d ** 2
 
-
+-- | Shadow feeler function. Calls on hit or intersect to determine whether there is an object within the shadow ray.
 shadowed :: Vector3D -> Object -> Vector3D -> RenderLight -> Bool
 shadowed p o n (DirectLight l _)     = not . null . intersect (mkShadowRay p (negate l) n) $ o
 shadowed p o n (PointLight l _)      = hit (mkShadowRay p (l-p) n) o

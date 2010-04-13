@@ -25,6 +25,7 @@ intersectI i1 i2 = removeBehind $ intersectRanges i1 i2
 differenceI :: CSG
 differenceI i1 i2 = removeBehind $ diffRanges i1 i2
 
-
+-- | Remove intersections that are behind the camera.
+-- Intersections can be discarded if the second part of the interval is behind the camera (<0).
 removeBehind :: Intersections -> Intersections
 removeBehind = dropWhile ((<0.0).distance.snd)

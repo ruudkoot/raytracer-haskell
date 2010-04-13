@@ -61,9 +61,13 @@ buildIntersection  _   _                    _  = error "Impossible!"
 
 -- | Returns the nearest @t@.
 --
-nearest :: Intersections -> IntersectionInfo
-nearest ((i1,i2):_) = if distance i1 > 0.0 then i1 else i2
-nearest _           = error "No intersections!"
+nearest :: Intersections -> Maybe IntersectionInfo
+nearest []          = Nothing
+nearest ((i1,i2):_) = if distance i1 > 0.0 
+                      then Just i1
+                      else if distance i2 == positiveInfinity 
+                           then Nothing
+                           else Just i2
 
 {-
 nearesttwo :: Intersections -> (Double, Double)

@@ -27,7 +27,7 @@ class Shape s f | s -> f where
     intervals r s = case intervals' s r of
                       []       -> Nothing
                       [t]      -> if t  > 0.0
-                                    then Just (t, positiveInfinity)
+                                    then Just (t, t)
                                     else Nothing
                       [t1, t2] -> if t2 > 0.0
                                     then Just (sort2 (t1,t2))

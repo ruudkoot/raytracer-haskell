@@ -18,6 +18,7 @@ import Renderer.Scene            (World(..), RenderOptions(..), getDimensions)
 
 import Control.Parallel.Strategies
 
+import Postlude
 
 -- | A RayMaker produces a Ray when given 
 -- its pixel coordinates.
@@ -48,13 +49,12 @@ renderPixel dep aa raymaker world x y = toRGB . toColour . vmap ( / aasquared) .
     aasquared  = fromIntegral $ aa*aa
     aaraymaker = raymaker x y
     renderPixel' depth ray k = 
-      case intersect ray (wObject world) of 
-        []   -> k $! toVec3D 0 0 0 -- No intersections. Intensity=0
-        rs -> if depth == 0 then k $! toVec3D 0 0 0
-              else let info      = nearest rs
-                       surface   = runShader (shader info) $! textureCoord info
-                       reflected = reflectedRay (location info) (rDirection ray) (normal info)
-                   in renderPixel' (depth - 1) reflected $! (k . localLighting info world surface ray) 
+      case nearest $ intersect ray (wObject world) of 
+        Nothing     -> k $! toVec3D 0 0 0 -- No intersections. Intensity=0
+        (Just info) -> if depth == 0 then k $! toVec3D 0 0 0
+                       else let surface   = runShader (shader info) $! textureCoord info
+                                reflected = reflectedRay (location info) (rDirection ray) (normal info)
+                            in renderPixel' (depth - 1) reflected $! (k . localLighting info world surface ray) 
                 
                     
 reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 

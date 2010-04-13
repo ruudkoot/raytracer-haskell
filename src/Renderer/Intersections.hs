@@ -33,9 +33,9 @@ csg f ray o1 o2 = f (iray o1) (iray o2)
 -- the intersect functions.
 --
 hit :: Ray -> Object -> Bool
-hit r o = case intersect r o of            
-            [] -> False
-            rs -> let t = distance (nearest rs) in (t > 0.0 && t < 1.0)
+hit r o = case nearest (intersect r o) of            
+            Nothing -> False
+            Just near -> let t = distance near in (t > 0.0 && t < 1.0)
 
 
 

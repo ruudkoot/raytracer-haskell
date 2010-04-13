@@ -20,11 +20,26 @@
 } /mkPlane
 
 1.0 0.0 0.0 point mkPlane apply
+%0.0 -1.0 0.0 translate
+%0.0 1.0 0.0 point mkSphere apply
+
+%1.0 0.0 0.0 point mkPlane apply
+%180.0 rotatex
+%0.0 1.0 0.0 translate
+%intersect
+
+%1.0 0.0 0.0 point mkPlane apply
+%90.0 rotatex
+%0.0 0.0 -1.0 translate
+
+%1.0 0.0 0.0 point mkPlane apply
+%-90.0 rotatex
+%0.0 0.0 1.0 translate
+%intersect
+%intersect
+%
 0.0 -1.0 0.0 translate
-0.0 1.0 0.0 point mkSphere apply 
-0.0 0.0 3.0 translate
-0.25 uscale
-union /scene
+/scene
 				% directional light
 1.0 -1.0 0.0 point		  % direction
 1.0  1.0 1.0 point light /l	  % directional light
