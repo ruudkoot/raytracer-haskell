@@ -1,6 +1,5 @@
 %texture "globe" "globe.jpg"
 %texture "wood" "wood.jpg"
-%texture "tile" "tile.jpg"
 
 %
 %globe
@@ -140,11 +139,37 @@ union
 -10.0 4.0 -1.0 point
 1.0 1.0 1.0 point pointlight /l
 
+{ /angle /z /y /x /object
+   object
+   x -1.0 mulf
+   y -1.0 mulf
+   z -1.0 mulf
+   translate
+   angle rotatey
+   x y z translate
+} /rotateAround
+
+{ /angle /z /y /x /file
 0.3 0.3 0.3 point
 [l]
-scene 
-1
+scene x y z angle rotateAround apply
+2
 90.0
 320 200
-"target/globe.ppm"
+file
 render
+} /drawRotated
+
+"target/globe0.ppm" -2.0 -1.5 8.0 0.0 drawRotated apply
+"target/globe30.ppm" -2.0 -1.5 8.0 30.0 drawRotated apply
+"target/globe60.ppm" -2.0 -1.5 8.0 60.0 drawRotated apply
+"target/globe90.ppm" -2.0 -1.5 8.0 90.0 drawRotated apply
+"target/globe120.ppm" -2.0 -1.5 8.0 120.0 drawRotated apply
+"target/globe150.ppm" -2.0 -1.5 8.0 150.0 drawRotated apply
+"target/globe180.ppm" -2.0 -1.5 8.0 180.0 drawRotated apply
+"target/globe210.ppm" -2.0 -1.5 8.0 210.0 drawRotated apply
+"target/globe240.ppm" -2.0 -1.5 8.0 240.0 drawRotated apply
+"target/globe270.ppm" -2.0 -1.5 8.0 270.0 drawRotated apply
+"target/globe300.ppm" -2.0 -1.5 8.0 300.0 drawRotated apply
+"target/globe330.ppm" -2.0 -1.5 8.0 330.0 drawRotated apply
+
