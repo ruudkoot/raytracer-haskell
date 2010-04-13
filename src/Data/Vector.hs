@@ -70,6 +70,8 @@ normalize = vnorm
 magnitude :: Vec -> Flt
 magnitude = vlen
 
+magnitudeSquared :: Vec -> Flt
+magnitudeSquared = vlensqr
 
 -- | Sadly, we cannot define Vec as an instance of Functor, as it has kind *.
 -- but this will do.

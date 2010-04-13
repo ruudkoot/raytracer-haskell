@@ -1,5 +1,5 @@
 module Test where
-import Tests.Input.GML.Parser
+import Tests.GML.Parser
 import Tests.Renderer.Intersections
 import Test.QuickCheck
 
