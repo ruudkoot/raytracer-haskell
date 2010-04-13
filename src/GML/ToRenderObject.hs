@@ -1,13 +1,13 @@
-module Input.GML.ToRenderObject where
+module GML.ToRenderObject where
 
 import           Data.Angle
 import           Data.Colour
 import           Data.Transformation
 import           Data.Texture
 
-import qualified Input.GML.AST      as GML
-import qualified Input.GML.Evaluate as Evil
-import qualified Renderer.Scene     as Renderer
+import qualified GML.AST        as GML
+import qualified GML.Evaluate   as Evil
+import qualified Renderer.Scene as Renderer
 
 toRenderObject :: Textures -> GML.Object -> Renderer.Object
 toRenderObject txs = flip (GML.foldObject algebra) identityTransformation

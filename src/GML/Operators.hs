@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Input.GML.Operators (operators,runOp,Operator) where
+module GML.Operators (operators,runOp,Operator) where
 
 import Postlude
 
@@ -21,7 +21,7 @@ import qualified Base.Shape.Cube                    as Cube
 import {-# SOURCE #-} qualified Base.Shape.GMLShape as GMLShape (GMLShape(..))
 import qualified Base.Shape.Cone                    as Cone
 
-import           Input.GML.AST                   hiding (State)
+import           GML.AST                   hiding (State)
 
 type Op = StateT Stack (Either String) 
 

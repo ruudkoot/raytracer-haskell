@@ -7,7 +7,7 @@ import Data.Angle
 import Data.Colour   (Colour(..), Colours, toRGB, toColour)
 import Data.Vector   (toVec3D, (!.!), Ray, mkRay, rDirection, vector3D, vmap, Pt3D, Vec3D)
 
-import Input.GML.RunGML (runGML, toWorld)
+import GML.RunGML    (runGML, toWorld)
 
 import Output.PPM    (toSize, toPPM)
 

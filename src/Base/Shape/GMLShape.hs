@@ -2,11 +2,13 @@
 
 module Base.Shape.GMLShape where
 
+import Data.Vector
+
 import Base.Shape
 import Base.Shader
-import Data.Vector
-import Input.GML.AST
-import Input.GML.Evaluate
+
+import GML.AST
+import GML.Evaluate
 
 data GMLShape = GMLShape
     { closureGetNormal' :: Closure

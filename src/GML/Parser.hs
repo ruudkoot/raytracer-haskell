@@ -1,4 +1,4 @@
-module Input.GML.Parser (parseGML, module Input.GML.AST) where
+module GML.Parser (parseGML, module GML.AST) where
 
 import Text.ParserCombinators.Parsec.Token
 import Control.Monad
@@ -6,9 +6,9 @@ import Control.Monad
 import Data.Char
 import qualified Data.Map as Map
 
-import Input.GML.Parser.ApplicativeParsec
-import Input.GML.AST
-import Input.GML.Operators
+import GML.Parser.ApplicativeParsec
+import GML.AST
+import GML.Operators
 
 gmlOperators::[String]
 gmlOperators = ["apply","if"] ++ Map.keys operators

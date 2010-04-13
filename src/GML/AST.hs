@@ -1,7 +1,7 @@
 {-# LANGUAGE Rank2Types #-}
 {-# LANGUAGE GADTs      #-}
 
-module Input.GML.AST where
+module GML.AST where
 
 import           Control.Monad
 
