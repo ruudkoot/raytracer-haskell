@@ -6,6 +6,7 @@ import           Data.Transformation
 import           Data.Texture
 
 import Base.BoundingSphere
+import Base.Shape
 
 import qualified GML.AST        as GML
 import qualified GML.Evaluate   as Evil
@@ -33,13 +34,6 @@ toRenderObject txs obj = GML.foldObject algebra obj $ identityTransformation
                                               
             )
                     
-{-bbox :: Renderer.Object -> Bbox 
-bbox (Renderer.Simple s   _ _ b) = b
-bbox (Renderer.Union      _ _ b) = b 
-bbox (Renderer.Intersect  _ _ b) = b
-bbox (Renderer.Difference _ _ b) = b
--}
-
 bsphere :: Renderer.Object -> BSphere
 bsphere (Renderer.Simple s   _ _ b) = b
 bsphere (Renderer.Union      _ _ b) = b 
@@ -51,12 +45,6 @@ updateBSphere f (Renderer.Simple s   sh t  b) = Renderer.Simple s sh t (f b)
 updateBSphere f (Renderer.Union      o1 o2 b) = Renderer.Union o1 o2 (f b)
 updateBSphere f (Renderer.Intersect  o1 o2 b) = Renderer.Intersect o1 o2 (f b)
 updateBSphere f (Renderer.Difference o1 o2 b) = Renderer.Difference o1 o2 (f b)
-
-transformBbox :: Bbox -> Transformation -> Bbox 
-transformBbox (Bbox p1 p2) trans = Bbox (toVec3D (min x1 x2) (min y1 y2) (min z1 z2))
-                                        (toVec3D (max x1 x2) (max y1 y2) (max z1 z2))
-  where (Vec x1 y1 z1) = invxfm_vec trans p1 
-        (Vec x2 y2 z2) = invxfm_vec trans p2
 
 toWorld :: Textures -> GML.Scene -> Renderer.Scene
 toWorld txs (GML.Scene amb l obj dp fov w h fil) = 

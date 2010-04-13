@@ -36,7 +36,7 @@ type Intersections = Ranges IntersectionInfo
 -- | Creates an interseciton between a ray and an object, requires an object and
 -- a ray in world coordinates.
 intersectObject::Ray -> Object -> Intersections
-intersectObject ray obj@(Simple shape tr1 _) = 
+intersectObject ray obj@(Simple shape tr1 _ _) = 
     let rayt = transformRay ray tr1
     in case intervals rayt shape of
                Just (t1,t2) -> [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
@@ -48,7 +48,7 @@ intersectObject _ _ = error "the impossible happened"
 -- build the resulting IntersectionInfo. Ray shoudl be a ray
 -- in local space
 buildIntersection :: Ray -> Object -> Double -> IntersectionInfo
-buildIntersection rayt (Simple shape tr1 sh) t = 
+buildIntersection rayt (Simple shape tr1 sh _) t = 
     IntersectionInfo 
        { location     = transformPoint tr1 loc --location in world
        , normal       = normalize $ transformNormal tr1 (getNormal shape rayt loc) --normal in world
