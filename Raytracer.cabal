@@ -28,5 +28,5 @@ Executable raytrace
                   , bytestring >= 0.9.1
                   , split      >= 0.1
                   , cmdargs    == 0.1
-  GHC-Options:      -O3 -Wall -funbox-strict-fields -threaded
+  GHC-Options:      -O2 -Wall -funbox-strict-fields -threaded
   Hs-Source-Dirs:   src/
