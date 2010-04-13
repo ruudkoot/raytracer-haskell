@@ -42,7 +42,7 @@ Executable raytrace
                     Renderer.IlluminationModel Renderer.IntersectionInfo
                     Renderer.Intersections Renderer.Renderer 
                     Renderer.Scene Postlude
-                    Tests.Data.Range Tests.Data.Matrix Tests.Data.Vector
+                    Tests.Data.Range Tests.Data.Transformation Tests.Data.Vector
                     Tests.Input.GML.AST Tests.Input.GML.Parser
                     Tests.Renderer.Datatypes Tests.Renderer.Intersections
   Hs-Source-Dirs:   src/
