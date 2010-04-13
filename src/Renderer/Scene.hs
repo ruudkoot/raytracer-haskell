@@ -33,10 +33,17 @@ data Options = Options
   , height   :: Int
   , file     :: FilePath }
   
+<<<<<<< HEAD:src/Renderer/Scene.hs
 data Object = forall s f. Shape s f => Simple     s Transformation Shader BSphere
             |                          Union      Object Object BSphere
             |                          Intersect  Object Object BSphere
             |                          Difference Object Object BSphere
+=======
+data Object = forall s f. Shape s f => Simple     s Transformation Shader
+            |                          Union      Object Object
+            |                          Intersect  Object Object
+            |                          Difference Object Object
+>>>>>>> 5aa912faa5275ff96ce3ec6f460a39cc1a398c17:src/Renderer/Scene.hs
 
 
 -- | Returns the width and height of 

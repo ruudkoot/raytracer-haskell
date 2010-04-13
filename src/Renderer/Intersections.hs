@@ -3,7 +3,6 @@
 module Renderer.Intersections where
 
 import Data.Vector 
-import Data.Glome.Vec (Bbox(..), bbclip, Interval(..))
 
 import Renderer.ConstructiveSolidGeometry
 import Renderer.IntersectionInfo
@@ -18,6 +17,7 @@ import Base.BoundingSphere
 -- ray and an object.
 --
 intersect :: Ray -> Object -> Intersections
+<<<<<<< HEAD:src/Renderer/Intersections.hs
 intersect ray o@(Simple _ _  _  _   ) = intersectObject ray o 
 intersect ray (Union      o1 o2 bbox) = ifInSphere ray o1 o2 bbox unionI 
 intersect ray (Difference o1 o2 bbox) = ifInSphere ray o1 o2 bbox differenceI 
@@ -40,6 +40,12 @@ bboxHit :: Ray -> Bbox -> Bool
 bboxHit ray bbox = i1 < i2
   where (Interval i1 i2) = bbclip ray bbox
 -}
+=======
+intersect ray o@(Simple _ _ _) = let x = intersectObject ray o in x--if not (null x) then trace (show x) x else x
+intersect ray (Union      o1 o2) = csg unionI      ray o1 o2
+intersect ray (Difference o1 o2) = csg differenceI ray o1 o2
+intersect ray (Intersect  o1 o2) = csg intersectI  ray o1 o2
+>>>>>>> 5aa912faa5275ff96ce3ec6f460a39cc1a398c17:src/Renderer/Intersections.hs
 
 -- | Helper function for perofrming CSG using the functions defined 
 -- in Renderer.CSG

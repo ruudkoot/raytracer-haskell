@@ -21,4 +21,4 @@ instance Shape Sphere () where
                          u     = phi / pi2
                          v     = (pi - theta) / pi                        
                      in ((), u, v)
-    boundingBox _ = Bbox (toVec3D (-1) (-1) (-1)) (toVec3D 1 1 1)
+

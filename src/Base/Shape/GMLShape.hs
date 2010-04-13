@@ -13,14 +13,12 @@ import GML.Evaluate
 data GMLShape = GMLShape
     { closureGetNormal' :: Closure
     , closureIntervals' :: Closure
-    , closureUV         :: Closure
-    , closureBoundingBox:: Closure }
+    , closureUV         :: Closure }
 
 instance Shape GMLShape Int where
     getNormal' = getNormalClosure'.closureGetNormal'
     intervals' = intervalsClosure'.closureIntervals'
     uv'        = uvClosure.closureUV
-    boundingBox = boundingBoxClosure.closureBoundingBox
     
 getNormalClosure' :: Closure -> Pt3D -> Vec3D
 getNormalClosure' (e, c) p = let s = [Point p]
@@ -49,10 +47,3 @@ uvClosure (e, c) p = let s = [Point p]
                      in case s' of
                           [BaseValue (Int i), BaseValue (Real u), BaseValue (Real v)] -> (i, u, v)
                           _ -> error ("error in uv closure: expected Int, Real, Real on stack, found " ++ show s')
-                          
-boundingBoxClosure :: Closure -> Bbox
-boundingBoxClosure (e, c) = let s = []
-                                (_, s', _) = evaluate (e, s, c)
-                            in case s' of
-                                 [Point a, Point b] -> Bbox a b
-                                 _ -> error ("error in uv closure: expected Point, Point on stack, found " ++ show s')

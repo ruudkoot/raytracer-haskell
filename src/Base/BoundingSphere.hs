@@ -5,6 +5,9 @@ import Postlude
 
 data BSphere = BSphere Vector Double
 
+infiniteSphere::BSphere
+infiniteSphere = BSphere (toVec3D 0.0 0.0 0.0) positiveInfinity
+
 bSphereIntersect::Ray -> BSphere -> [Double]
 bSphereIntersect ray (BSphere loc rad) = 
     let (k, dir) = (rOrigin ray - loc, rDirection ray)
@@ -32,7 +35,7 @@ intersectSpheres (BSphere pos1 r1) (BSphere pos2 r2) =
         midoff = s2dist + overlap*0.5
         newpos = pos1 + ((midoff*) `vmap` (normalize dir))
     in if overlap < 0.0 then BSphere (toVec3D 0.0 0.0 0.0) 0.0
-       else BSphere newpos (min r1 r2)
+       else BSphere newpos (max r1 r2)
 
 differenceSpheres::BSphere -> BSphere -> BSphere
 differenceSpheres = const
