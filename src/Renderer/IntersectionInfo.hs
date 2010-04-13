@@ -62,10 +62,9 @@ buildIntersection  _   _                    _  = error "the impossible happened"
 -- | Returns the nearest @t@.
 --
 nearest :: Intersections -> Maybe IntersectionInfo
-nearest []          = Nothing
-nearest ((i1,i2):_) = if distance i1 > 0.0 
-                      then Just i1
-                      else if distance i2 == positiveInfinity 
-                           then Nothing
-                           else Just i2
+nearest []             = Nothing
+nearest ((i1, i2) : _) | distance i1 > 0.0               = Just i1
+                       | distance i2 == positiveInfinity = Nothing
+                       | otherwise                       = Just i2
+
 
