@@ -9,7 +9,7 @@ import Data.Vector   (toVec3D, (!.!), Ray, mkRay, rDirection, vector3D, vmap, Pt
 
 import Input.GML.RunGML (runGML, toWorld)
 
-import Output.PPM    (toSize, toPPM)
+import Output.PPM    (toPPM)
 
 import Renderer.IntersectionInfo (IntersectionInfo(..),nearest)
 import Renderer.Intersections    (intersect)
@@ -76,7 +76,7 @@ reflectedRay origin rdirection norm = mkRay clearasil direction
 -- location of which is specified in the GML)
 --
 saveRendering :: World -> Colours Int -> IO ()
-saveRendering world pix = maybe bad save $! toPPM (toSize w) (toSize h) pix
+saveRendering world pix = maybe bad save $! toPPM w h pix
   where bad    = error "Error: didn't produce a valid PPM image."
         (w,h)  = getDimensions world
         save p = do putStrLn ("writing result to " ++ roFile (wOptions world)) ;
