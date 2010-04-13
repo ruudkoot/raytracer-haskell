@@ -1,4 +1,5 @@
 %texture "globe" "globe.jpg"
+%texture "wood" "wood.jpg"
 
 %
 %globe
@@ -48,8 +49,7 @@ connect  union
 /frame
 
 %
-%total scene
-%
+%Globe frame
 frame
 globe
 union
@@ -57,6 +57,9 @@ union
 40.0 rotatey
 /globeframe
 
+%
+% Globe base
+%
 { /v /u /face
   0.8 0.2 0.8 point
   0.5 1.0 1.0
@@ -76,14 +79,64 @@ basestand
 union
 /base
 
+%
+%Full globe
+%
 globeframe
 0.0 2.0 0.0 translate
 base
 union
-0.0 0.0 4.0 translate
+/fullglobe
+
+%
+%table
+%
+{ /v /u /face
+  "wood"
+  0.5 1.0 1.0
+} cube /tablewood
+
+{
+tablewood
+0.4 5.0 0.4 scale } /leg
+
+tablewood
+8.0 0.4 10.0 scale
+leg apply 0.0 -5.0 0.0 translate
+union
+leg apply 7.6 -5.0 0.0 translate
+union
+leg apply 0.0 -5.0 9.6 translate
+union
+leg apply 7.6 -5.0 9.6 translate
+union
+-4.0 -0.4 -5.0 translate
+/table
+
+%
+%ground plane
+%
+{ /v /u /face
+  0.8 0.3 0.5 point
+  0.5 1.0 1.0
+} plane /floorplane
+
+
+%
+%scene
+%
+table
+0.6 uscale
+floorplane
+0.0 -3.0 0.0 translate
+union
+fullglobe
+-1.0 0.0 -1.0 translate
+union
+-4.0 -3.0 10.0 translate
 /scene
 
--2.0 0.0 -1.0 point
+-10.0 4.0 -1.0 point
 1.0 1.0 1.0 point pointlight /l
 
 0.3 0.3 0.3 point
