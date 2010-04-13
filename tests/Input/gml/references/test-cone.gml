@@ -21,7 +21,7 @@ blueCone   2.5 -1.0 3.0 translate
 union union /scene
 
 				% directional light
-1.0 0.0 0.0 point		  % direction
+1.0 1.0 0.5 point		  % direction
 0.75 0.75 0.75 point light /l	  % directional light
 
 				% render
