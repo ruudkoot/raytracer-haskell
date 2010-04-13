@@ -56,8 +56,10 @@ prop_diffSpan2::TRanges -> Property
 prop_diffSpan2 (TRanges r) = not (null r) ==> unionRanges r (diffRanges [span r] r) == [span r]
 
 --Cross validity
+{-
 prop_unionComplement::TRanges -> Property
 prop_unionComplement (TRanges r) = not (null r) ==> unionRanges r (complement r) == [span r]
 
 prop_cValid::TRanges -> TRanges -> Property
 prop_cValid (TRanges r1) (TRanges r2) = not (null r2) ==> diffRanges r1 r2 == intersectRanges r1 (complementIn (-10000,10000) r2)
+-}
