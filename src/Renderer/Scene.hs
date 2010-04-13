@@ -10,6 +10,7 @@ import Base.Light
 import Base.Shape
 import Base.Shader
 
+import Base.BoundingSphere
 -- * Types
 
 -- ** World
@@ -32,10 +33,10 @@ data Options = Options
   , height   :: Int
   , file     :: FilePath }
   
-data Object = forall s f. Shape s f => Simple     s Transformation Shader Bbox
-            |                          Union      Object Object Bbox
-            |                          Intersect  Object Object Bbox
-            |                          Difference Object Object Bbox
+data Object = forall s f. Shape s f => Simple     s Transformation Shader BSphere
+            |                          Union      Object Object BSphere
+            |                          Intersect  Object Object BSphere
+            |                          Difference Object Object BSphere
 
 
 -- | Returns the width and height of 

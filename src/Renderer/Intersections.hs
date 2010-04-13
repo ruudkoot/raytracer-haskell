@@ -9,6 +9,8 @@ import Renderer.ConstructiveSolidGeometry
 import Renderer.IntersectionInfo
 import Renderer.Scene
 
+import Base.BoundingSphere
+
 -- * Intersections 
 
 
@@ -17,11 +19,19 @@ import Renderer.Scene
 --
 intersect :: Ray -> Object -> Intersections
 intersect ray o@(Simple _ _  _  _   ) = intersectObject ray o 
-intersect ray (Union      o1 o2 bbox) = ifInBbox ray o1 o2 bbox unionI 
-intersect ray (Difference o1 o2 bbox) = ifInBbox ray o1 o2 bbox differenceI 
-intersect ray (Intersect  o1 o2 bbox) = ifInBbox ray o1 o2 bbox intersectI
+intersect ray (Union      o1 o2 bbox) = ifInSphere ray o1 o2 bbox unionI 
+intersect ray (Difference o1 o2 bbox) = ifInSphere ray o1 o2 bbox differenceI 
+intersect ray (Intersect  o1 o2 bbox) = ifInSphere ray o1 o2 bbox intersectI
 
-ifInBbox :: Ray -> Object -> Object -> Bbox -> CSG -> Intersections
+ifInSphere :: Ray -> Object -> Object -> BSphere -> CSG -> Intersections
+ifInSphere ray o1 o2 bsphere f = if sphereHit ray bsphere 
+                                 then csg f ray o1 o2 
+                                 else []
+
+sphereHit :: Ray -> BSphere -> Bool 
+sphereHit ray bsphere = not.null $ bSphereIntersect ray bsphere
+
+{-ifInBbox :: Ray -> Object -> Object -> Bbox -> CSG -> Intersections
 ifInBbox ray o1 o2 bbox f = if bboxHit ray bbox 
                               then csg f ray o1 o2 
                               else []
@@ -29,6 +39,7 @@ ifInBbox ray o1 o2 bbox f = if bboxHit ray bbox
 bboxHit :: Ray -> Bbox -> Bool 
 bboxHit ray bbox = i1 < i2
   where (Interval i1 i2) = bbclip ray bbox
+-}
 
 -- | Helper function for perofrming CSG using the functions defined 
 -- in Renderer.CSG

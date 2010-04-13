@@ -1,2 +1,3 @@
-%include "three-cubes.gml"
-%include "sphere.gml"
+%include "spheres.gml"
+
+s s

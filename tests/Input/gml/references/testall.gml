@@ -1,3 +1,4 @@
+%include "test-sphere.gml"
 %include "intercyl.gml"
 %include "checked-cube.gml"
 %include "golf.gml"
@@ -8,4 +9,4 @@
 %include "test-plane.gml"
 %include "intercones.gml"
 %include "intercubes.gml"
-%include "test-sphere.gml"
+

@@ -1,11 +1,6 @@
-% spheres.gml
-%
-% OUTPUTS: spheres.gml
-%
-% A pair of spheres over a white plane
-%
 
-#include "surface.ins"
+
+%include "surface.ins"
 
 				% a sphere
 { /v /u /face			  % bind arguments

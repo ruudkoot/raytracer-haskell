@@ -6,6 +6,8 @@ import Base.Shape
 import Data.Vector
 import Postlude
 
+import Base.BoundingSphere
+
 data Plane = Plane
 
 instance Shape Plane () where
@@ -24,4 +26,4 @@ instance Shape Plane () where
                                       else [negativeInfinity ,t]
     uv'        _ v = ((), getX3D v, getZ3D v)
     boundingBox _ = Bbox (toVec3D negativeInfinity 0 negativeInfinity) (toVec3D positiveInfinity 0 positiveInfinity)
-
+    boundingSphere _ = BSphere (toVec3D 0.0 0.0 0.0) positiveInfinity
