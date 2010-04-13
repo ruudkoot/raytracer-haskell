@@ -1,6 +1,10 @@
 {-# LANGUAGE DeriveDataTypeable #-}
--- | File containing the commandline args datastructure, factored out for usage
---   further in the program.
+
+-- | File containing the command line 
+-- arguments data type; factored out 
+-- for usage further in the program.
+-- (Project.hs and Renderer/Renderer.hs)
+--
 module Base.CLI where
 
 import System.Console.CmdArgs
@@ -23,10 +27,10 @@ usage = unlines
 -- | Standard command line options. 
 --
 standard :: Mode ProgramOptions
-standard = mode $ ProgramOptions 
+standard = mode ProgramOptions 
             { 
               bloom = def &= text "Enable bloom filter"  
             , aa    = 1   &= text "Enable anti-aliasing" 
-            , files = def &= text "FILE"                 & args
+            , files = def &= text "FILES" & args
             }
 

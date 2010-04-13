@@ -104,5 +104,5 @@ mkRayMaker aa x y dx dy i j aai aaj = mkRay eye dir
                        , y + fromIntegral j * dy + 0.5*aady + fromIntegral aaj * aady
                        , 1
                        )
-        aadx = dx / (fromIntegral aa)
-        aady = dy / (fromIntegral aa)
+        aadx = dx / fromIntegral aa
+        aady = dy / fromIntegral aa
