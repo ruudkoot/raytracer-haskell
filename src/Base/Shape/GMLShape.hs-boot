@@ -7,6 +7,7 @@ import GML.AST
 data GMLShape = GMLShape
     { closureGetNormal' :: Closure
     , closureIntervals' :: Closure
-    , closureUV         :: Closure }
+    , closureUV         :: Closure
+    , closureBoundingBox:: Closure }
 
 instance Shape GMLShape Int
