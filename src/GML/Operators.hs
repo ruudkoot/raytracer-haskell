@@ -178,7 +178,7 @@ operators = fromList [ ( "addi"      ,       iii (+)                       ) -- 
                      , ( "point"     ,      rrrp (\x y z -> vector3D (x, y, z)))
                      , ( "get"       ,       aiv (!!)                      ) -- arrays
                      , ( "length"    ,        ai length                    )
-                     , ( "sphere"    ,        co (Simple Sphere.Sphere)   )) -- Primitive Objects
+                     , ( "sphere"    ,        co (Simple Sphere.Sphere    )) -- Primitive Objects
                      , ( "cube"      ,        co (Simple Cube.Cube        ))
                      , ( "gmlshape"  ,       co4 (\x y z -> Simple (GMLShape.GMLShape x y z)))
                      , ( "cylinder"  ,        co (Simple Cylinder.Cylinder))
