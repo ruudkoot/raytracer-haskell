@@ -13,8 +13,9 @@ instance Shape Plane () where
     intervals' _ r = let (oy, ry) = (getY3D $ rOrigin r, getY3D $ rDirection r)
                       in if (oy == 0)
                          then []
-                         else let t = -oy/ry
-                              in if oy > 0.0 --aan normal kant ?
+                         else --[-oy/ry, positiveInfinity]
+                              let t = -oy/ry
+                              in if oy < 0.0 --aan normal kant ?
                                  then if t > 0.0 --naar plane toe?
                                       then [-positiveInfinity,t]
                                       else [t, positiveInfinity]
