@@ -1,4 +1,4 @@
-module Output.PPM (toPPM) where 
+module Output.PPM (toPPM, toSize) where 
 
 import Data.Char (chr)
 import Data.Colour

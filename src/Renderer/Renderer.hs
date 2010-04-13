@@ -9,8 +9,7 @@ import Data.Vector   (toVec3D, (!.!), Ray, mkRay, rDirection, vector3D, vmap, Pt
 
 import Input.GML.RunGML (runGML, toWorld)
 
-import Output.Output (toSize)
-import Output.PPM    (toPPM)
+import Output.PPM    (toSize, toPPM)
 
 import Renderer.IntersectionInfo (IntersectionInfo(..),nearest)
 import Renderer.Intersections    (intersect)
