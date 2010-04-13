@@ -45,7 +45,7 @@ dcone 0.0 -2.0 0.0 translate union
 0.4 0.5 0.6 point pointlight /l2
 
 0.5 0.5 0.5 point                 % ambient light
-[ l1 ]                         % lights
+[ l1 l2 ]                         % lights
 %1.0 0.01 0.001 point		  % light attenuation
 scene                             % scene to render
 20                                % tracing depth

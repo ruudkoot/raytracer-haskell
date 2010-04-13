@@ -7,7 +7,7 @@
 { /color
   { /v /u /face			  % bind arguments
     color			  % surface color
-    0.8 0.0 10.0		  % kd ks n
+    0.8 0.2 10.0		  % kd ks n
   } cone 1.0 2.0 1.0 scale
 } /mkCone
 
@@ -25,7 +25,7 @@ union union /scene
 0.75 0.75 0.75 point light /l	  % directional light
 
 				% render
-0.0 0.0 0.0 point		  % ambient light
+0.25 0.25 0.25 point		  % ambient light
 [ l ]				  % lights
 %1.0 0.0 0.0 point		  % light attenuation
 scene				  % scene to render
