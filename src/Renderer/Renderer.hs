@@ -58,13 +58,13 @@ renderPixel dep aa raymaker world x y = toRGB . toColour . vmap ( / aasquared) .
     aasquared  = fromIntegral $ aa*aa
     aaraymaker = raymaker x y
     renderPixel' depth ray k = 
-      case intersect ray (wObject world) of 
-        []   -> k $! toVec3D 0 0 0 -- No intersections. Intensity=0
-        rs -> if depth == 0 then k $! toVec3D 0 0 0
-              else let info      = nearest rs
-                       surface   = runShader (shader info) $! textureCoord info
-                       reflected = reflectedRay (location info) (rDirection ray) (normal info)
-                   in renderPixel' (depth - 1) reflected $! (k . localLighting info world surface ray) 
+      let rs = intersect ray (wObject world)
+      in if depth == 0 || null rs 
+           then k $! toVec3D 0 0 0 
+           else let info      = nearest rs
+                    surface   = runShader (shader info) $! textureCoord info
+                    reflected = reflectedRay (location info) (rDirection ray) (normal info)
+                in renderPixel' (depth - 1) reflected $! (k . localLighting info world surface ray) 
                 
                     
 reflectedRay :: Pt3D -> Vec3D -> Vec3D -> Ray 
