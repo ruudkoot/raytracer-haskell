@@ -22,9 +22,12 @@ toRenderObject txs = flip (GML.foldObject algebra) identityTransformation
             , \o d           trans -> o (trans !*! rotateX (toRadians d))
             , \o d           trans -> o (trans !*! rotateY (toRadians d))
             , \o d           trans -> o (trans !*! rotateZ (toRadians d))
-            , \o1 o2         trans -> Renderer.Union      (o1 trans) (o2 trans) (bbjoin (bbox $ o1 trans) (bbox $ o2 trans) `transformBbox` trans)
-            , \o1 o2         trans -> Renderer.Intersect  (o1 trans) (o2 trans) (bboverlap (bbox $ o1 trans) (bbox $ o2 trans) `transformBbox` trans)
-            , \o1 o2         trans -> Renderer.Difference (o1 trans) (o2 trans) (bbjoin (bbox $ o1 trans) (bbox $ o2 trans) `transformBbox` trans)
+            , \o1 o2         trans -> Renderer.Union      (o1 trans) (o2 trans) 
+                                      (bbjoin (bbox $ o1 trans) (bbox $ o2 trans) `transformBbox` trans)
+            , \o1 o2         trans -> Renderer.Intersect  (o1 trans) (o2 trans) 
+                                      (bboverlap (bbox $ o1 trans) (bbox $ o2 trans) `transformBbox` trans)
+            , \o1 o2         trans -> Renderer.Difference (o1 trans) (o2 trans) 
+                                      ((bbox $ o1 trans) `transformBbox` trans)
             )
                     
 bbox :: Renderer.Object -> Bbox 
