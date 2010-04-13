@@ -29,4 +29,8 @@ Executable raytrace
                   , split      >= 0.1
                   , cmdargs    == 0.1
   GHC-Options:      -O2 -Wall -funbox-strict-fields -threaded
+  Other-Modules:    Base.CLI Base.Light Base.Shader Base.Shape
+                    Base.Shape.Cone Base.Shape.Cube Base.Shape.Cylinder 
+                    Base.Shape.GMLShape Base.Shape.Plane 
+                    Base.Shape.Sphere	
   Hs-Source-Dirs:   src/
