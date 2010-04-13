@@ -12,22 +12,28 @@ import qualified GML.AST        as GML
 import qualified GML.Evaluate   as Evil
 import qualified Renderer.Scene as Renderer
 
+data SBox = SingleBox Bbox 
+          | UnionBox SBox SBox
+          | IntersectBox SBox SBox
+
 toRenderObject :: Textures -> GML.Object -> Renderer.Object
-toRenderObject txs = flip (GML.foldObject algebra) identityTransformation
+toRenderObject txs = fst $ flip (GML.foldObject algebra) identityTransformation
     where algebra = ( GML.SimpleTransformer $
-              \shape closure trans -> Renderer.Simple shape trans (Evil.shader txs closure) (transformBbox (boundingBox shape) trans)
-            , \o d1 d2 d3    trans -> o (trans !*! translate d1 d2 d3)
-            , \o d1 d2 d3    trans -> o (trans !*! scale d1 d2 d3)
-            , \o d           trans -> o (trans !*! scale d d d)
-            , \o d           trans -> o (trans !*! rotateX (toRadians d))
-            , \o d           trans -> o (trans !*! rotateY (toRadians d))
-            , \o d           trans -> o (trans !*! rotateZ (toRadians d))
-            , \o1 o2         trans -> Renderer.Union      (o1 trans) (o2 trans) 
-                                      (bbjoin (bbox $ o1 trans) (bbox $ o2 trans) `transformBbox` trans)
-            , \o1 o2         trans -> Renderer.Intersect  (o1 trans) (o2 trans) 
-                                      (bboverlap (bbox $ o1 trans) (bbox $ o2 trans) `transformBbox` trans)
-            , \o1 o2         trans -> Renderer.Difference (o1 trans) (o2 trans) 
-                                      ((bbox $ o1 trans) `transformBbox` trans)
+              \shape closure    trans      -> (Renderer.Simple shape trans (Evil.shader txs closure), 
+                                               SingleBox (boundingBox shape), trans)
+            , \(o,b,t) d1 d2 d3 trans      -> (o (trans !*! translate d1 d2 d3), b, undefined)
+            , \(o,b,t) d1 d2 d3 trans      -> (o (trans !*! scale d1 d2 d3), b, undefined)
+            , \(o,b,t) d        trans      -> (o (trans !*! scale d d d), b, undefined)
+            , \(o,b,t) d        trans      -> (o (trans !*! rotateX (toRadians d)), b, undefined)
+            , \(o,b,t) d        trans      -> (o (trans !*! rotateY (toRadians d)), b, undefined)
+            , \(o,b,t) d        trans      -> (o (trans !*! rotateZ (toRadians d)), b, undefined)
+            , \(o1,b1,t1) (o2,b2,t2) trans -> (Renderer.Union (o1 trans) (o2 trans), 
+                                               UnionBox b1 b2, undefined)
+            , \(o1,b1,t1) (o2,b2,t2) trans -> (Renderer.Intersect  (o1 trans) (o2 trans),
+                                               IntersectBox b1 b2, undefined)
+            , \(o1,b1,t1) (o2,_ ,t2) trans -> (Renderer.Difference (o1 trans) (o2 trans),
+                                               b1, undefined)
+                                              
             )
                     
 bbox :: Renderer.Object -> Bbox 
