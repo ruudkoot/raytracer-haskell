@@ -1,7 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses  #-}
 {-# LANGUAGE FunctionalDependencies #-}
 
-module Base.Shape (Shape (..), Intervals) where
+module Base.Shape (Shape (..), Intervals, Bbox(..)) where
 
 import Postlude
 import Data.Vector

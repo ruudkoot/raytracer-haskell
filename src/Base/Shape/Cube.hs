@@ -45,4 +45,5 @@ instance Shape Cube Face where
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
+    boundingBox _ = Bbox (toVec3D 0 0 0) (toVec3D 1 1 1)
 

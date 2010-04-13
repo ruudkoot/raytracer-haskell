@@ -23,4 +23,5 @@ instance Shape Plane () where
                                       then [t, positiveInfinity]
                                       else [negativeInfinity ,t]
     uv'        _ v = ((), getX3D v, getZ3D v)
+    boundingBox _ = undefined
 
