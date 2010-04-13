@@ -22,13 +22,10 @@ type Transformation = Xfm
 transformPoint::Transformation -> Vec -> Vec
 transformPoint = xfm_point
 
--- | Transform a vector with a transformation matrix. Matrix-vector multiplication.
-transformVector::Transformation -> Vec -> Vec
-transformVector = xfm_vec
-
--- | Transform a vector with an inverse transformation matrix. Matrix-vector multiplication.
-transformVector'::Transformation -> Vec -> Vec
-transformVector' = invxfm_vec
+-- | Transform a normal with a transformation matrix. Not the same as
+--   transforming a vector or a point, as it needs to remain a normal.
+transformNormal :: Transformation -> Vec -> Vec
+transformNormal = invxfm_norm
 
 -- | Identity matrix transformation
 identityTransformation::Transformation

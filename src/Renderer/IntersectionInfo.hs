@@ -51,7 +51,7 @@ buildIntersection :: Ray -> Object -> Double -> IntersectionInfo
 buildIntersection rayt (Simple shape tr1 sh) t = 
     IntersectionInfo 
        { location     = transformPoint tr1 loc --location in world
-       , normal       = normalize $ transformVector tr1 (getNormal shape rayt loc) --normal in world
+       , normal       = normalize $ transformNormal tr1 (getNormal shape rayt loc) --normal in world
        , distance     = t 
        , textureCoord = uv shape loc
        , shader       = sh
