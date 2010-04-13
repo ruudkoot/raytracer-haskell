@@ -39,10 +39,10 @@ intersectObject::Ray -> Object -> Intersections
 intersectObject ray obj@(Simple shape tr1 _) = 
     let rayt = transformRay ray tr1
     in case intervals rayt shape of
-               Just t -> let (t1, t2) = sort2 t 
-                         in [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
-               Nothing -> []
+               Just (t1,t2) -> [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
+               Nothing      -> []
 intersectObject _ _ = error "the impossible happened"
+
 
 -- | Helper function used by @intersectObject@ to 
 -- build the resulting IntersectionInfo. Ray shoudl be a ray
@@ -69,15 +69,3 @@ nearest ((i1,i2):_) = if distance i1 > 0.0
                            then Nothing
                            else Just i2
 
-{-
-nearesttwo :: Intersections -> (Double, Double)
-nearesttwo = minimumtwo . filter (>0.0)
-    
-minimumtwo :: Ord a => [a] -> (a,a)
-minimumtwo [a] = (a,a)
-minimumtwo (x:y:ys) = f ys (min x y, max x y)
-  where f    []  res                     = res
-        f (x:xs) (min, mmin) | x < min   = f xs (x, min)
-                             | x < mmin  = f xs (min, x)
-                             | otherwise = f xs (min, mmin)
--}

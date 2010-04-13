@@ -12,7 +12,7 @@ data Face     = Outside | Top | Bottom deriving Enum
 instance Shape Cylinder Face where
     getNormal' _ v | 0.0 ~= y = vector3D (0.0,-1.0,0.0)
                    | 1.0 ~= y = vector3D (0.0, 1.0,0.0)
-                   | otherwise   = normalize $ vector3D (2*x,0.0,2*z)
+                   | otherwise   = normalize $ vector3D (x,0.0,z)
                    where x = getX3D v
                          y = getY3D v
                          z = getZ3D v
