@@ -4,7 +4,7 @@ module Renderer.Intersections where
 
 import Data.Vector 
 
-import Renderer.CSG
+import Renderer.ConstructiveSolidGeometry
 import Renderer.IntersectionInfo
 import Renderer.Scene
 
@@ -33,7 +33,7 @@ csg f ray o1 o2 = f (iray o1) (iray o2)
 -- the intersect functions.
 --
 hit :: Ray -> Object -> Bool
-hit r o = case nearest (intersect r o) of            
+hit r o = case nearest (r `intersect` o) of            
             Nothing -> False
             Just near -> let t = distance near in (t > 0.0 && t < 1.0)
 

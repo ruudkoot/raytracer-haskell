@@ -19,7 +19,7 @@ import           Test.QuickCheck
 
 data Scene = Scene
   { sceneAmbience :: Pt3D
-  , sceneLights   :: [Light.RenderLight]
+  , sceneLights   :: [Light.Light]
   , sceneObj      :: Object
   , sceneDepth    :: Int
   , sceneFov      :: Degrees
@@ -105,7 +105,7 @@ type Code      = [Token]
 type Closure   = (Env, Code)
 
 type Point     = Vector3D
-type Light     = Light.RenderLight
+type Light     = Light.Light
 
 data Value     = BaseValue BaseValue
                | Closure   Closure

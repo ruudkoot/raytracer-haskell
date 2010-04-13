@@ -2,7 +2,7 @@ module Base.Light where
 
 import Data.Vector
 
-data RenderLight = 
+data Light = 
 
   -- | Light source at pos infinity.
   -- 

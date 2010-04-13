@@ -42,7 +42,7 @@ intersectObject ray obj@(Simple shape tr1 _) =
                Just t -> let (t1, t2) = sort2 t 
                          in [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
                Nothing -> []
-intersectObject _ _ = error "Impossible!"
+intersectObject _ _ = error "the impossible happened"
 
 -- | Helper function used by @intersectObject@ to 
 -- build the resulting IntersectionInfo. Ray shoudl be a ray
@@ -57,7 +57,7 @@ buildIntersection rayt (Simple shape tr1 sh) t =
        , shader       = sh
        } 
   where loc = getPosition rayt t --local intersection point
-buildIntersection  _   _                    _  = error "Impossible!"
+buildIntersection  _   _                    _  = error "the impossible happened"
 
 -- | Returns the nearest @t@.
 --

@@ -1,4 +1,5 @@
-module Renderer.CSG where
+module Renderer.ConstructiveSolidGeometry where
+
 import Renderer.IntersectionInfo
 import Data.Range
 
