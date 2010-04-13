@@ -32,10 +32,10 @@ data Options = Options
   , height   :: Int
   , file     :: FilePath }
   
-data Object = forall s f. Shape s f => Simple     s Transformation Shader Bbox
-            |                          Union      Object Object Bbox
-            |                          Intersect  Object Object Bbox
-            |                          Difference Object Object Bbox
+data Object = forall s f. Shape s f => Simple     s Transformation Shader
+            |                          Union      Object Object
+            |                          Intersect  Object Object
+            |                          Difference Object Object
 
 
 -- | Returns the width and height of 
