@@ -23,7 +23,7 @@ data IntersectionInfo = IntersectionInfo {
     , distance     :: Double         -- ^ Distance between Intersection and eye.
     , textureCoord :: SurfaceCoord   -- ^ Unit world coordinates
     , shader       :: Shader         -- ^ The shader to use to calculate the final color
-    } deriving (Show)
+    } 
 
 instance Eq IntersectionInfo where
     (==) = (==) `on` distance
