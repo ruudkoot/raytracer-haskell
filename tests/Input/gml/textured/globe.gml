@@ -113,12 +113,19 @@ union
 -4.0 -0.4 -5.0 translate
 /table
 
+1.0  1.0  1.0  point /white
+0.3  0.3  0.3  point /grey
+
 %
 %ground plane
 %
 { /v /u /face
-  0.8 0.3 0.5 point
-  0.5 1.0 1.0
+  v floor /i
+  u floor /j
+  i j addi 2 modi 0 eqi
+  { white 1.0 0.2 1.0 }
+  { grey 1.0 0.2 1.0 }
+  if
 } plane /floorplane
 
 
@@ -155,21 +162,44 @@ union
 scene x y z angle rotateAround apply
 2
 90.0
-320 200
+640 480
 file
 render
 } /drawRotated
 
-"target/globe0.ppm" -2.0 -1.5 8.0 0.0 drawRotated apply
-"target/globe30.ppm" -2.0 -1.5 8.0 30.0 drawRotated apply
-"target/globe60.ppm" -2.0 -1.5 8.0 60.0 drawRotated apply
-"target/globe90.ppm" -2.0 -1.5 8.0 90.0 drawRotated apply
+"target/globe000.ppm" -2.0 -1.5 8.0 0.0 drawRotated apply
+"target/globe010.ppm" -2.0 -1.5 8.0 10.0 drawRotated apply
+"target/globe020.ppm" -2.0 -1.5 8.0 20.0 drawRotated apply
+"target/globe030.ppm" -2.0 -1.5 8.0 30.0 drawRotated apply
+"target/globe040.ppm" -2.0 -1.5 8.0 40.0 drawRotated apply
+"target/globe050.ppm" -2.0 -1.5 8.0 50.0 drawRotated apply
+"target/globe060.ppm" -2.0 -1.5 8.0 60.0 drawRotated apply
+"target/globe070.ppm" -2.0 -1.5 8.0 70.0 drawRotated apply
+"target/globe080.ppm" -2.0 -1.5 8.0 80.0 drawRotated apply
+"target/globe090.ppm" -2.0 -1.5 8.0 90.0 drawRotated apply
+"target/globe100.ppm" -2.0 -1.5 8.0 100.0 drawRotated apply
+"target/globe110.ppm" -2.0 -1.5 8.0 110.0 drawRotated apply
 "target/globe120.ppm" -2.0 -1.5 8.0 120.0 drawRotated apply
+"target/globe130.ppm" -2.0 -1.5 8.0 130.0 drawRotated apply
+"target/globe140.ppm" -2.0 -1.5 8.0 140.0 drawRotated apply
 "target/globe150.ppm" -2.0 -1.5 8.0 150.0 drawRotated apply
+"target/globe160.ppm" -2.0 -1.5 8.0 160.0 drawRotated apply
+"target/globe170.ppm" -2.0 -1.5 8.0 170.0 drawRotated apply
 "target/globe180.ppm" -2.0 -1.5 8.0 180.0 drawRotated apply
+"target/globe190.ppm" -2.0 -1.5 8.0 190.0 drawRotated apply
+"target/globe200.ppm" -2.0 -1.5 8.0 200.0 drawRotated apply
 "target/globe210.ppm" -2.0 -1.5 8.0 210.0 drawRotated apply
+"target/globe220.ppm" -2.0 -1.5 8.0 220.0 drawRotated apply
+"target/globe230.ppm" -2.0 -1.5 8.0 230.0 drawRotated apply
 "target/globe240.ppm" -2.0 -1.5 8.0 240.0 drawRotated apply
+"target/globe250.ppm" -2.0 -1.5 8.0 250.0 drawRotated apply
+"target/globe260.ppm" -2.0 -1.5 8.0 260.0 drawRotated apply
 "target/globe270.ppm" -2.0 -1.5 8.0 270.0 drawRotated apply
+"target/globe280.ppm" -2.0 -1.5 8.0 280.0 drawRotated apply
+"target/globe290.ppm" -2.0 -1.5 8.0 290.0 drawRotated apply
 "target/globe300.ppm" -2.0 -1.5 8.0 300.0 drawRotated apply
+"target/globe310.ppm" -2.0 -1.5 8.0 310.0 drawRotated apply
+"target/globe320.ppm" -2.0 -1.5 8.0 320.0 drawRotated apply
 "target/globe330.ppm" -2.0 -1.5 8.0 330.0 drawRotated apply
-
+"target/globe340.ppm" -2.0 -1.5 8.0 340.0 drawRotated apply
+"target/globe350.ppm" -2.0 -1.5 8.0 350.0 drawRotated apply
