@@ -14,7 +14,6 @@ import qualified GML.AST        as GML
 import qualified GML.Evaluate   as Evil
 import qualified Renderer.Scene as Renderer
 
-
 toRenderObject :: Textures -> GML.Object -> Renderer.Object
 toRenderObject txs obj = GML.foldObject algebra obj $ identityTransformation
     where algebra = ( GML.SimpleTransformer $
