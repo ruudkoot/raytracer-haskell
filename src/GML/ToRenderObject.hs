@@ -14,7 +14,6 @@ import qualified Renderer.Scene as Renderer
 toRenderObject :: Textures -> GML.Object -> Renderer.Object
 toRenderObject txs obj = GML.foldObject algebra obj $ identityTransformation
     where algebra = ( GML.SimpleTransformer $
-<<<<<<< HEAD:src/GML/ToRenderObject.hs
               \shape closure trans   -> Renderer.Simple shape trans (Evil.shader txs closure) (boundingSphere shape)
             , \o d1 d2 d3 trans      -> updateBSphere (translateSphere d1 d2 d3)         $ o (trans !*! translate d1 d2 d3) 
             , \o d1 d2 d3 trans      -> updateBSphere (scaleSphere (max d1 (max d2 d3))) $ o (trans !*! scale d1 d2 d3)
@@ -59,20 +58,6 @@ transformBbox (Bbox p1 p2) trans = Bbox (toVec3D (min x1 x2) (min y1 y2) (min z1
   where (Vec x1 y1 z1) = invxfm_vec trans p1 
         (Vec x2 y2 z2) = invxfm_vec trans p2
 
-=======
-                      \shape closure transformation -> Renderer.Simple shape transformation (Evil.shader txs closure)
-                    , \o d1 d2 d3    transformation -> o (transformation !*! translate d1 d2 d3)
-                    , \o d1 d2 d3    transformation -> o (transformation !*! scale d1 d2 d3)
-                    , \o d           transformation -> o (transformation !*! scale d d d)
-                    , \o d           transformation -> o (transformation !*! rotateX (toRadians d))
-                    , \o d           transformation -> o (transformation !*! rotateY (toRadians d))
-                    , \o d           transformation -> o (transformation !*! rotateZ (toRadians d))
-                    , \o1 o2         transformation -> Renderer.Union      (o1 transformation) (o2 transformation)
-                    , \o1 o2         transformation -> Renderer.Intersect  (o1 transformation) (o2 transformation)
-                    , \o1 o2         transformation -> Renderer.Difference (o1 transformation) (o2 transformation)
-                    )
-                    
->>>>>>> 5aa912faa5275ff96ce3ec6f460a39cc1a398c17:src/GML/ToRenderObject.hs
 toWorld :: Textures -> GML.Scene -> Renderer.Scene
 toWorld txs (GML.Scene amb l obj dp fov w h fil) = 
        Renderer.Scene (Renderer.Options (toColour amb) dp (toRadians fov) w h fil) (toRenderObject txs obj) l

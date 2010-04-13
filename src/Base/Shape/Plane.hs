@@ -25,9 +25,6 @@ instance Shape Plane () where
                                       then [t, positiveInfinity]
                                       else [negativeInfinity ,t]
     uv'        _ v = ((), getX3D v, getZ3D v)
-<<<<<<< HEAD:src/Base/Shape/Plane.hs
     boundingBox _ = Bbox (toVec3D negativeInfinity 0 negativeInfinity) (toVec3D positiveInfinity 0 positiveInfinity)
     boundingSphere _ = BSphere (toVec3D 0.0 0.0 0.0) positiveInfinity
-=======
 
->>>>>>> 5aa912faa5275ff96ce3ec6f460a39cc1a398c17:src/Base/Shape/Plane.hs
