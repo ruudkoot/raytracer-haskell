@@ -41,6 +41,8 @@ Executable raytrace
                     Renderer.ConstructiveSolidGeometry
                     Renderer.IlluminationModel Renderer.IntersectionInfo
                     Renderer.Intersections Renderer.Renderer 
-                    Renderer.Scene
-
+                    Renderer.Scene Postlude
+                    Tests.Data.Range Tests.Data.Matrix Tests.Data.Vector
+                    Tests.Input.GML.AST Tests.Input.GML.Parser
+                    Tests.Renderer.Datatypes Tests.Renderer.Intersections
   Hs-Source-Dirs:   src/
