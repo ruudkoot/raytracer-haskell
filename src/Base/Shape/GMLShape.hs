@@ -13,10 +13,10 @@ data GMLShape = GMLShape
     , closureIntervals' :: Closure
     , closureUV         :: Closure }
 
-instance Shape GMLShape () where
+instance Shape GMLShape Int where
     getNormal' = getNormalClosure'.closureGetNormal'
     intervals' = intervalsClosure'.closureIntervals'
-    uv         = uvClosure.closureUV
+    uv'        = uvClosure.closureUV
     
 getNormalClosure' :: Closure -> Pt3D -> Vec3D
 getNormalClosure' (e, c) p = let s = [Point p]
@@ -39,7 +39,7 @@ intervalsClosure' (e, c) r = let s = [Point o,Point d]
                                   _ -> error ("error in intervals closure: expected array of reals on stack, found " ++ show s')
                              
                              
-uvClosure :: Closure -> Pt3D -> SurfaceCoord
+uvClosure :: Closure -> Pt3D -> (Int, Double, Double)
 uvClosure (e, c) p = let s = [Point p]
                          (_, s', _) = evaluate (e, s, c)
                      in case s' of

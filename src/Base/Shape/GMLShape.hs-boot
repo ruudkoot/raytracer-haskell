@@ -9,4 +9,4 @@ data GMLShape = GMLShape
     , closureIntervals' :: Closure
     , closureUV         :: Closure }
 
-instance Shape GMLShape ()
+instance Shape GMLShape Int
