@@ -68,15 +68,3 @@ nearest ((i1,i2):_) = if distance i1 > 0.0
                            then Nothing
                            else Just i2
 
-{-
-nearesttwo :: Intersections -> (Double, Double)
-nearesttwo = minimumtwo . filter (>0.0)
-    
-minimumtwo :: Ord a => [a] -> (a,a)
-minimumtwo [a] = (a,a)
-minimumtwo (x:y:ys) = f ys (min x y, max x y)
-  where f    []  res                     = res
-        f (x:xs) (min, mmin) | x < min   = f xs (x, min)
-                             | x < mmin  = f xs (min, x)
-                             | otherwise = f xs (min, mmin)
--}
