@@ -41,7 +41,8 @@ intersectObject ray obj@(Simple shape tr1 _) =
     in case intervals rayt shape of
                Just (t1,t2) -> [(buildIntersection rayt obj t1, buildIntersection rayt obj t2)]
                Nothing      -> []
-intersectObject _ _ = error "Impossible!"
+intersectObject _ _ = error "the impossible happened"
+
 
 -- | Helper function used by @intersectObject@ to 
 -- build the resulting IntersectionInfo. Ray shoudl be a ray
@@ -56,15 +57,14 @@ buildIntersection rayt (Simple shape tr1 sh) t =
        , shader       = sh
        } 
   where loc = getPosition rayt t --local intersection point
-buildIntersection  _   _                    _  = error "Impossible!"
+buildIntersection  _   _                    _  = error "the impossible happened"
 
 -- | Returns the nearest @t@.
 --
 nearest :: Intersections -> Maybe IntersectionInfo
-nearest []          = Nothing
-nearest ((i1,i2):_) = if distance i1 > 0.0 
-                      then Just i1
-                      else if distance i2 == positiveInfinity 
-                           then Nothing
-                           else Just i2
+nearest []             = Nothing
+nearest ((i1, i2) : _) | distance i1 > 0.0               = Just i1
+                       | distance i2 == positiveInfinity = Nothing
+                       | otherwise                       = Just i2
+
 

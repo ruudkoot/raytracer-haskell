@@ -13,12 +13,10 @@ import Base.Shader
 -- * Types
 
 -- ** World
-data World = World 
-  {
-    wOptions :: RenderOptions
-  , wObject  :: Object
-  , wLights  :: [RenderLight]
-  }
+data Scene = Scene
+  { options :: Options
+  , object  :: Object
+  , lights  :: [Light] }
   
 
 -- | The global datatype, also referenced to as `scene'. We pushed down some
@@ -26,27 +24,24 @@ data World = World
 -- not entirely sure whether the `union' representation of the objects is 
 -- workable for us.
 
-data RenderOptions = RenderOptions
-  {
-    roAmbience :: ColourD -- amb
-  , roDepth    :: Int
-  , roFov      :: Radians -- fov
-  , roWidth    :: Int -- wid
-  , roHeight   :: Int -- ht
-  , roFile     :: FilePath
-  }
+data Options = Options
+  { ambience :: ColourD
+  , depth    :: Int
+  , fov      :: Radians
+  , width    :: Int
+  , height   :: Int
+  , file     :: FilePath }
   
-data Object   = forall s f. Shape s f => Simple s Transformation Shader
-              | Union      Object Object
-              | Intersect  Object Object
-              | Difference Object Object
-              --deriving Show
+data Object = forall s f. Shape s f => Simple     s Transformation Shader
+            |                          Union      Object Object
+            |                          Intersect  Object Object
+            |                          Difference Object Object
 
 
 -- | Returns the width and height of 
 -- the World as defined in its RenderOptions.
 --
-getDimensions :: World -> (Int, Int)
-getDimensions w = (roWidth opts, roHeight opts)
-  where opts = wOptions w
+getDimensions :: Scene -> (Int, Int)
+getDimensions w = (width opts, height opts)
+  where opts = options w
 

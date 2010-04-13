@@ -24,7 +24,7 @@ toRenderObject txs = flip (GML.foldObject algebra) identityTransformation
                     , \o1 o2         transformation -> Renderer.Difference (o1 transformation) (o2 transformation)
                     )
                     
-toWorld :: Textures -> GML.Scene -> Renderer.World
+toWorld :: Textures -> GML.Scene -> Renderer.Scene
 toWorld txs (GML.Scene amb l obj dp fov w h fil) = 
-       Renderer.World (Renderer.RenderOptions (toColour amb) dp (toRadians fov) w h fil) (toRenderObject txs obj) l
+       Renderer.Scene (Renderer.Options (toColour amb) dp (toRadians fov) w h fil) (toRenderObject txs obj) l
 
