@@ -1,6 +1,6 @@
-module Tests.Input.GML.Parser where
-import Input.GML.AST
-import Input.GML.Parser
+module Tests.GML.Parser where
+import GML.AST
+import GML.Parser
 import Test.QuickCheck
 import Text.ParserCombinators.Parsec
 
