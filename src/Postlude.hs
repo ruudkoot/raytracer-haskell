@@ -24,9 +24,11 @@ clampf r1 | r1 < 0.0  = 0.0
 --
 
 
+{-# INLINE solveQuadratic #-}
 solveQuadratic :: Double -> Double -> Double -> [Double]
-solveQuadratic a b c = let discr  = b ^ 2 - 4 * a * c
-                           abc op = (-b `op` sqrt discr) / (2 * a)
+solveQuadratic a b c = let discr  = b * b - 4 * a * c
+                           sd = sqrt discr
+                           abc op = (-b `op` sd) / (2 * a)
                         in case compare discr 0.0 of 
                              LT -> [] 
                              EQ -> [-b / (2 * a)]
